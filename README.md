@@ -162,53 +162,6 @@ To view encrypted files `ansible-vault view <file_path>`, it will ask for passwo
 
 To edit encrypted files `ansible-vault edit <file_path>`, it will ask for password
 
-### Git diff ansible vault
-
-Setup your `textconv` for vault files in either `~/.gitconfig` (globally) or `./.git/config` (per-project).
-
-```git
-[diff "ansible-vault"]
-    textconv = ansible-vault view
-    cachetextconv = true
-```
-
-Then, either in `~/.config/git/attributes` (globally) or in `./.gitattributes` (per-project), configure your vault files to use the `ansible-vault` type.
-
-```bash
-# input vault files need to diff
-viettelpay/inventory/multinode diff=ansible-vault
-viettelpay/config.yml diff=ansible-vault
-```
-
-Now, `git diff` has a lot less gibberish.
-
-```bash
-$ git diff HEAD~1 viettelpay/inventory/multinode_train
-diff --git a/viettelpay/inventory/multinode_train b/viettelpay/inventory/multinode_train
-index e86d0f2..c6df441 100644
---- a/viettelpay/inventory/multinode_train
-+++ b/viettelpay/inventory/multinode_train
-@@ -101,7 +101,7 @@ control
- monitoring
-
- [prometheus:children]
--#monitoring
-+monitoring
-
- [kafka:children]
- control
-@@ -787,6 +787,9 @@ blazar
- blazar
-
- # Prometheus
-+[prometheus_server:children]
-+prometheus
-+
- [prometheus-node-exporter:children]
- monitoring
- control
-```
-
 ### **Last but not least**
 
 To run [tools/ansitheus](./tools/ansitheus) with encrypted files, please add `--ask-vault-pass` to command.
