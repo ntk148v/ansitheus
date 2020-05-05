@@ -8,12 +8,13 @@
 ## Description
 
 - Highly inspired by [kolla-ansible](https://docs.openstack.org/kolla-ansible).
-- Components are deployed as Docker container.
+- Components are deployed as [Docker](https://docker.com) container.
 
 ## Features
 
 - Allow to configure & setup the system from scratch (prepare local repostiory, install necessary packages, configure Docker daemon...).
-- Deploy & configure full [Prometheus](https://github.com/prometheus/prometheus) monitoring system using [Ansible](https://www.ansible.com/) & [Docker](https://www.docker.com/).
+- Deploy & configure full [Prometheus](https://github.com/prometheus/prometheus) monitoring system using [Ansible](https://www.ansible.com/).
+- Containerize Prometheus components.
 - Support High Availability.
 - Support centralized Docker logging with Fluentd.
 - Highly flexible & configurable components.
