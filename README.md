@@ -12,6 +12,7 @@
 
 ## Features
 
+- Allow to configure & setup the system from scratch (prepare local repostiory, install necessary packages, configure Docker daemon...).
 - Deploy & configure full [Prometheus](https://github.com/prometheus/prometheus) monitoring system using [Ansible](https://www.ansible.com/) & [Docker](https://www.docker.com/).
 - Support High Availability.
 - Support centralized Docker logging with Fluentd.
