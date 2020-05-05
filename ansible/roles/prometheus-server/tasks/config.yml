@@ -1,0 +1,76 @@
+---
+- name: Ensuring config directory exist
+  file:
+    path: "{{ prometheus_server_conf }}"
+    state: "directory"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+    mode: "0755"
+  become: true
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ prometheus_server_services }}"
+
+- name: Find custom prometheus alert rule files
+  local_action:
+    module: find
+    path: "{{ ansitheus_custom_conf }}/prometheus_server/"
+    pattern: "*.rules"
+  run_once: true
+  become: true
+  register: prometheus_alert_rules
+
+- name: Copying over custom prometheus alert rules files
+  vars:
+    service: "{{ prometheus_server_services['prometheus_server']}}"
+  copy:
+    src: "{{ item.path }}"
+    dest: "{{ ansitheus_conf }}/prometheus_server/{{ item.path | basename }}"
+    mode: "0755"
+  register: prometheus_alert_confs
+  become: true
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+    - prometheus_alert_rules is defined and prometheus_alert_rules.files | length > 0
+  with_items: "{{ prometheus_alert_rules.files }}"
+  notify:
+    - Reload prometheus_server config
+
+- name: Copying over prometheus config file
+  vars:
+    service: "{{ prometheus_server_services['prometheus_server']}}"
+  template:
+    src: "{{ item }}"
+    dest: "{{ ansitheus_conf }}/prometheus_server/prometheus.yml"
+    mode: "0755"
+  register: prometheus_confs
+  become: true
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+  with_first_found:
+    - "{{ ansitheus_custom_conf }}/prometheus_server/{{ inventory_hostname }}/prometheus.yml"
+    - "{{ ansitheus_custom_conf }}/prometheus_server/prometheus.yml"
+    - "{{ role_path }}/templates/prometheus.yml.j2"
+  notify:
+    - Reload prometheus_server config
+
+- name: Check prometheus_server containers
+  become: true
+  docker_container:
+    name: "{{ item.value.container_name }}"
+    image: "{{ item.value.image }}"
+    volumes: "{{ item.value.volumes }}"
+    command: "{{ item.value.command }}"
+    state: "{{ item.value.state }}"
+    restart_policy: "{{ item.value.restart_policy }}"
+    privileged: "{{ item.value.privileged }}"
+    network_mode: "{{ item.value.network_mode }}"
+    log_driver: "{{ item.value.log_driver }}"
+    log_options: "{{ item.value.log_options }}"
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ prometheus_server_services }}"

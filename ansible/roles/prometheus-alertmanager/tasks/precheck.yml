@@ -1,0 +1,22 @@
+---
+- name: Check free port for Prometheus alertmanager
+  wait_for:
+    host: "{{ hostvars[inventory_hostname]['ansible_' + api_interface]['ipv4']['address'] }}"
+    port: "{{ prometheus_alertmanager_port }}"
+    connect_timeout: 1
+    timeout: 1
+    state: stopped
+  when:
+    - inventory_hostname in groups[item.value.group]
+  with_dict: "{{ prometheus_alertmanager_services }}"
+
+- name: Check free port for Prometheus alertmanager cluster
+  wait_for:
+    host: "{{ hostvars[inventory_hostname]['ansible_' + api_interface]['ipv4']['address'] }}"
+    port: "{{ prometheus_alertmanager_cluster_port }}"
+    connect_timeout: 1
+    timeout: 1
+    state: stopped
+  when:
+    - inventory_hostname in groups[item.value.group]
+  with_dict: "{{ prometheus_alertmanager_services }}"

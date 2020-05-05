@@ -1,0 +1,21 @@
+<match *.**>
+    @type copy
+    <store>
+       @type elasticsearch
+       host {{ es_address }}
+       port {{ es_port }}
+{% if es_username is defined and es_password is defined and es_username != "" and es_password != "" %}
+       user {{ es_username }}
+       password {{ es_password }}
+       reload_connections false
+       reload_on_failure false
+{% endif %}
+       logstash_format true
+       logstash_prefix {{ fluentd_log_prefix }}
+       include_tag_key true
+       tag_key tag
+       <buffer>
+              flush_interval {{ fluentd_flush_interval }}
+       </buffer>
+    </store>
+</match>

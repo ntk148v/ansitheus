@@ -1,0 +1,61 @@
+---
+- import_playbook: gather-facts.yml
+
+- name: Apply role fluentd
+  gather_facts: false
+  hosts:
+    - fluentd
+  roles:
+    - { role: fluentd, tags: fluentd, when: enable_fluentd | bool }
+
+- name: Apply role haproxy-keepalived
+  gather_facts: false
+  hosts:
+    - haproxy
+    - keepalived
+  roles:
+    - {
+        role: haproxy-keepalived,
+        tags: haproxy,
+        when: enable_haproxy | bool and enable_keepalived | bool,
+      }
+
+- name: Apply role prometheus-server
+  gather_facts: false
+  hosts:
+    - prometheus_server
+  roles:
+    - {
+        role: prometheus-server,
+        tags: prometheus-server,
+        when: enable_prometheus_server | bool,
+      }
+
+- name: Apply role prometheus-alertmanager
+  gather_facts: false
+  hosts:
+    - prometheus_alertmanager
+  roles:
+    - {
+        role: prometheus-alertmanager,
+        tags: prometheus-alertmanager,
+        when: enable_prometheus_alertmanager | bool,
+      }
+
+- name: Apply role prometheus-exporter
+  gather_facts: false
+  hosts:
+    - all
+  roles:
+    - {
+        role: prometheus-exporter,
+        tags: prometheus-exporter,
+        when: enable_prometheus_node_exporter | bool or
+          enable_prometheus_cadvisor | bool or
+          enable_prometheus_snmp_exporter_dell_server | bool or
+          enable_prometheus_snmp_exporter_hpe_device | bool or
+          enable_prometheus_snmp_exporter_fujitsu_server | bool or
+          enable_prometheus_snmp_exporter_switch | bool or
+          enable_prometheus_snmp_exporter_huawei_device | bool or
+          enable_prometheus_container_status_exporter| bool,
+      }

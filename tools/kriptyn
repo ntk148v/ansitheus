@@ -1,0 +1,86 @@
+#!/bin/bash
+
+function usage() {
+  cat <<EOF
+Usage: $0 COMMAND [filename1] [filename2] ...
+
+Commands:
+    encrypt         Encrypt files
+    decrypt         Decrypt files
+    rekey           Encrypt files with new password
+    help            Show this
+EOF
+}
+
+files=()
+
+function find_file() {
+  while IFS=  read -r -d $'\0'; do
+    files+=("$REPLY")
+  done < <(find /etc /root /home -type f -iname "${1}" -print0)
+}
+
+function process_cmd() {
+    echo "$ACTION : $CMD"
+    $CMD
+    if [[ $? -ne 0 ]]; then
+        echo "Command failed $CMD"
+        exit 1
+    fi
+}
+
+if [[ $# -lt 2 ]]; then
+  usage
+  exit 1
+fi
+
+case "$1" in
+
+encrypt)
+    ACTION="Encrypting files"
+    COMMAND="encrypt"
+    shift 1
+    ;;
+
+decrypt)
+    ACTION="Decrypting files"
+    COMMAND="decrypt"
+    shift 1
+    ;;
+
+rekey)
+    ACTION="Changing files passwords"
+    COMMAND="rekey"
+    shift 1
+    ;;
+
+*)
+    usage
+    exit 0
+    ;;
+esac
+
+while [ "$#" -gt 0 ]; do
+  find_file "$1"
+  shift 1
+done
+
+arr_length=${#files[@]}
+
+clear
+for (( i=1; i<${arr_length}+1; i++ ));
+    do
+        echo $i : ${files[$i-1]}
+    done
+
+read -p 'Index of files to include (separated by '\,'): ' include_files
+
+include_files="$(echo $include_files | sed -e 's/ //g')"
+
+IFS=', ' read -r -a array <<< "$include_files"
+for i in "${array[@]}"; do
+  nfiles+=(${files[$(($i-1))]})
+done
+
+CMD="ansible-vault $COMMAND ${nfiles[@]}"
+process_cmd

@@ -1,0 +1,79 @@
+---
+- block: 
+    - include_tasks: setup-redhat.yml
+  become: true
+  when: ansible_os_family == 'RedHat'
+
+- block: 
+    - include_tasks: setup-debian.yml
+  become: true
+  when: ansible_os_family == 'Debian'
+
+- name: Install python2-pip
+  package:
+    name: python2-pip
+    state: present
+  become: true
+
+- name: Ensures /root/.pip dir exists
+  file:
+    path: /root/.pip
+    state: directory
+  become: true
+
+- name: Configure Pypi local repo
+  template:
+    src: pip.conf.j2
+    dest: /root/.pip/pip.conf
+  when: pip_repository is defined and pip_repository is not none
+  become: true
+
+- name: Install pip packages
+  pip:
+    name: "docker=={{ pip_docker_ver }}"
+    state: present
+  become: true
+
+- name: Install Docker
+  package:
+    name: "{{ docker_pkg }}-{{ docker_pkg_version }}"
+    state: present
+  become: true
+
+- name: Enable and start Docker service
+  service:
+    name: docker
+    state: started
+    enabled: yes
+  become: true
+
+- name: Configure Docker daemon
+  template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+  become: true
+  register: docker_register_daemon
+
+- name: Reload systemd daemon and reload docker
+  systemd:
+    name: docker
+    daemon_reload: yes
+    state: reloaded
+  when: (docker_register_daemon and docker_register_daemon is changed)
+  become: true
+
+- name: Login private registry
+  docker_login:
+    registry: "{{ docker_registry }}"
+    username: "{{ docker_registry_username }}"
+    password: "{{ docker_registry_password }}"
+  when: docker_registry is defined and docker_registry is not none
+  become: true
+
+- name: Add users to docker group
+  user:
+    name: "{{ item }}"
+    groups: "docker"
+    append: yes
+  with_items: "{{ docker_users }}"
+  become: true

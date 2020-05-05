@@ -1,0 +1,39 @@
+vrrp_script check_haproxy_alive {
+    script "/usr/local/etc/keepalived/check_haproxy_alive.sh"
+    interval 2
+    fall 2
+    rise 10
+}
+
+vrrp_instance ansible_vip_{{ keepalived_virtual_router_id }} {
+  state BACKUP
+  nopreempt
+  interface {{ ansitheus_network_interface }}
+  virtual_router_id {{ keepalived_virtual_router_id }}
+  priority {{ groups['haproxy'].index(inventory_hostname) + 1 }}
+  advert_int 1
+{% if keepalived_traffic_mode == 'unicast' %}
+  unicast_src_ip {{ hostvars[inventory_hostname]['ansible_' + ansitheus_network_interface]['ipv4']['address'] }}
+{% if groups['haproxy'] | length > 1 %}
+  unicast_peer {
+{% for host in groups['haproxy'] %}
+{% set ip_addr = hostvars[host]['ansible_' + hostvars[host]['ansitheus_network_interface']]['ipv4']['address'] %}
+{% if ip_addr != hostvars[inventory_hostname]['ansible_' + ansitheus_network_interface]['ipv4']['address'] %}
+    {{ ip_addr }}
+{% endif %}
+{% endfor %}
+  }
+{% endif %}
+{% endif %}
+  virtual_ipaddress {
+    {{ ansitheus_vip_address }} dev {{ ansitheus_network_interface }}
+  }
+  authentication {
+    auth_type PASS
+    auth_pass {{ keepalived_password }}
+  }
+
+  track_script {
+    check_haproxy_alive
+  }
+}

@@ -1,0 +1,42 @@
+[base]
+name=VTnetCentralRepo-CentOS-$releasever - Base
+baseurl=http://private-repository-host/repository/Centos_Mirror/centos/$releasever/os/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-$releasever
+enabled=1
+
+[updates]
+name=VTnetCentralRepo-CentOS-$releasever - Updates
+baseurl=http://private-repository-host/repository/Centos_Mirror/centos/$releasever/updates/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-$releasever
+enabled=1
+
+#additional packages that may be useful
+[extras]
+name=VTnetCentralRepo-CentOS-$releasever - Extras
+baseurl=http://private-repository-host/repository/Centos_Mirror/centos/$releasever/extras/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-$releasever
+enabled=1
+
+#additional packages that extend functionality of existing packages
+[centosplus]
+name=VTnetCentralRepo-CentOS-$releasever - Plus
+baseurl=http://private-repository-host/repository/Centos_Mirror/centos/$releasever/centosplus/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-$releasever
+enabled=0
+
+[epel]
+name=EPEL mirror at ehost.vn
+baseurl=http://private-repository-host/repository/EPEL/$releasever/$basearch/
+gpgcheck=0
+#gpgkey=http://private-repository-host/repository/EPEL/RPM-GPG-KEY-EPEL-$releasever
+enabled=1
+
+[docker]
+name=Docker
+baseurl=http://private-repository-host/repository/docker_yum/7/x86_64/stable
+enabled=1
+gpgcheck=0

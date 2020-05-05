@@ -1,0 +1,11 @@
+{
+
+{% if docker_registry is defined and docker_registry is not none %}
+    "insecure-registries" : ["{{ docker_registry }}"],
+{% endif %}
+    "live-restore": true,
+    "log-opts": {
+	    "max-size": "10m",
+	    "max-file": "3"
+    }
+}

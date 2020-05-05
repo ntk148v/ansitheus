@@ -1,0 +1,66 @@
+---
+- name: Ensuring config directory exist
+  file:
+    path: "{{ prometheus_alertmanager_conf }}"
+    state: "directory"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+    mode: "0755"
+  become: true
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ prometheus_alertmanager_services }}"
+
+- name: Check if custom alertmanager config exists
+  local_action: "stat path={{ ansitheus_custom_conf }}/prometheus_alertmanager/config.yml"
+  register: prometheus_alertmanager_config_file
+  run_once: True
+
+- name: Copying over custom prometheus alertmanager config file if exists
+  vars:
+    service: "{{ prometheus_alertmanager_services['prometheus_alertmanager']}}"
+  copy:
+    src: "{{ ansitheus_custom_conf }}/prometheus_alertmanager/config.yml"
+    dest: "{{ ansitheus_conf }}/prometheus_alertmanager/config.yml"
+  register: prometheus_alertmanager_custom_confs
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+    - prometheus_alertmanager_config_file.stat.exists
+  notify:
+    - Reload prometheus_alertmanager config
+
+- name: Copying over prometheus alertmanager config file
+  vars:
+    service: "{{ prometheus_alertmanager_services['prometheus_alertmanager']}}"
+  template:
+    src: "prometheus_alertmanager.yml.j2"
+    dest: "{{ ansitheus_conf }}/prometheus_alertmanager/config.yml"
+    mode: "0755"
+  register: prometheus_alertmanager_confs
+  become: true
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+    - not prometheus_alertmanager_config_file.stat.exists
+  notify:
+    - Reload prometheus_alertmanager config
+
+- name: Check prometheus_alertmanager containers
+  become: true
+  docker_container:
+    name: "{{ item.value.container_name }}"
+    image: "{{ item.value.image }}"
+    volumes: "{{ item.value.volumes }}"
+    command: "{{ item.value.command }}"
+    state: "{{ item.value.state }}"
+    restart_policy: "{{ item.value.restart_policy }}"
+    privileged: "{{ item.value.privileged }}"
+    network_mode: "{{ item.value.network_mode }}"
+    log_driver: "{{ item.value.log_driver }}"
+    log_options: "{{ item.value.log_options }}"
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ prometheus_alertmanager_services }}"

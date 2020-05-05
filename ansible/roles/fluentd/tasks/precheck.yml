@@ -1,0 +1,16 @@
+---
+- name: Check free port for Fluentd (syslog)
+  wait_for:
+    host: "{{ hostvars[inventory_hostname]['ansible_' + api_interface]['ipv4']['address'] }}"
+    port: "{{ fluentd_syslog_port }}"
+    connect_timeout: 1
+    timeout: 1
+    state: stopped
+
+- name: Check free port for Fluentd (listening)
+  wait_for:
+    host: "{{ hostvars[inventory_hostname]['ansible_' + api_interface]['ipv4']['address'] }}"
+    port: "{{ fluentd_listen_port }}"
+    connect_timeout: 1
+    timeout: 1
+    state: stopped

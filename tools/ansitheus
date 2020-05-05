@@ -1,0 +1,159 @@
+#!/bin/bash
+
+# This script can be used to interact with ansitheus
+function find_base_dir() {
+    local real_path=$(python -c "import os;print(os.path.realpath('$0'))")
+    local dir_name="$(dirname "$real_path")"
+    # TODO: Check in /usr/lib etc...
+    BASEDIR="$(dirname ${dir_name})"
+}
+
+function usage() {
+    cat <<EOF
+Usage: $0 COMMAND [option]
+
+Options:
+    --inventory, -i <inventory_path> Specify path to ansible inventory file
+    --configdir, -c <config_path>    Specify path to directory with config.yml
+    --verbose, -v                    Increase verbosity of ansible-playbook
+    --tags, -t <tags>                Only run plays and tasks tagged with these values
+    --help, -h                       Show this usage information
+    --skip-common                    Skip common role
+    --ask-vault-pass                 Ask for vault password
+
+Commands:
+    precheck                         Do pre-deployment checks for hosts
+    deploy                           Deploy and start all ansitheus containers
+    pull                             Pull all images for containers (only pull, no running containers)
+    destroy                          Destroy Prometheus containers and service configuration
+                                        --include-images to also destroy Prometheus images
+                                        --include-volumes to also destroy Prometheus volumes
+EOF
+}
+
+function process_cmd() {
+    echo "$ACTION : $CMD"
+    $CMD
+    if [[ $? -ne 0 ]]; then
+        echo "Command failed $CMD"
+        exit 1
+    fi
+}
+
+SHORT_OPTS="hi:c:t:v"
+LONG_OPTS="help,invetory:,configdir:,tags:,verbose,include-images,include-volumes,skip-common,ask-vault-pass"
+ARGS=$(getopt -o "${SHORT_OPTS}" -l "${LONG_OPTS}" --name "$0" -- "$@") || {
+    usage >&2
+    exit 2
+}
+
+eval set -- "$ARGS"
+
+find_base_dir
+
+INVENTORY="${BASEDIR}/ansible/inventory/all-in-one"
+PLAYBOOK="${BASEDIR}/ansible/site.yml"
+VERBOSITY=
+EXTRA_OPTS=${EXTRA_OPTS}
+CONFIG_DIR="/etc/ansitheus"
+REMOVE_INCLUDE_IMAGES="no"
+REMOVE_INCLUDE_VOLUMES="no"
+SKIP_COMMON="no"
+ASK_VAULT_PASS="no"
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+
+    --inventory | -i)
+        INVENTORY="$2"
+        shift 2
+        ;;
+
+    --configdir | -c)
+        CONFIG_DIR="$2"
+        shift 2
+        ;;
+
+    --verbose | -v)
+        VERBOSITY="$VERBOSITY --verbose"
+        shift
+        ;;
+
+    --tags | -t)
+        EXTRA_OPTS="$EXTRA_OPTS --tags $2"
+        shift 2
+        ;;
+
+    --include-images)
+        REMOVE_INCLUDE_IMAGES="yes"
+        shift 1
+        ;;
+
+    --include-volumes)
+        REMOVE_INCLUDE_VOLUMES="yes"
+        shift 1
+        ;;
+
+    --skip-common)
+        SKIP_COMMON="yes"
+        shift 1
+        ;;
+
+    --ask-vault-pass)
+        EXTRA_OPTS="$EXTRA_OPTS --ask-vault-pass"
+        shift 1
+        ;;
+
+    --help | -h)
+        usage
+        shift
+        exit 0
+        ;;
+    --)
+        shift
+        break
+        ;;
+    *)
+        echo 'error'
+        exit 3
+        ;;
+    esac
+done
+
+case "$1" in
+
+deploy)
+    ACTION="Deploying ansitheus containers with docker-compose"
+    EXTRA_OPTS="${EXTRA_OPTS} -e ansitheus_action=deploy"
+    EXTRA_OPTS="${EXTRA_OPTS} -e skip_common=${SKIP_COMMON}"
+    ;;
+
+pull)
+    ACTION="Pull all images without running containers"
+    EXTRA_OPTS="${EXTRA_OPTS} -e ansitheus_action=pull"
+    EXTRA_OPTS="${EXTRA_OPTS} -e skip_common=${SKIP_COMMON}"
+    ;;
+
+precheck)
+    ACTION="Precheck port and docker installation in target hosts"
+    EXTRA_OPTS="${EXTRA_OPTS} -e ansitheus_action=precheck"
+    EXTRA_OPTS="${EXTRA_OPTS} -e skip_common=yes" # Force skip common role
+    ;;
+
+destroy)
+    ACTION="Destroy Prometheus containers and service configuration"
+    EXTRA_OPTS="${EXTRA_OPTS} -e ansitheus_action=destroy"
+    EXTRA_OPTS="${EXTRA_OPTS} -e skip_common=yes" # Force skip common role
+    EXTRA_OPTS="${EXTRA_OPTS} -e destroy_include_images=${REMOVE_INCLUDE_IMAGES}"
+    EXTRA_OPTS="${EXTRA_OPTS} -e destroy_include_volumes=${REMOVE_INCLUDE_VOLUMES}"
+    ;;
+
+*)
+    usage
+    exit 0
+    ;;
+esac
+
+CONFIG_OPTS="-e @${CONFIG_DIR}/config.yml"
+CMD="ansible-playbook -i $INVENTORY $CONFIG_OPTS $EXTRA_OPTS $PLAYBOOK $VERBOSITY"
+process_cmd

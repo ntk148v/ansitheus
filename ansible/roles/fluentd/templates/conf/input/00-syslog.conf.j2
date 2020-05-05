@@ -1,0 +1,9 @@
+<source>
+  @type syslog
+  port {{ fluentd_syslog_port }}
+  bind 127.0.0.1
+  tag syslog
+  severity_key log_level
+  source_hostname_key Hostname
+  message_format auto
+</source>

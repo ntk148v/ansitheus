@@ -1,0 +1,26 @@
+route:
+  receiver: 'custom_alert'
+
+receivers:
+  - name: 'custom_alert'
+{% if alert_via_slack | bool %}
+    slack_configs:
+      - send_resolved: true
+        text: {% raw %}"{{ .CommonAnnotations.description }}"{% endraw %}
+
+        username: 'Prometheus'
+        channel: "{{ alert_slack_channel }}"
+        api_url: "https://hooks.slack.com/services/{{ alert_slack_webhook_id }}"
+{% endif %}
+
+{% if alert_via_email | bool %}
+    email_configs:
+      - to: "{{ alert_mail_account }}"
+        from: "{{ alert_mail_account }}"
+        smarthost: "{{ alert_mail_host }}:{{ alert_mail_port }}"
+        auth_username: "{{ alert_mail_account }}"
+        auth_identity: "{{ alert_mail_account }}"
+        auth_password: "{{ alert_mail_password }}"
+        require_tls: false
+        text: {% raw %}"{{ .CommonAnnotations.description }}"{% endraw %}
+{% endif %}
