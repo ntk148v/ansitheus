@@ -22,12 +22,18 @@ prometheus_server_services:
       - "--storage.tsdb.retention={{ prometheus_storage_retention }}"
       - "--web.enable-lifecycle"
       - "--web.external-url=http://{{ prometheus_server_vip_address }}:{{ prometheus_server_port }}"
+      - "--log.level={{ prometheus_server_log_level }}"
+      - "--log.format={{ prometheus_server_log_format }}"
     log_driver: "{{ prometheus_server_log_driver }}"
     log_options: "{{ prometheus_server_log_opts }}"
 
 prometheus_server_conf: "{{ ansitheus_conf }}/prometheus_server"
 prometheus_server_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ prometheus_docker_namespace }}/prometheus:{{ prometheus_server_ver }}"
 prometheus_server_volume: "prometheus_data"
+# Only log messages with the given severity or above. One of: [debug, info, warn, error]
+prometheus_server_log_level: "info"
+# Output format of log messages. One of: [logfmt, json]
+prometheus_server_log_format: "json"
 
 prometheus_server_log_driver: "{{ docker_log_driver }}"
 prometheus_server_log_opts: "{{ docker_log_opts }}"
