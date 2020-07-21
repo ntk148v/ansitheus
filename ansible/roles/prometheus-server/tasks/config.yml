@@ -15,8 +15,8 @@
 - name: Find custom prometheus alert rule files
   local_action:
     module: find
-    path: "{{ ansitheus_custom_conf }}/prometheus_server/"
-    pattern: "*.rules"
+    path: "{{ ansitheus_custom_conf }}/prometheus_server/rules/"
+    pattern: "*.yml,*.yaml"
   run_once: true
   become: true
   register: prometheus_alert_rules
@@ -26,7 +26,7 @@
     service: "{{ prometheus_server_services['prometheus_server']}}"
   copy:
     src: "{{ item.path }}"
-    dest: "{{ ansitheus_conf }}/prometheus_server/{{ item.path | basename }}"
+    dest: "{{ ansitheus_conf }}/prometheus_server/rules/{{ item.path | basename }}"
     mode: "0755"
   register: prometheus_alert_confs
   become: true
