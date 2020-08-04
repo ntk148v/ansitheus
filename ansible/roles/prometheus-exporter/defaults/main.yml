@@ -156,7 +156,7 @@ prometheus_exporter_services:
     log_options: "{{ prometheus_container_status_exporter_log_opts }}"
 
 prometheus_node_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ prometheus_docker_namespace }}/node-exporter:{{ prometheus_node_exporter_ver }}"
-prometheus_cadvisor_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ prometheus_cadvisor_docker_namespace }}/cadvisor:{{ prometheus_cadvisor_ver }}"
+prometheus_cadvisor_image: "{{ docker_registry ~ '/' if docker_registry else 'gcr.io/' }}{{ prometheus_cadvisor_docker_namespace }}/cadvisor:{{ prometheus_cadvisor_ver }}"
 prometheus_snmp_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ prometheus_docker_namespace }}/snmp-exporter:{{ prometheus_snmp_exporter_ver }}"
 prometheus_container_status_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ prometheus_docker_namespace }}/container-status-exporter:{{ prometheus_container_status_exporter_ver }}"
 snmp_container_config_directory: "/etc/snmp_exporter"
