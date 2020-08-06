@@ -1,5 +1,6 @@
 ---
 - import_playbook: gather-facts.yml
+  when: not skip_gather_fact | bool
 
 - name: Apply role fluentd
   gather_facts: false
