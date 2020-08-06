@@ -112,19 +112,20 @@ Options:
     --inventory, -i <inventory_path> Specify path to ansible inventory file
     --configdir, -c <config_path>    Specify path to directory with config.yml
     --verbose, -v                    Increase verbosity of ansible-playbook
-    --tags, -t <tags>                Only run plays & tasks tagged with these values
+    --tags, -t <tags>                Only run plays and tasks tagged with these values
+    --limit <host>                   Specify host to run plays
     --help, -h                       Show this usage information
     --skip-common                    Skip common role
+    --skip-gather-fact               Skip gather fact
     --ask-vault-pass                 Ask for vault password
 
 Commands:
     precheck                         Do pre-deployment checks for hosts
-    deploy                           Deploy & start all ansitheus containers
+    deploy                           Deploy and start all ansitheus containers
     pull                             Pull all images for containers (only pull, no running containers)
-    destroy                          Destroy Prometheus containers & service configuration
+    destroy                          Destroy Prometheus containers and service configuration
                                         --include-images to also destroy Prometheus images
                                         --include-volumes to also destroy Prometheus volumes
-
 ```
 
 ### Encrypting with `kriptyn`

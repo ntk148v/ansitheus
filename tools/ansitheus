@@ -17,6 +17,7 @@ Options:
     --configdir, -c <config_path>    Specify path to directory with config.yml
     --verbose, -v                    Increase verbosity of ansible-playbook
     --tags, -t <tags>                Only run plays and tasks tagged with these values
+    --limit <host>                   Specify host to run plays
     --help, -h                       Show this usage information
     --skip-common                    Skip common role
     --skip-gather-fact               Skip gather fact
@@ -42,7 +43,7 @@ function process_cmd() {
 }
 
 SHORT_OPTS="hi:c:t:v"
-LONG_OPTS="help,invetory:,configdir:,tags:,verbose,include-images,include-volumes,skip-common,skip-gather-fact,ask-vault-pass"
+LONG_OPTS="help,invetory:,configdir:,tags:,limits:,verbose,include-images,include-volumes,skip-common,skip-gather-fact,ask-vault-pass"
 ARGS=$(getopt -o "${SHORT_OPTS}" -l "${LONG_OPTS}" --name "$0" -- "$@") || {
     usage >&2
     exit 2
@@ -83,6 +84,11 @@ while [ "$#" -gt 0 ]; do
 
     --tags | -t)
         EXTRA_OPTS="$EXTRA_OPTS --tags $2"
+        shift 2
+        ;;
+
+    --limit)
+        EXTRA_OPTS="$EXTRA_OPTS --limit $2"
         shift 2
         ;;
 
