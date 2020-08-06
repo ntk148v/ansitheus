@@ -38,6 +38,32 @@
   notify:
     - Reload prometheus_server config
 
+- name: Check custom file_sd folder exists
+  local_action:
+    module: find
+    path: "{{ ansitheus_custom_conf }}/prometheus_server/file_sd"
+    pattern: "*.json"
+  run_once: true
+  become: true
+  register: prometheus_file_sd
+
+- name: Copying over custom file_sd
+  vars:
+    service: "{{ prometheus_server_services['prometheus_server']}}"
+  copy:
+    src: "{{ item.path }}"
+    dest: "{{ ansitheus_conf }}/prometheus_server/file_sd/{{ item.path | basename }}"
+    mode: "0755"
+  become: true
+  register: prometheus_file_sd_confs
+  with_items: "{{ prometheus_file_sd.files }}"
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+    - prometheus_file_sd is defined and prometheus_file_sd.files | length > 0
+  notify:
+    - Reload prometheus_server config
+
 - name: Copying over prometheus config file
   vars:
     service: "{{ prometheus_server_services['prometheus_server']}}"

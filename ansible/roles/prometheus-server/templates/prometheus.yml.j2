@@ -39,3 +39,14 @@ scrape_configs:
         - '{{ hostvars[host]['ansible_' + hostvars[host]['api_interface']]['ipv4']['address'] }}:{{ hostvars[host]['prometheus_cadvisor_port'] }}'
 {% endfor %}
 {% endif %}
+
+{% if prometheus_file_sd is defined and prometheus_file_sd.files | length > 0 %}
+{% for f in prometheus_file_sd.files %}
+  - job_name: {{ f.path | basename | regex_replace('.json', '') }}-file-sd
+    scrape_interval: 180s
+    scrape_timeout: 150s
+    file_sd_configs:
+      - files:
+        - "/etc/prometheus/file_sd/{{ f.path | basename }}"
+{% endfor %}
+{% endif %}
