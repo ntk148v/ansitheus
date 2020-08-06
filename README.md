@@ -38,7 +38,7 @@ Ansitheus allows users to configure & deploy the following components:
 
 ## Requirements
 
-Ansible >= 2.7.9 (It might work on previous versions, but we cannot guarantee it)
+Ansible >= 2.8.4 (It might work on previous versions, but we cannot guarantee it)
 
 ## Tested environment
 
