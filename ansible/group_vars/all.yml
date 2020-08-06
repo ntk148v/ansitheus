@@ -138,9 +138,9 @@ fluentd_listen_port: "24224"
 # Image version
 ###############
 
-prometheus_server_ver: "v2.15.1"
+prometheus_server_ver: "v2.19.1"
 prometheus_alertmanager_ver: "v0.19.0"
-prometheus_node_exporter_ver: "v0.18.0"
+prometheus_node_exporter_ver: "v1.0.1"
 prometheus_rabbit_exporter_ver: "v0.29.0"
 prometheus_cadvisor_ver: "v0.35.0"
 prometheus_snmp_exporter_ver: "v0.15.0"
