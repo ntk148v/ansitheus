@@ -17,6 +17,8 @@ prometheus_exporter_services:
       - "--path.rootfs=/rootfs"
       - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
       - "--web.listen-address {{ api_interface_address }}:{{ prometheus_node_exporter_port }}"
+      - "--log.level={{ prometheus_node_exporter_log_level }}"
+      - "--log.format={{ prometheus_node_exporter_log_format }}"
     restart_policy: "unless-stopped"
     network_mode: "host"
     port: "{{ prometheus_node_exporter_port }}"
@@ -169,3 +171,8 @@ prometheus_snmp_exporter_log_driver: "{{ docker_log_driver }}"
 prometheus_snmp_exporter_log_opts: "{{ docker_log_opts }}"
 prometheus_container_status_exporter_log_driver: "{{ docker_log_driver }}"
 prometheus_container_status_exporter_log_opts: "{{ docker_log_opts }}"
+
+# Only log messages with the given severity or above. One of: [debug, info, warn, error]
+prometheus_node_exporter_log_level: "info"
+# Output format of log messages. One of: [logfmt, json]
+prometheus_node_exporter_log_format: "json"
