@@ -1,9 +1,8 @@
 ---
 - name: Pull image without running Prometheus alertmanager container
-  docker_container:
-    name: "{{ item.value.container_name }}"
-    image: "{{ item.value.image }}"
-    pull: "yes"
+  docker_image:
+    name: "{{ item.value.image }}"
+    source: pull
   become: true
   when:
     - inventory_hostname in groups[item.value.group]
