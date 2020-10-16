@@ -17,6 +17,15 @@
   become: true
   register: prometheus_alert_rules
 
+- name: Ensuring rules directory exist
+  file:
+    path: "{{ ansitheus_custom_conf }}/prometheus_server/rules/"
+    state: "directory"
+    mode: "0755"
+  become: true
+  when:
+    - prometheus_alert_rules is defined and prometheus_alert_rules.files | length > 0
+
 - name: Copying over custom prometheus alert rules files
   copy:
     src: "{{ item.path }}"
@@ -38,6 +47,15 @@
   run_once: true
   become: true
   register: prometheus_file_sd
+
+- name: Ensuring file_sd directory exist
+  file:
+    path: "{{ ansitheus_custom_conf }}/prometheus_server/file_sd/"
+    state: "directory"
+    mode: "0755"
+  become: true
+  when:
+    - prometheus_file_sd is defined and prometheus_file_sd.files | length > 0
 
 - name: Copying over custom file_sd
   copy:
