@@ -1,5 +1,5 @@
 ---
-- name: Ensuring config directory exist
+- name: Ensuring prometheus config directory exist
   file:
     path: "{{ prometheus_server_conf }}"
     state: "directory"
@@ -7,10 +7,6 @@
     group: "{{ config_owner_group }}"
     mode: "0755"
   become: true
-  when:
-    - inventory_hostname in groups[item.value.group]
-    - item.value.enabled | bool
-  with_dict: "{{ prometheus_server_services }}"
 
 - name: Find custom prometheus alert rule files
   local_action:
@@ -22,8 +18,6 @@
   register: prometheus_alert_rules
 
 - name: Copying over custom prometheus alert rules files
-  vars:
-    service: "{{ prometheus_server_services['prometheus_server']}}"
   copy:
     src: "{{ item.path }}"
     dest: "{{ ansitheus_conf }}/prometheus_server/rules/{{ item.path | basename }}"
@@ -31,14 +25,12 @@
   register: prometheus_alert_confs
   become: true
   when:
-    - inventory_hostname in groups[service.group]
-    - service.enabled | bool
     - prometheus_alert_rules is defined and prometheus_alert_rules.files | length > 0
   with_items: "{{ prometheus_alert_rules.files }}"
   notify:
     - Reload prometheus_server config
 
-- name: Check custom file_sd folder exists
+- name: Check custom file_sd files exists
   local_action:
     module: find
     path: "{{ ansitheus_custom_conf }}/prometheus_server/file_sd"
@@ -48,8 +40,6 @@
   register: prometheus_file_sd
 
 - name: Copying over custom file_sd
-  vars:
-    service: "{{ prometheus_server_services['prometheus_server']}}"
   copy:
     src: "{{ item.path }}"
     dest: "{{ ansitheus_conf }}/prometheus_server/file_sd/{{ item.path | basename }}"
@@ -58,24 +48,17 @@
   register: prometheus_file_sd_confs
   with_items: "{{ prometheus_file_sd.files }}"
   when:
-    - inventory_hostname in groups[service.group]
-    - service.enabled | bool
     - prometheus_file_sd is defined and prometheus_file_sd.files | length > 0
   notify:
     - Reload prometheus_server config
 
 - name: Copying over prometheus config file
-  vars:
-    service: "{{ prometheus_server_services['prometheus_server']}}"
   template:
     src: "{{ item }}"
     dest: "{{ ansitheus_conf }}/prometheus_server/prometheus.yml"
     mode: "0755"
   register: prometheus_confs
   become: true
-  when:
-    - inventory_hostname in groups[service.group]
-    - service.enabled | bool
   with_first_found:
     - "{{ ansitheus_custom_conf }}/prometheus_server/{{ inventory_hostname }}/prometheus.yml"
     - "{{ ansitheus_custom_conf }}/prometheus_server/prometheus.yml"
@@ -96,7 +79,4 @@
     network_mode: "{{ item.value.network_mode }}"
     log_driver: "{{ item.value.log_driver }}"
     log_options: "{{ item.value.log_options }}"
-  when:
-    - inventory_hostname in groups[item.value.group]
-    - item.value.enabled | bool
   with_dict: "{{ prometheus_server_services }}"
