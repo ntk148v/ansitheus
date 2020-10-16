@@ -5,6 +5,22 @@
 
 > Ansible + Prometheus = Ansitheus
 
+- [Ansitheus](#ansitheus)
+  - [Description](#description)
+  - [Features](#features)
+  - [Components](#components)
+  - [Requirements](#requirements)
+  - [Tested environment](#tested-environment)
+  - [Role variables](#role-variables)
+  - [Configure Ansible](#configure-ansible)
+  - [Getting started](#getting-started)
+    - [Basic](#basic)
+    - [Docker](#docker)
+    - [Encrypting with `kriptyn`](#encrypting-with-kriptyn)
+    - [Encrypting with `ansible-vault`](#encrypting-with-ansible-vault)
+    - [**Last but not least**](#last-but-not-least)
+  - [Contributors](#contributors)
+
 ## Description
 
 - Highly inspired by [kolla-ansible](https://docs.openstack.org/kolla-ansible).
@@ -78,6 +94,8 @@ Further information on tuning Ansible is available [here](https://www.ansible.co
 
 ## Getting started
 
+### Basic
+
 1. Install Ansible in deployment node.
 
 2. Clone this repostiory.
@@ -126,6 +144,43 @@ Commands:
     destroy                          Destroy Prometheus containers and service configuration
                                         --include-images to also destroy Prometheus images
                                         --include-volumes to also destroy Prometheus volumes
+```
+
+### Docker
+
+If you don't to do clone step, install requirements,... you can run Ansitheus with Docker.
+
+1. Pull or build image kiennt26/ansitheus:<version>. <version> is the ansitheus repository's tag.
+
+2. Run it.
+
+```bash
+docker run --name ansitheus --rm -v /path/to/your/inventory:/etc/ansitheus/inventory \
+    -v /path/to/your/config:/etc/ansitheus \
+    -v /tmp/facts_cache:/tmp/facts_cache:rw \
+    10.240.201.50:8890/cloudlab/ansitheus:<version> -h
+
+Usage: ./tools/ansitheus COMMAND [option]
+
+Options:
+    --inventory, -i <inventory_path> Specify path to ansible inventory file
+    --configdir, -c <config_path>    Specify path to directory with config.yml
+    --verbose, -v                    Increase verbosity of ansible-playbook
+    --tags, -t <tags>                Only run plays and tasks tagged with these values
+    --help, -h                       Show this usage information
+    --skip-common                    Skip common role
+    --limit <host>                   Specify host to run plays
+    --skip-gather-fact               Skip gather fact
+    --ask-vault-pass                 Ask for vault password
+
+Commands:
+    precheck                         Do pre-deployment checks for hosts
+    deploy                           Deploy and start all ansitheus containers
+    pull                             Pull all images for containers (only pull, no running containers)
+    destroy                          Destroy Prometheus containers and service configuration
+                                        --include-images to also destroy Prometheus images
+                                        --include-volumes to also destroy Prometheus volumes
+
 ```
 
 ### Encrypting with `kriptyn`
