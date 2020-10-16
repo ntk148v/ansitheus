@@ -136,6 +136,7 @@ Options:
     --skip-common                    Skip common role
     --skip-gather-fact               Skip gather fact
     --ask-vault-pass                 Ask for vault password
+    --vault-password-file            Provide the vault password file
 
 Commands:
     precheck                         Do pre-deployment checks for hosts
@@ -172,6 +173,7 @@ Options:
     --limit <host>                   Specify host to run plays
     --skip-gather-fact               Skip gather fact
     --ask-vault-pass                 Ask for vault password
+    --vault-password-file            Provide the vault password file
 
 Commands:
     precheck                         Do pre-deployment checks for hosts
