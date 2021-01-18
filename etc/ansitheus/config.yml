@@ -102,7 +102,7 @@ prometheus_node_exporter_port: "9100"
 prometheus_rabbit_exporter_port: "5557"
 prometheus_unsee_dashboard_port: "55550"
 prometheus_cadvisor_port: "8080"
-grafana_port: "5555"
+grafana_listen_port: "5555"
 prometheus_snmp_exporter_dell_server_port: "9116"
 prometheus_snmp_exporter_hpe_device_port: "9117"
 prometheus_snmp_exporter_switch_port: "9118"
@@ -120,7 +120,7 @@ prometheus_node_exporter_ver: "v0.18.0"
 prometheus_rabbit_exporter_ver: "v0.29.0"
 prometheus_cadvisor_ver: "v0.33.0"
 prometheus_snmp_exporter_ver: "v0.15.0"
-grafana_ver: "6.2.5"
+grafana_ver: "7.2.2"
 haproxy_ver: "1.8.20"
 keepalived_ver: "2.0.17"
 
@@ -164,3 +164,53 @@ alert_mail_password: "supersecurepassword"
 alert_via_slack: "no"
 alert_slack_channel: "fakechannel"
 alert_slack_webhook_id: "longwebhookid"
+
+##################
+# Grafana options
+##################
+grafana_data_dir: "/var/lib/grafana"
+grafana_logs_dir: "/var/log/grafana"
+grafana_plugin_dir: "{{ grafana_data_dir }}/plugins"
+# Please check http://docs.grafana.org/installation/configuration/
+grafana_database:
+  type: sqlite3
+  # name: grafana
+  # username: admin
+  # password: "KbJdz8*U" # Please change me
+grafana_remote_cache: {}
+grafana_security:
+  admin_user: "admin"
+  admin_password: "YJ97&Yz$" # Please change me
+  #  secret_key: ""
+  #  login_remember_days: 7
+  #  cookie_username: grafana_user
+  #  cookie_remember_name: grafana_remember
+  #  disable_gravatar: true
+  #  data_source_proxy_whitelist:
+grafana_session: {}
+#  provider: file
+#  provider_config: "sessions"
+# grafana authentication mechanisms
+grafana_auth: {}
+#  disable_login_form: false
+#  oauth_auto_login: false
+#  disable_signout_menu: false
+#  signout_redirect_url: ""
+#  anonymous:
+#    org_name: "Main Organization"
+#    org_role: Viewer
+#  ldap:
+#    config_file: "/etc/grafana/ldap.toml"
+#    allow_sign_up: false
+#  basic:
+#    enabled: true
+grafana_users:
+  allow_sign_up: false
+  # allow_org_create: true
+  # auto_assign_org: true
+  auto_assign_org_role: Viewer
+  # login_hint: "email or username"
+  default_theme: dark
+  # external_manage_link_url: ""
+  # external_manage_link_name: ""
+  # external_manage_info: ""

@@ -49,7 +49,7 @@ Ansitheus allows users to configure & deploy the following components:
 - [Haproxy](http://www.haproxy.org/)
 - [Keepalived](https://www.keepalived.org/)
 - [Fluentd](https://github.com/fluent/fluentd)
-- [Grafana](https://github.com/grafana/grafana) - **TODO**
+- [Grafana](https://github.com/grafana/grafana)
 - Other Prometheus exporters - **TODO**
 
 ## Requirements

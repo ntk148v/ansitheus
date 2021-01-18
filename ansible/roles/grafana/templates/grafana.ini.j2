@@ -1,0 +1,74 @@
+# Directories
+[paths]
+data = {{ grafana_data_dir }}
+logs = {{ grafana_log_dir }}
+plugins = {{ grafana_plugin_dir }}
+
+# HTTP options
+[server]
+protocol = http
+http_addr = {{ api_interface_address }}
+http_port = {{ grafana_listen_port }}
+router_logging = true
+static_root_path = public
+enable_gzip = false
+
+# Database
+[database]
+{% for k,v in grafana_database.items() %}
+{%   if k == 'password' %}
+{{ k }} = """{{ v }}"""
+{%   else %}
+{{ k }} = {{ v }}
+{%   endif %}
+{% endfor %}
+
+# Remote cache
+[remote_cache]
+{% for k,v in grafana_remote_cache.items() %}
+{{ k }} = {{ v }}
+{% endfor %}
+
+# Security
+[security]
+{% for k,v in grafana_security.items() %}
+{{ k }} = {{ v }}
+{% endfor %}
+
+# Session
+{% if grafana_session != {} %}
+[session]
+{%   for k,v in grafana_session.items() %}
+{{ k }} = {{ v }}
+{%   endfor %}
+{% endif %}
+
+# Authentication
+{% if grafana_auth != {} %}
+[auth]
+disable_login_form = {{ grafana_auth.disable_login_form | default('False') }}
+oauth_auto_login = {{ grafana_auth.oauth_auto_login | default('False') }}
+disable_signout_menu = {{ grafana_auth.disable_signout_menu | default('False') }}
+signout_redirect_url = {{ grafana_auth.signout_redirect_url | default('') }}
+{%  for section, options in grafana_auth.items() %}
+{%    if options is mapping %}
+[auth.{{ section }}]
+{%      if "enabled" not in options %}
+enabled = True
+{%      endif %}
+{%      for k, v in options.items() %}
+{{ k }} = {{ v }}
+{%      endfor %}
+{%    else %}
+{{ section }} = {{ options }}
+{%    endif %}
+{%  endfor %}
+{% endif %}
+
+# Users management and registration
+{% if grafana_users != {} %}
+[users]
+{%   for k,v in grafana_users.items() %}
+{{ k }} = {{ v }}
+{%   endfor %}
+{% endif %}

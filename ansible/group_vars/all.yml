@@ -120,7 +120,7 @@ prometheus_node_exporter_port: "9100"
 prometheus_rabbit_exporter_port: "5557"
 prometheus_unsee_dashboard_port: "55550"
 prometheus_cadvisor_port: "8080"
-grafana_port: "5555"
+grafana_listen_port: "5555"
 prometheus_snmp_exporter_dell_server_port: "9116"
 prometheus_snmp_exporter_hpe_device_port: "9117"
 prometheus_snmp_exporter_switch_port: "9118"
@@ -145,7 +145,7 @@ prometheus_rabbit_exporter_ver: "v0.29.0"
 prometheus_cadvisor_ver: "v0.35.0"
 prometheus_snmp_exporter_ver: "v0.15.0"
 prometheus_container_status_exporter_ver: "v0.1.0"
-grafana_ver: "6.2.5"
+grafana_ver: "7.2.2"
 haproxy_ver: "1.8.20"
 keepalived_ver: "2.0.17"
 fluentd_ver: "v1.9"
@@ -155,7 +155,7 @@ fluentd_ver: "v1.9"
 ##########################
 
 prometheus_docker_namespace: "{{ docker_namespace if docker_namespace else 'prom' }}"
-grafana_docker_name: "{{ docker_namespace if docker_namespace else 'grafana' }}"
+grafana_docker_namespace: "{{ docker_namespace if docker_namespace else 'grafana' }}"
 # Non-prom exporters
 prometheus_cadvisor_docker_namespace: "{{ docker_namespace if docker_namespace else 'google-containers' }}"
 prometheus_rabbit_exporter_docker_namespace: "{{ docker_namespace if docker_namespace else 'kbudde'}}"
@@ -188,8 +188,53 @@ rabbit_output_format: "json"
 # Grafana options
 #################
 
-grafana_user: "admin"
-grafana_password: "password"
+##################
+# Grafana options
+##################
+# Please check http://docs.grafana.org/installation/configuration/
+grafana_database:
+  type: sqlite3
+  # name: grafana
+  # host: 127.0.0.1
+  # usere: admin
+  # password: "KbJdz8*U" # Please change me
+grafana_remote_cache: {}
+grafana_security:
+  admin_user: "admin"
+  admin_password: "YJ97&Yz$" # Please change me
+  #  secret_key: ""
+  #  login_remember_days: 7
+  #  cookie_username: grafana_user
+  #  cookie_remember_name: grafana_remember
+  #  disable_gravatar: true
+  #  data_source_proxy_whitelist:
+grafana_session: {}
+#  provider: file
+#  provider_config: "sessions"
+# grafana authentication mechanisms
+grafana_auth: {}
+#  disable_login_form: false
+#  oauth_auto_login: false
+#  disable_signout_menu: false
+#  signout_redirect_url: ""
+#  anonymous:
+#    org_name: "Main Organization"
+#    org_role: Viewer
+#  ldap:
+#    config_file: "/etc/grafana/ldap.toml"
+#    allow_sign_up: false
+#  basic:
+#    enabled: true
+grafana_users:
+  allow_sign_up: false
+  # allow_org_create: true
+  # auto_assign_org: true
+  auto_assign_org_role: Viewer
+  # login_hint: "email or username"
+  default_theme: dark
+  # external_manage_link_url: ""
+  # external_manage_link_name: ""
+  # external_manage_info: ""
 
 ###############
 # Alert options

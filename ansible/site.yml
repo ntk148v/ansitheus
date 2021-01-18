@@ -60,3 +60,10 @@
           enable_prometheus_snmp_exporter_huawei_device | bool or
           enable_prometheus_container_status_exporter| bool,
       }
+
+- name: Apply role grafana
+  gather_facts: false
+  hosts:
+    - grafana
+  roles:
+    - { role: grafana, tags: grafana, when: enable_grafana | bool }

@@ -1,0 +1,39 @@
+---
+project_name: "grafana"
+
+grafana_services:
+  grafana:
+    container_name: "grafana"
+    group: "grafana"
+    enabled: "{{ enable_grafana | bool }}"
+    image: "{{ grafana_image_full }}"
+    privileged: "no"
+    network_mode: "host"
+    restart_policy: "unless-stopped"
+    state: "started"
+    volumes:
+      - "{{ grafana_conf }}:/etc/grafana:rw"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "{{ grafana_volume }}:{{ grafana_data_dir }}"
+      - "{{ grafana_conf }}/plugins:{{ grafana_plugin_dir }}"
+      - "{{ grafana_log_volume }}:{{ grafana_log_dir }}"
+    log_driver: "{{ grafana_log_driver }}"
+    log_options: "{{ grafana_log_opts }}"
+
+grafana_conf: "{{ ansitheus_conf }}/grafana/"
+grafana_data_dir: "/var/lib/grafana"
+grafana_log_dir: "/var/log/grafana"
+grafana_plugin_dir: "{{ grafana_data_dir }}/plugins"
+
+##########
+# Docker #
+##########
+
+grafana_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ grafana_docker_namespace }}/grafana"
+grafana_tag: "{{ grafana_ver }}"
+grafana_image_full: "{{ grafana_image }}:{{ grafana_tag }}"
+grafana_volume: "grafana"
+grafana_log_volume: "grafana_log"
+# logging
+grafana_log_driver: "{{ docker_log_driver }}"
+grafana_log_opts: "{{ docker_log_opts }}"

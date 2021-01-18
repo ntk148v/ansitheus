@@ -1,0 +1,7 @@
+---
+- include_tasks: "{{ ansitheus_action }}.yml"
+  tags: grafana
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ grafana_services }}"
