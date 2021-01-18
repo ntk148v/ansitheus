@@ -25,7 +25,7 @@ prometheus_alertmanager_services:
 
 prometheus_alertmanager_conf: "{{ ansitheus_conf }}/prometheus_alertmanager"
 prometheus_alertmanager_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ prometheus_docker_namespace }}/alertmanager:{{ prometheus_alertmanager_ver }}"
-prometheus_alertmanager_volume: "prometheus_data"
+prometheus_alertmanager_volume: "prometheus_alertmanager_data"
 # Only log messages with the given severity or above. One of: [debug, info, warn, error]
 prometheus_alertmanager_log_level: "info"
 # Output format of log messages. One of: [logfmt, json]
