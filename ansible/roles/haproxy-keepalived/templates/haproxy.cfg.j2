@@ -26,6 +26,8 @@ userlist prometheus-server-user
 
 listen prometheus_server
   bind {{ ansitheus_vip_address }}:{{ prometheus_server_port }}
+  option httpchk GET /-/ready
+  http-check expect status 200
   http-request del-header X-Forwarded-Proto
   http-request set-header X-Forwarded-Proto https if { ssl_fc }
   acl auth_acl http_auth(prometheus-server-user)
