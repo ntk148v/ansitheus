@@ -28,14 +28,13 @@
 
 - name: Copying over custom prometheus alert rules files
   copy:
-    src: "{{ item.path }}"
-    dest: "{{ ansitheus_conf }}/prometheus_server/rules/{{ item.path | basename }}"
+    src: "{{ ansitheus_custom_conf }}/prometheus_server/rules"
+    dest: "{{ ansitheus_conf }}/prometheus_server"
     mode: "0755"
   register: prometheus_alert_confs
   become: true
   when:
-    - prometheus_alert_rules is defined and prometheus_alert_rules.files | length > 0
-  with_items: "{{ prometheus_alert_rules.files }}"
+    - prometheus_alert_rules.stat.isdir is defined and prometheus_alert_rules.stat.isdir
   notify:
     - Reload prometheus_server config
 
@@ -48,25 +47,15 @@
   become: true
   register: prometheus_file_sd
 
-- name: Ensuring file_sd directory exist
-  file:
-    path: "{{ ansitheus_custom_conf }}/prometheus_server/file_sd/"
-    state: "directory"
-    mode: "0755"
-  become: true
-  when:
-    - prometheus_file_sd is defined and prometheus_file_sd.files | length > 0
-
 - name: Copying over custom file_sd
   copy:
-    src: "{{ item.path }}"
-    dest: "{{ ansitheus_conf }}/prometheus_server/file_sd/{{ item.path | basename }}"
+    src: "{{ ansitheus_custom_conf }}/prometheus_server/file_sd"
+    dest: "{{ ansitheus_conf }}/prometheus_server"
     mode: "0755"
   become: true
   register: prometheus_file_sd_confs
-  with_items: "{{ prometheus_file_sd.files }}"
   when:
-    - prometheus_file_sd is defined and prometheus_file_sd.files | length > 0
+    - prometheus_file_sd.stat.isdir is defined and prometheus_file_sd.stat.isdir
   notify:
     - Reload prometheus_server config
 
@@ -76,7 +65,7 @@
     path: "{{ ansitheus_custom_conf }}/prometheus_server/tls_config"
   run_once: true
   become: true
-  register: prometheus_tls_confs
+  register: prometheus_tls_config
 
 - name: Copying over tls_config file
   copy:
@@ -84,8 +73,9 @@
     dest: "{{ ansitheus_conf }}/prometheus_server"
     mode: "0755"
   become: true
+  register: prometheus_tls_confs
   when:
-    - prometheus_tls_confs.stat.isdir is defined and prometheus_tls_confs.stat.isdir
+    - prometheus_tls_config.stat.isdir is defined and prometheus_tls_config.stat.isdir
   notify:
     - Reload prometheus_server config
 
