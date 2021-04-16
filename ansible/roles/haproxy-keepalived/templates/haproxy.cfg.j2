@@ -3,6 +3,11 @@ global
   maxconn {{ haproxy_max_connections }}
   nbproc {{ haproxy_processes }}
   stats socket {{ haproxy_socket_dir }}/haproxy.sock mode 660 level admin
+{# Only haproxy with version >= 1.9 support the bellow option #}
+{# For haproxy version < 1.9, users have to configure sending output to a syslog server #}
+{% if haproxy_ver is version('1.9', '>=') %}
+  log stdout format raw local0
+{% endif %}
 
 defaults
   log global
