@@ -70,6 +70,25 @@
   notify:
     - Reload prometheus_server config
 
+- name: Check tls_config folder exists
+  local_action:
+    module: stat
+    path: "{{ ansitheus_custom_conf }}/prometheus_server/tls_config"
+  run_once: true
+  become: true
+  register: prometheus_tls_confs
+
+- name: Copying over tls_config file
+  copy:
+    src: "{{ ansitheus_custom_conf }}/prometheus_server/tls_config"
+    dest: "{{ ansitheus_conf }}/prometheus_server"
+    mode: "0755"
+  become: true
+  when:
+    - prometheus_tls_confs.stat.isdir is defined and prometheus_tls_confs.stat.isdir
+  notify:
+    - Reload prometheus_server config
+
 - name: Copying over prometheus config file
   template:
     src: "{{ item }}"

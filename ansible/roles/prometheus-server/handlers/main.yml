@@ -18,3 +18,4 @@
     - prometheus_confs.changed | bool
       or prometheus_alert_confs.changed | bool
       or prometheus_file_sd_confs.changed | bool
+      or prometheus_tls_confs.changed | bool
