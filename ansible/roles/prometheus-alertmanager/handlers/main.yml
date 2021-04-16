@@ -17,3 +17,4 @@
     - service.enabled | bool
     - prometheus_alertmanager_confs.changed | bool
       or prometheus_alertmanager_custom_confs.changed | bool
+      or prometheus_alertmanager_custom_templates.changed | bool

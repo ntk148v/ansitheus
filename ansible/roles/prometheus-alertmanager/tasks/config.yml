@@ -12,17 +12,48 @@
     - item.value.enabled | bool
   with_dict: "{{ prometheus_alertmanager_services }}"
 
+- name: Find custom prometheus alertmanager custom template files
+  local_action:
+    module: find
+    path: "{{ ansitheus_custom_conf }}/prometheus_alertmanager/template"
+    pattern: "*.tmpl"
+  run_once: true
+  become: true
+  register: prometheus_alertmanager_custom_template_files
+
 - name: Check if custom alertmanager config exists
   local_action: "stat path={{ ansitheus_custom_conf }}/prometheus_alertmanager/config.yml"
   register: prometheus_alertmanager_config_file
   run_once: True
+
+- name: Ensuring custom template directory exist
+  file:
+    path: "{{ prometheus_alertmanager_conf }}/template/"
+    state: "directory"
+    mode: "0755"
+  become: true
+  when:
+    - prometheus_alertmanager_custom_template_files is defined and prometheus_alertmanager_custom_template_files.files | length > 0
+
+- name: Copying custom prometheus alertmanager custom template files if exists
+  copy:
+    src: "{{ item.path }}"
+    dest: "{{ prometheus_alertmanager_conf }}/template/{{ item.path | basename }}"
+    mode: "0755"
+  register: prometheus_alertmanager_custom_templates
+  become: true
+  when:
+    - prometheus_alertmanager_custom_template_files is defined and prometheus_alertmanager_custom_template_files.files | length > 0
+  with_items: "{{ prometheus_alertmanager_custom_template_files.files }}"
+  notify:
+    - Reload prometheus_alertmanager config
 
 - name: Copying over custom prometheus alertmanager config file if exists
   vars:
     service: "{{ prometheus_alertmanager_services['prometheus_alertmanager']}}"
   copy:
     src: "{{ ansitheus_custom_conf }}/prometheus_alertmanager/config.yml"
-    dest: "{{ ansitheus_conf }}/prometheus_alertmanager/config.yml"
+    dest: "{{ prometheus_alertmanager_conf }}/config.yml"
   register: prometheus_alertmanager_custom_confs
   when:
     - inventory_hostname in groups[service.group]
@@ -36,7 +67,7 @@
     service: "{{ prometheus_alertmanager_services['prometheus_alertmanager']}}"
   template:
     src: "prometheus_alertmanager.yml.j2"
-    dest: "{{ ansitheus_conf }}/prometheus_alertmanager/config.yml"
+    dest: "{{ prometheus_alertmanager_conf }}/config.yml"
     mode: "0755"
   register: prometheus_alertmanager_confs
   become: true
