@@ -12,9 +12,6 @@
             <img alt="Github tag" src="https://img.shields.io/github/tag/ntk148v/ansitheus?style=for-the-badge">
         </a>
 	</p><br>
-    <p>
-        <img src="./screenshot.png">
-    </p>
 </div>
 
 - [1. Description](#1-description)
