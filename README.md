@@ -1,32 +1,44 @@
-# Ansitheus
+<div align="center">
+	<h1>Ansitheus</h1>
+	<blockquote align="center">Ansible + Prometheus = Ansitheus</blockquote>
+	<p>
+		<a href="https://github.com/ntk148v/ansitheus/blob/master/LICENSE">
+			<img alt="GitHub license" src="https://img.shields.io/github/license/ntk148v/ansitheus?style=for-the-badge">
+		</a>
+		<a href="https://github.com/ntk148v/ansitheus/stargazers">
+            <img alt="GitHub stars" src="https://img.shields.io/github/stars/ntk148v/ansitheus?style=for-the-badge">
+        </a>
+        <a href="https://github.com/ntk148v/ansitheus/tags">
+            <img alt="Github tag" src="https://img.shields.io/github/tag/ntk148v/ansitheus?style=for-the-badge">
+        </a>
+	</p><br>
+    <p>
+        <img src="./screenshot.png">
+    </p>
+</div>
 
-[![license](https://img.shields.io/badge/license-Apache%20v2.0-blue.svg)](LICENSE)
-[![GitHub tag](https://img.shields.io/github/tag/ntk148v/ansitheus.svg)](https://github.com/ntk148v/ansitheus/tags)
+- [1. Description](#1-description)
+- [2. Features](#2-features)
+- [3. Components](#3-components)
+- [4. Requirements](#4-requirements)
+- [5. Tested environment](#5-tested-environment)
+- [6. Role variables](#6-role-variables)
+- [7. Configure Ansible](#7-configure-ansible)
+- [8. Getting started](#8-getting-started)
+  - [8.1. Basic](#81-basic)
+  - [8.2. Docker](#82-docker)
+  - [8.3. Encrypting with `kriptyn`](#83-encrypting-with-kriptyn)
+  - [8.4. Encrypting with `ansible-vault`](#84-encrypting-with-ansible-vault)
+  - [8.5. **Last but not least**](#85-last-but-not-least)
+- [9. Contributors](#9-contributors)
 
-> Ansible + Prometheus = Ansitheus
+## 1. Description
 
-- [Ansitheus](#ansitheus)
-  - [Description](#description)
-  - [Features](#features)
-  - [Components](#components)
-  - [Requirements](#requirements)
-  - [Tested environment](#tested-environment)
-  - [Role variables](#role-variables)
-  - [Configure Ansible](#configure-ansible)
-  - [Getting started](#getting-started)
-    - [Basic](#basic)
-    - [Docker](#docker)
-    - [Encrypting with `kriptyn`](#encrypting-with-kriptyn)
-    - [Encrypting with `ansible-vault`](#encrypting-with-ansible-vault)
-    - [**Last but not least**](#last-but-not-least)
-  - [Contributors](#contributors)
-
-## Description
-
+- Deploy & configure full [Prometheus](https://github.com/prometheus/prometheus) monitoring system using [Ansible](https://www.ansible.com/).
 - Highly inspired by [kolla-ansible](https://docs.openstack.org/kolla-ansible).
 - Components are deployed as [Docker](https://docker.com) container.
 
-## Features
+## 2. Features
 
 - Allow to configure & setup the system from scratch (prepare local repostiory, install necessary packages, configure Docker daemon...).
 - Deploy & configure full [Prometheus](https://github.com/prometheus/prometheus) monitoring system using [Ansible](https://www.ansible.com/).
@@ -37,7 +49,7 @@
 - Support Docker private registry.
 - Support Ansible vault.
 
-## Components
+## 3. Components
 
 Ansitheus allows users to configure & deploy the following components:
 
@@ -52,15 +64,15 @@ Ansitheus allows users to configure & deploy the following components:
 - [Grafana](https://github.com/grafana/grafana)
 - Other Prometheus exporters - **TODO**
 
-## Requirements
+## 4. Requirements
 
 Ansible >= 2.8.4 (It might work on previous versions, but we cannot guarantee it)
 
-## Tested environment
+## 5. Tested environment
 
 - CentOS 7
 
-## Role variables
+## 6. Role variables
 
 > **NOTE**: TODO
 >
@@ -68,7 +80,7 @@ Ansible >= 2.8.4 (It might work on previous versions, but we cannot guarantee it
 
 Check [ansible/group_vars/all.yml](./ansible/group_vars/all.yml) fir more details. We're too busy (& lazy) to create a table for it.
 
-## Configure Ansible
+## 7. Configure Ansible
 
 For best results, Ansible configuration should be tuned for your environment. For example, add the following options to the Ansible configuration file `/etc/ansible/ansible.cfg`:
 
@@ -92,9 +104,9 @@ pipelining = True
 
 Further information on tuning Ansible is available [here](https://www.ansible.com/blog/ansible-performance-tuning).
 
-## Getting started
+## 8. Getting started
 
-### Basic
+### 8.1. Basic
 
 1. Install Ansible in deployment node.
 
@@ -147,7 +159,7 @@ Commands:
                                         --include-volumes to also destroy Prometheus volumes
 ```
 
-### Docker
+### 8.2. Docker
 
 If you don't to do clone step, install requirements,... you can run Ansitheus with Docker.
 
@@ -185,7 +197,7 @@ Commands:
 
 ```
 
-### Encrypting with `kriptyn`
+### 8.3. Encrypting with `kriptyn`
 
 In regard to security concern, password of encrypted files should be changed periodicallyl. However, the number of files needs encrypting might change depending on deployment node.
 
@@ -212,7 +224,7 @@ Commands:
 - _only files in `/home`, `/etc`, `/root` are found_
 - _`root` permission might required for files in `/etc` & `/root`_
 
-### Encrypting with `ansible-vault`
+### 8.4. Encrypting with `ansible-vault`
 
 Encrypting config & inventory files with [`ansible-vault`](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
 
@@ -222,11 +234,11 @@ To view encrypted files `ansible-vault view <file_path>`, it will ask for passwo
 
 To edit encrypted files `ansible-vault edit <file_path>`, it will ask for password
 
-### **Last but not least**
+### 8.5. **Last but not least**
 
 To run [tools/ansitheus](./tools/ansitheus) with encrypted files, please add `--ask-vault-pass` to command.
 
-## Contributors
+## 9. Contributors
 
 1. [Kien Nguyen](https://github.com/ntk148v)
 2. [Dat Vu](https://github.com/vtdat)
