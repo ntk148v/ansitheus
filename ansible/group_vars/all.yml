@@ -3,15 +3,13 @@
 # Service VIP address
 ######################
 ansitheus_vip_address: ""
-prometheus_server_vip_address: "{{ ansitheus_vip_address }}"
-# TODO: just for now
-prometheus_alertmanager_vip_address: "{{ ansitheus_vip_address }}"
+prometheus_vip_address: "{{ ansitheus_vip_address }}"
+alertmanager_vip_address: "{{ ansitheus_vip_address }}"
 
 ansitheus_network_interface: "eth0"
 keepalived_virtual_router_id: "82"
-
-ansitheus_conf: "/etc/ansitheus"
-ansitheus_custom_conf: "{{ ansitheus_conf }}/config"
+ansitheus_config_dir: "/etc/ansitheus"
+ansitheus_custom_config_dir: "{{ ansitheus_config_dir }}/config"
 # The group which own node_config_directory, you can use a non-root
 config_owner_user: "root"
 config_owner_group: "root"
@@ -29,139 +27,69 @@ prometheus_alertmanager_user: "admin"
 ###################
 # Haproxy Passwords
 ###################
+
 keepalived_password: "{{ keepalived_password }}"
-prometheus_alertmanager_password: "{{ prometheus_alertmanager_password }}"
-prometheus_server_password: "{{ prometheus_server_password }}"
+# Passwords that are used for HAProxy basic auth
+alertmanager_basic_auth_password: "{{ alertmanager_basic_auth_password }}"
+prometheus_basic_auth_password: "{{ prometheus_basic_auth_password }}"
 
 ################
 # Docker options
 ################
 
-docker_registry: "{{ docker_registry }}"
-docker_namespace:
-docker_registry_username: "{{ docker_registry_username }}"
-docker_registry_password: "{{ docker_registry_password }}"
-# Sets the options used by DNS resolvers by writing an options line
-# into the container's /etc/resolv.conf.
-# For example:
-# docker_dns_servers:
-#   - "8.8.8.8"
-#   - "8.8.4.4"
-docker_dns_servers:
-# Change Docker storage drivers
-# For example: docker_storage_driver: "overlay2"
-docker_storage_driver:
-# Change runtime directory
-# For example: docker_runtime_directory: "/var/lib/docker
-docker_runtime_directory:
-# Can be used to set environment variables for the Docker daemon, such as:
-# docker_daemon_environment:
-#   - "HTTP_PROXY=http://proxy.example.com:3128/"
-#   - "HTTPS_PROXY=http://proxy.example.com:3128/"
-#   - "NO_PROXY=localhost,127.0.0.1"
-docker_daemon_environment: []
-# Global docker logging configs
-# For details, please check:
-# https://docs.docker.com/config/containers/logging/configure/
+docker_registry: "{{ docker_registry if docker_registry else '' }}"
+docker_namespace: "{{ docker_namespace if docker_namespace else '' }}"
+docker_registry_username: "{{ docker_registry_username if docker_registry_username else ''}}"
+docker_registry_password: "{{ docker_registry_password if docker_registry_password else '' }}"
 docker_log_driver: "json-file"
 docker_log_opts:
-  max-size: 10m
+  max-size: 30m
   max-file: 3
-# A set of users will be added to docker group
-docker_users: []
-docker_edition: "ce"
-docker_pkg: "docker-{{ docker_edition }}"
-docker_pkg_version:
-
-##############
-# Pypi options
-##############
-
-pip_repository: "{{ pip_repository }}"
-
-######################
-# Yum Local repository
-######################
-use_local_repo: "{{ use_local_repo }}"
 
 ##################
 # Service options
 ##################
 
-enable_prometheus_server: "yes"
-enable_prometheus_exporter: "yes"
-enable_prometheus_node_exporter: "yes"
-enable_prometheus_rabbit_exporter: "no"
-enable_prometheus_snmp_exporter: "no"
-enable_prometheus_cadvisor: "yes"
+enable_prometheus: "yes"
+enable_node_exporter: "yes"
+enable_cadvisor: "yes"
 enable_grafana: "no"
-enable_prometheus_alertmanager: "yes"
-enable_haproxy: "yes"
-enable_keepalived: "{{ enable_haproxy }}"
-enable_prometheus_snmp_exporter_dell_server: "no"
-enable_prometheus_snmp_exporter_hpe_device: "no"
-enable_prometheus_snmp_exporter_fujitsu_server: "no"
-enable_prometheus_snmp_exporter_switch: "no"
-enable_prometheus_snmp_exporter_huawei_device: "no"
-enable_prometheus_container_status_exporter: "no"
-enable_prometheus_nocpro_alert: "no"
-# By default, enable fluentd whenever using
-# fluentd logging driver
-enable_fluentd: "{{ docker_log_driver == 'fluentd' }}"
+enable_alertmanager: "yes"
+enable_haproxy_keepalived: "yes"
 
 ##################
 # Port mappings
 #################
 
-prometheus_server_port: "9090"
-prometheus_alertmanager_port: "9093"
-prometheus_alertmanager_cluster_port: "9094"
-prometheus_node_exporter_port: "9100"
-prometheus_rabbit_exporter_port: "5557"
-prometheus_unsee_dashboard_port: "55550"
-prometheus_cadvisor_port: "8080"
-grafana_listen_port: "5555"
-prometheus_snmp_exporter_dell_server_port: "9116"
-prometheus_snmp_exporter_hpe_device_port: "9117"
-prometheus_snmp_exporter_switch_port: "9118"
-prometheus_snmp_exporter_huawei_device_port: "9119"
-prometheus_snmp_exporter_fujitsu_server_port: "9120"
-prometheus_container_status_exporter_port: "9800"
-
-fluentd_syslog_port: "5140"
-# Fluentd listen port must be match with
-# docker_log_opts.fluentd-address config
-# if docker_log_driver == 'fluentd'
-fluentd_listen_port: "24224"
+prometheus_port: "9090"
+alertmanager_port: "9093"
+alertmanager_cluster_port: "9094"
+node_exporter_port: "9100"
+cadvisor_port: "8080"
+grafana_port: "3000"
 
 ###############
 # Image version
 ###############
 
-prometheus_server_ver: "v2.19.1"
-prometheus_alertmanager_ver: "v0.19.0"
-prometheus_node_exporter_ver: "v1.0.1"
-prometheus_rabbit_exporter_ver: "v0.29.0"
-prometheus_cadvisor_ver: "v0.35.0"
-prometheus_snmp_exporter_ver: "v0.15.0"
-prometheus_container_status_exporter_ver: "v0.1.0"
-grafana_ver: "7.2.2"
-haproxy_ver: "2.3.1"
-keepalived_ver: "2.0.17"
-fluentd_ver: "v1.9"
+prometheus_version: "2.52.0"
+alertmanager_version: "0.27.0"
+node_exporter_version: "v1.0.1"
+cadvisor_version: "v0.35.0"
+grafana_version: "7.2.2"
+haproxy_version: "2.3.1"
+keepalived_version: "2.0.17"
 
 ##########################
 # Service docker namespace
 ##########################
 
 prometheus_docker_namespace: "{{ docker_namespace if docker_namespace else 'prom' }}"
+alertmanager_docker_namespace: "{{ docker_namespace if docker_namespace else 'prom' }}"
 grafana_docker_namespace: "{{ docker_namespace if docker_namespace else 'grafana' }}"
-# Non-prom exporters
-prometheus_cadvisor_docker_namespace: "{{ docker_namespace if docker_namespace else 'google-containers' }}"
-prometheus_rabbit_exporter_docker_namespace: "{{ docker_namespace if docker_namespace else 'kbudde'}}"
+cadvisor_docker_namespace: "{{ docker_namespace if docker_namespace else 'google-containers' }}"
 keepalived_docker_namespace: "{{ docker_namespace if docker_namespace else 'kiennt26' }}"
 haproxy_docker_namespace: "{{ docker_namespace if docker_namespace else '' }}"
-fluentd_docker_namespace: "{{ docker_namespace if docker_namespace else 'kiennt26' }}"
 
 ####################
 # Prometheus options
@@ -173,16 +101,6 @@ prometheus_external_labels: # This is a dictionary variable
 prometheus_scrape_interval: "60s"
 prometheus_scrape_timeout: "30s"
 prometheus_evaluation_interval: "120s"
-
-##########################
-# Rabbit container options
-##########################
-
-rabbit_url: "http://localhost:15672"
-rabbit_user: "admin"
-rabbit_password: "rabbitpassword"
-rabbit_log_level: "debug"
-rabbit_output_format: "json"
 
 #################
 # Grafana options
@@ -248,11 +166,3 @@ alert_mail_password: "{{ alert_mail_password }}"
 alert_via_slack: "no"
 alert_slack_channel: "{{ alert_slack_channel }}"
 alert_slack_webhook_id: "{{ alert_slack_webhook_id }}"
-
-#######################
-# Elasticsearch options
-#######################
-es_address: "127.0.0.1"
-es_port: "9200"
-es_username:
-es_password:

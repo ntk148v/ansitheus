@@ -3,7 +3,6 @@
   docker_container:
     name: "{{ item.value.container_name }}"
     state: "absent"
-  become: true
   when:
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool
@@ -13,7 +12,6 @@
   file:
     state: "absent"
     path: "{{ grafana_conf }}"
-  become: true
   when:
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool
@@ -23,7 +21,6 @@
   docker_image:
     name: "{{ item.value.image }}"
     state: "absent"
-  become: true
   when:
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool
@@ -34,7 +31,6 @@
   docker_volume:
     name: "{{ grafana_volume }}"
     state: "absent"
-  become: true
   when:
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool
@@ -45,7 +41,6 @@
   docker_volume:
     name: "{{ grafana_log_volume }}"
     state: "absent"
-  become: true
   when:
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool

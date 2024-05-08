@@ -2,7 +2,7 @@
 
 # This script can be used to interact with ansitheus
 function find_base_dir() {
-    local real_path=$(python -c "import os;print(os.path.realpath('$0'))")
+    local real_path=$(python3 -c "import os;print(os.path.realpath('$0'))")
     local dir_name="$(dirname "$real_path")"
     # TODO: Check in /usr/lib etc...
     BASEDIR="$(dirname ${dir_name})"

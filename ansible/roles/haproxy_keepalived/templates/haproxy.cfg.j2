@@ -1,0 +1,128 @@
+global
+  daemon
+  maxconn {{ haproxy_max_connections }}
+  nbproc {{ haproxy_processes }}
+  stats socket {{ haproxy_socket_dir }}/haproxy.sock mode 660 level admin
+{# Only haproxy with version >= 1.9 support the bellow option #}
+{# For haproxy version < 1.9, users have to configure sending output to a syslog server #}
+{% if haproxy_version is version('1.9', '>=') %}
+  log stdout format raw local0
+{% endif %}
+
+defaults
+  log global
+  mode http
+  option redispatch
+  option httplog
+  retries 3
+  timeout http-request 10s
+  timeout queue 1m
+  timeout connect 10s
+  timeout client {{ haproxy_client_timeout }}
+  timeout server {{ haproxy_server_timeout }}
+  timeout check 10s
+  balance {{ haproxy_defaults_balance }}
+
+
+{% if enable_prometheus | bool %}
+
+userlist prometheus-server-user
+  user {{ prometheus_server_user }} insecure-password {{ prometheus_basic_auth_password }}
+
+listen prometheus_server
+  bind {{ ansitheus_vip_address }}:{{ prometheus_port }}
+  option httpchk GET /-/ready
+  http-check expect status 200
+  http-request del-header X-Forwarded-Proto
+  http-request set-header X-Forwarded-Proto https if { ssl_fc }
+  acl auth_acl http_auth(prometheus-server-user)
+  http-request auth realm basicauth unless auth_acl
+{% for host in groups['prometheus_server'] %}
+  server {{ hostvars[host]['ansible_hostname'] }} {{ hostvars[host]['ansible_' + hostvars[host]['ansitheus_network_interface']]['ipv4']['address'] }}:{{ prometheus_port }} check inter 2000 rise 2 fall 5 {% if not loop.first %}backup{% endif %}
+
+{% endfor %}
+{% endif %}
+
+{% if enable_prometheus_snmp_exporter_dell_server | bool %}
+listen prometheus_snmp_exporter_dell_server
+  timeout client 2000s
+  timeout server 2000s
+  bind {{ ansitheus_vip_address }}:{{ prometheus_snmp_exporter_dell_server_port }}
+  http-request del-header X-Forwarded-Proto if { ssl_fc }
+{% for host in groups['prometheus_snmp_exporter_dell_server'] %}
+  server {{ hostvars[host]['ansible_hostname'] }} {{ hostvars[host]['ansible_' + hostvars[host]['ansitheus_network_interface']]['ipv4']['address'] }}:{{ prometheus_snmp_exporter_dell_server_port }} check inter 2000 rise 2 fall 5 {% if not loop.first %}backup{% endif %}
+
+{% endfor %}
+{% endif %}
+
+{% if enable_prometheus_snmp_exporter_hpe_device | bool %}
+listen prometheus_snmp_exporter_hpe_device
+  timeout client 2000s
+  timeout server 2000s
+  bind {{ ansitheus_vip_address }}:{{ prometheus_snmp_exporter_hpe_device_port }}
+  http-request del-header X-Forwarded-Proto if { ssl_fc }
+{% for host in groups['prometheus_snmp_exporter_hpe_device'] %}
+  server {{ hostvars[host]['ansible_hostname'] }} {{ hostvars[host]['ansible_' + hostvars[host]['ansitheus_network_interface']]['ipv4']['address'] }}:{{ prometheus_snmp_exporter_hpe_device_port }} check inter 2000 rise 2 fall 5 {% if not loop.first %}backup{% endif %}
+
+{% endfor %}
+{% endif %}
+
+{% if enable_prometheus_snmp_exporter_fujitsu_server | bool %}
+listen prometheus_snmp_exporter_fujitsu_server
+  timeout client 2000s
+  timeout server 2000s
+  bind {{ ansitheus_vip_address }}:{{ prometheus_snmp_exporter_fujitsu_server_port }}
+  http-request del-header X-Forwarded-Proto if { ssl_fc }
+{% for host in groups['prometheus_snmp_exporter_fujitsu_server'] %}
+  server {{ hostvars[host]['ansible_hostname'] }} {{ hostvars[host]['ansible_' + hostvars[host]['ansitheus_network_interface']]['ipv4']['address'] }}:{{ prometheus_snmp_exporter_fujitsu_server_port }} check inter 2000 rise 2 fall 5 {% if not loop.first %}backup{% endif %}
+
+{% endfor %}
+{% endif %}
+
+{% if enable_prometheus_snmp_exporter_switch | bool %}
+listen prometheus_snmp_exporter_switch
+  timeout client 2000s
+  timeout server 2000s
+  bind {{ ansitheus_vip_address }}:{{ prometheus_snmp_exporter_switch_port }}
+  http-request del-header X-Forwarded-Proto if { ssl_fc }
+{% for host in groups['prometheus_snmp_exporter_switch'] %}
+  server {{ hostvars[host]['ansible_hostname'] }} {{ hostvars[host]['ansible_' + hostvars[host]['ansitheus_network_interface']]['ipv4']['address'] }}:{{ prometheus_snmp_exporter_switch_port }} check inter 2000 rise 2 fall 5 {% if not loop.first %}backup{% endif %}
+
+{% endfor %}
+{% endif %}
+
+{% if enable_prometheus_snmp_exporter_huawei_device | bool %}
+listen prometheus_snmp_exporter_huawei_device
+  timeout client 2000s
+  timeout server 2000s
+  bind {{ ansitheus_vip_address }}:{{ prometheus_snmp_exporter_huawei_device_port }}
+  http-request del-header X-Forwarded-Proto if { ssl_fc }
+{% for host in groups['prometheus_snmp_exporter_huawei_device'] %}
+  server {{ hostvars[host]['ansible_hostname'] }} {{ hostvars[host]['ansible_' + hostvars[host]['ansitheus_network_interface']]['ipv4']['address'] }}:{{ prometheus_snmp_exporter_huawei_device_port }} check inter 2000 rise 2 fall 5 {% if not loop.first %}backup{% endif %}
+
+{% endfor %}
+{% endif %}
+
+{% if enable_alertmanager | bool %}
+userlist prometheus-alertmanager-user
+  user {{ prometheus_alertmanager_user }} insecure-password {{ alertmanager_basic_auth_password }}
+
+listen prometheus_alertmanager
+  bind {{ ansitheus_vip_address }}:{{ alertmanager_port }}
+  http-request del-header X-Forwarded-Proto
+  http-request set-header X-Forwarded-Proto https if { ssl_fc }
+  acl auth_acl http_auth(prometheus-alertmanager-user)
+  http-request auth realm basicauth unless auth_acl
+{% for host in groups['prometheus_alertmanager'] %}
+  server {{ hostvars[host]['ansible_hostname'] }} {{ hostvars[host]['ansible_' + hostvars[host]['ansitheus_network_interface']]['ipv4']['address'] }}:{{ alertmanager_port }} check inter 2000 rise 2 fall 5
+{% endfor %}
+{% endif %}
+
+{% if enable_prometheus_nocpro_alert | bool %}
+listen prometheus_nocpro_alert
+  bind {{ ansitheus_vip_address }}:{{ prometheus_nocpro_alert_port }}
+  http-request del-header X-Forwarded-Proto if { ssl_fc }
+{% for host in groups['prometheus_nocpro_alert'] %}
+  server {{ hostvars[host]['ansible_hostname'] }} {{ hostvars[host]['ansible_' + hostvars[host]['ansitheus_network_interface']]['ipv4']['address'] }}:{{ prometheus_nocpro_alert_port }} check fall 5 inter 2000 rise 2
+{% endfor %}
+{% endif %}

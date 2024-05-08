@@ -1,0 +1,19 @@
+---
+- name: Reload prometheus config
+  vars:
+    service_name: "prometheus"
+    service: "{{ prometheus_services[service_name] }}"
+  uri:
+    url: http://{{ hostvars[host]['ansible_' + hostvars[host]['api_interface']]['ipv4']['address'] }}:{{ prometheus_port }}/-/reload
+    method: PUT
+  register: result
+  retries: 5
+  delay: 20
+  until: result.status == 200
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+    - prometheus_confs.changed | bool
+      or prometheus_alert_confs.changed | bool
+      or prometheus_file_sd_confs.changed | bool
+      or prometheus_tls_confs.changed | bool

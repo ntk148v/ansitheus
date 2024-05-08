@@ -1,6 +1,5 @@
 ---
 - name: Pull image without running Prometheus exporter containers
-  become: true
   docker_image:
     name: "{{ item.value.image }}"
     source: pull

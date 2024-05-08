@@ -19,110 +19,53 @@ network_interface: "eth0"
 # Haproxy Passwords
 ###################
 keepalived_password: "{{ keepalived_password }}"
-prometheus_alertmanager_password: "{{ prometheus_alertmanager_password }}"
-prometheus_server_password: "{{ prometheus_server_password }}"
+alertmanager_basic_auth_password: "{{ alertmanager_basic_auth_password }}"
+prometheus_basic_auth_password: "{{ prometheus_basic_auth_password }}"
 
 ################
 # Docker options
 ################
 
-docker_registry: "registry.cloud.com"
-docker_namespace: "cloud"
-docker_registry_username: "cloud"
-docker_registry_password: "passwordcuacloudne"
-# Sets the options used by DNS resolvers by writing an options line
-# into the container's /etc/resolv.conf.
-# For example:
-# docker_dns_servers:
-#   - "8.8.8.8"
-#   - "8.8.4.4"
-docker_dns_servers:
-# Change Docker storage drivers
-# For example: docker_storage_driver: "overlay2"
-docker_storage_driver:
-# Change runtime directory
-# For example: docker_runtime_directory: "/var/lib/docker
-docker_runtime_directory:
-# Can be used to set environment variables for the Docker daemon, such as:
-# docker_daemon_environment:
-#   - "HTTP_PROXY=http://proxy.example.com:3128/"
-#   - "HTTPS_PROXY=http://proxy.example.com:3128/"
-#   - "NO_PROXY=localhost,127.0.0.1"
-docker_daemon_environment: []
-# A set of users will be added to docker group
-docker_users: []
-docker_edition: "ce"
-docker_pkg_version: "18.09"
-# Docker logging driver
-# More details: https://docs.docker.com/config/containers/logging
-docker_log_driver: "json-file"
-docker_log_opts:
-  max-size: 10m
-  max-file: 3
-
-##################
-# Pypi options
-##################
-
-pip_repository: "pip.cloud.repo"
-
-######################
-# Yum Local repository
-######################
-use_local_repo: "yes"
+docker_registry: ""
+docker_namespace: ""
+docker_registry_username: ""
+docker_registry_password: ""
 
 ##################
 # Service options
 ##################
 
-enable_prometheus_server: "yes"
-enable_prometheus_node_exporter: "yes"
-enable_prometheus_rabbit_exporter: "no"
-enable_prometheus_snmp_exporter: "no"
-enable_prometheus_cadvisor: "yes"
+enable_prometheus: "yes"
+enable_node_exporter: "yes"
+enable_cadvisor: "yes"
 enable_grafana: "no"
-enable_prometheus_alertmanager: "yes"
-enable_haproxy: "yes"
-enable_keepalived: "yes"
-enable_prometheus_snmp_exporter_dell_server: "no"
-enable_prometheus_snmp_exporter_hpe_server: "no"
-enable_prometheus_snmp_exporter_fujitsu_server: "no"
-enable_prometheus_snmp_exporter_switch: "no"
-enable_prometheus_nocpro_alert: "no"
-enable_fluentd: "yes"
+enable_alertmanager: "yes"
+enable_haproxy_keepalived: "yes"
 
 ##################
 # Port mappings
 #################
 
-prometheus_server_port: "9090"
-prometheus_alertmanager_port: "9093"
-prometheus_alertmanager_cluster_port: "9094"
-prometheus_node_exporter_port: "9100"
-prometheus_rabbit_exporter_port: "5557"
-prometheus_unsee_dashboard_port: "55550"
-prometheus_cadvisor_port: "8080"
-grafana_listen_port: "5555"
-prometheus_snmp_exporter_dell_server_port: "9116"
-prometheus_snmp_exporter_hpe_device_port: "9117"
-prometheus_snmp_exporter_switch_port: "9118"
-prometheus_snmp_exporter_huawei_device_port: "9119"
-prometheus_snmp_exporter_fujitsu_server_port: "9120"
-prometheus_container_status_exporter_port: "9800"
+prometheus_port: "9090"
+alertmanager_port: "9093"
+alertmanager_cluster_port: "9094"
+node_exporter_port: "9100"
+cadvisor_port: "8080"
+grafana_port: "3000"
 
 ###############
 # Image version
 ###############
 
-prometheus_server_ver: "v2.15.1"
-prometheus_alertmanager_ver: "v0.19.0"
-prometheus_node_exporter_ver: "v0.18.0"
+prometheus_version: "2.52.0"
+alertmanager_version: "0.27.0"
+node_exporter_version: "0.18.0"
 prometheus_rabbit_exporter_ver: "v0.29.0"
-prometheus_cadvisor_ver: "v0.33.0"
+cadvisor_version: "v0.33.0"
 prometheus_snmp_exporter_ver: "v0.15.0"
-grafana_ver: "7.2.2"
-haproxy_ver: "2.3.1"
-keepalived_ver: "2.0.17"
+grafana_version: "7.2.2"
+haproxy_version: "2.3.1"
+keepalived_version: "2.0.17"
 
 ####################
 # Prometheus options

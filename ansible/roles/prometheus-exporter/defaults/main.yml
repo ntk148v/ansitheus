@@ -3,7 +3,7 @@ prometheus_exporter_services:
   node_exporter:
     container_name: "node_exporter"
     group: "prometheus_node_exporter"
-    enabled: "{{ enable_prometheus_node_exporter }}"
+    enabled: "{{ enable_node_exporter }}"
     image: "{{ prometheus_node_exporter_image }}"
     privileged: "no"
     state: "started"
@@ -16,18 +16,18 @@ prometheus_exporter_services:
       - "--path.sysfs=/host/sys"
       - "--path.rootfs=/rootfs"
       - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
-      - "--web.listen-address {{ api_interface_address }}:{{ prometheus_node_exporter_port }}"
+      - "--web.listen-address {{ api_interface_address }}:{{ node_exporter_port }}"
       - "--log.level={{ prometheus_node_exporter_log_level }}"
       - "--log.format={{ prometheus_node_exporter_log_format }}"
     restart_policy: "unless-stopped"
     network_mode: "host"
-    port: "{{ prometheus_node_exporter_port }}"
+    port: "{{ node_exporter_port }}"
     log_driver: "{{ prometheus_node_exporter_log_driver }}"
     log_options: "{{ prometheus_node_exporter_log_opts }}"
   cadvisor:
     container_name: "cadvisor"
     group: "prometheus_cadvisor"
-    enabled: "{{ enable_prometheus_cadvisor }}"
+    enabled: "{{ enable_cadvisor }}"
     image: "{{ prometheus_cadvisor_image }}"
     privileged: "no"
     volumes:
@@ -38,139 +38,24 @@ prometheus_exporter_services:
       - "/cgroup:/cgroup:ro"
     command:
       - "--listen_ip={{ api_interface_address }}"
-      - "--port={{ prometheus_cadvisor_port }}"
+      - "--port={{ cadvisor_port }}"
       - "--store_container_labels=false"
       - "--docker_only=true"
       - "--disable_root_cgroup_stats=true"
     restart_policy: "unless-stopped"
     state: "started"
     network_mode: "host"
-    port: "{{ prometheus_cadvisor_port }}"
+    port: "{{ cadvisor_port }}"
     log_driver: "{{ prometheus_cadvisor_log_driver }}"
     log_options: "{{ prometheus_cadvisor_log_opts }}"
-  prometheus_snmp_exporter_dell_server:
-    container_name: prometheus_snmp_exporter_dell_server
-    group: prometheus_snmp_exporter_dell_server
-    enabled: "{{ enable_prometheus_snmp_exporter_dell_server | bool }}"
-    image: "{{ prometheus_snmp_exporter_image }}"
-    privileged: "no"
-    command:
-      - "--web.listen-address {{ api_interface_address }}:{{ prometheus_snmp_exporter_dell_server_port }}"
-      - "--config.file {{ snmp_container_config_directory }}/snmp.yml"
-    volumes:
-      - "{{ ansitheus_conf }}/prometheus_snmp_exporter_dell_server/:{{ snmp_container_config_directory }}/:ro"
-      - "/etc/localtime:/etc/localtime:ro"
-    restart_policy: "unless-stopped"
-    state: "started"
-    network_mode: "host"
-    port: "{{ prometheus_snmp_exporter_dell_server_port }}"
-    log_driver: "{{ prometheus_snmp_exporter_log_driver }}"
-    log_options: "{{ prometheus_snmp_exporter_log_opts }}"
-  prometheus_snmp_exporter_hpe_device:
-    container_name: prometheus_snmp_exporter_hpe_device
-    group: prometheus_snmp_exporter_hpe_device
-    enabled: "{{ enable_prometheus_snmp_exporter_hpe_device | bool }}"
-    image: "{{ prometheus_snmp_exporter_image }}"
-    privileged: "no"
-    command:
-      - "--web.listen-address {{ api_interface_address }}:{{ prometheus_snmp_exporter_hpe_device_port }}"
-      - "--config.file {{ snmp_container_config_directory }}/snmp.yml"
-    volumes:
-      - "{{ ansitheus_conf }}/prometheus_snmp_exporter_hpe_device/:{{ snmp_container_config_directory }}/:ro"
-      - "/etc/localtime:/etc/localtime:ro"
-    restart_policy: "unless-stopped"
-    state: "started"
-    network_mode: "host"
-    port: "{{ prometheus_snmp_exporter_hpe_device_port }}"
-    log_driver: "{{ prometheus_snmp_exporter_log_driver }}"
-    log_options: "{{ prometheus_snmp_exporter_log_opts }}"
-  prometheus_snmp_exporter_fujitsu_server:
-    container_name: prometheus_snmp_exporter_fujitsu_server
-    group: prometheus_snmp_exporter_fujitsu_server
-    enabled: "{{ enable_prometheus_snmp_exporter_fujitsu_server | bool }}"
-    image: "{{ prometheus_snmp_exporter_image }}"
-    privileged: "no"
-    command:
-      - "--web.listen-address {{ api_interface_address }}:{{ prometheus_snmp_exporter_fujitsu_server_port }}"
-      - "--config.file {{ snmp_container_config_directory }}/snmp.yml"
-    volumes:
-      - "{{ ansitheus_conf }}/prometheus_snmp_exporter_fujitsu_server/:{{ snmp_container_config_directory }}/:ro"
-      - "/etc/localtime:/etc/localtime:ro"
-    restart_policy: "unless-stopped"
-    state: "started"
-    network_mode: "host"
-    port: "{{ prometheus_snmp_exporter_fujitsu_server_port }}"
-    log_driver: "{{ prometheus_snmp_exporter_log_driver }}"
-    log_options: "{{ prometheus_snmp_exporter_log_opts }}"
-  prometheus_snmp_exporter_switch:
-    container_name: prometheus_snmp_exporter_switch
-    group: prometheus_snmp_exporter_switch
-    enabled: "{{ enable_prometheus_snmp_exporter_switch | bool }}"
-    image: "{{ prometheus_snmp_exporter_image }}"
-    privileged: "no"
-    command:
-      - "--web.listen-address {{ api_interface_address }}:{{ prometheus_snmp_exporter_switch_port }}"
-      - "--config.file {{ snmp_container_config_directory }}/snmp.yml"
-    volumes:
-      - "{{ ansitheus_conf }}/prometheus_snmp_exporter_switch/:{{ snmp_container_config_directory }}/:ro"
-      - "/etc/localtime:/etc/localtime:ro"
-    restart_policy: "unless-stopped"
-    state: "started"
-    network_mode: "host"
-    port: "{{ prometheus_snmp_exporter_switch_port }}"
-    log_driver: "{{ prometheus_snmp_exporter_log_driver }}"
-    log_options: "{{ prometheus_snmp_exporter_log_opts }}"
-  prometheus_snmp_exporter_huawei_device:
-    container_name: prometheus_snmp_exporter_huawei_device
-    group: prometheus_snmp_exporter_huawei_device
-    enabled: "{{ enable_prometheus_snmp_exporter_huawei_device | bool }}"
-    image: "{{ prometheus_snmp_exporter_image }}"
-    privileged: "no"
-    command:
-      - "--web.listen-address {{ api_interface_address }}:{{ prometheus_snmp_exporter_huawei_device_port }}"
-      - "--config.file {{ snmp_container_config_directory }}/snmp.yml"
-    volumes:
-      - "{{ ansitheus_conf }}/prometheus_snmp_exporter_huawei_device/:{{ snmp_container_config_directory }}/:ro"
-      - "/etc/localtime:/etc/localtime:ro"
-    restart_policy: "unless-stopped"
-    state: "started"
-    network_mode: "host"
-    port: "{{ prometheus_snmp_exporter_huawei_device_port }}"
-    log_driver: "{{ prometheus_snmp_exporter_log_driver }}"
-    log_options: "{{ prometheus_snmp_exporter_log_opts }}"
-  prometheus_container_status_exporter:
-    container_name: prometheus_container_status_exporter
-    group: prometheus_container_status_exporter
-    enabled: "{{ enable_prometheus_container_status_exporter | bool }}"
-    image: "{{ prometheus_container_status_exporter_image }}"
-    privileged: "no"
-    command:
-      - "--port {{ prometheus_container_status_exporter_port }}"
-    volumes:
-      - "/etc/hosts:/etc/hosts:ro"
-      - "/etc/localtime:/etc/localtime:ro"
-      - "/var/run/docker.sock:/var/run/docker.sock"
-    restart_policy: "unless-stopped"
-    state: "started"
-    network_mode: "host"
-    port: "{{ prometheus_container_status_exporter_port }}"
-    log_driver: "{{ prometheus_container_status_exporter_log_driver }}"
-    log_options: "{{ prometheus_container_status_exporter_log_opts }}"
 
-prometheus_node_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ prometheus_docker_namespace }}/node-exporter:{{ prometheus_node_exporter_ver }}"
-prometheus_cadvisor_image: "{{ docker_registry ~ '/' if docker_registry else 'gcr.io/' }}{{ prometheus_cadvisor_docker_namespace }}/cadvisor:{{ prometheus_cadvisor_ver }}"
-prometheus_snmp_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ prometheus_docker_namespace }}/snmp-exporter:{{ prometheus_snmp_exporter_ver }}"
-prometheus_container_status_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ prometheus_docker_namespace }}/container-status-exporter:{{ prometheus_container_status_exporter_ver }}"
-snmp_container_config_directory: "/etc/snmp_exporter"
+prometheus_node_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ prometheus_docker_namespace }}/node-exporter:{{ node_exporter_version }}"
+prometheus_cadvisor_image: "{{ docker_registry ~ '/' if docker_registry else 'gcr.io/' }}{{ cadvisor_docker_namespace }}/cadvisor:{{ cadvisor_version }}"
 
 prometheus_node_exporter_log_driver: "{{ docker_log_driver }}"
 prometheus_node_exporter_log_opts: "{{ docker_log_opts }}"
 prometheus_cadvisor_log_driver: "{{ docker_log_driver }}"
 prometheus_cadvisor_log_opts: "{{ docker_log_opts }}"
-prometheus_snmp_exporter_log_driver: "{{ docker_log_driver }}"
-prometheus_snmp_exporter_log_opts: "{{ docker_log_opts }}"
-prometheus_container_status_exporter_log_driver: "{{ docker_log_driver }}"
-prometheus_container_status_exporter_log_opts: "{{ docker_log_opts }}"
 
 # Only log messages with the given severity or above. One of: [debug, info, warn, error]
 prometheus_node_exporter_log_level: "info"

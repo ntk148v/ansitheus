@@ -1,0 +1,20 @@
+---
+- name: Reload alertmanager config
+  vars:
+    service_name: "alertmanager"
+    service: "{{ alertmanager_services[service_name] }}"
+    ansible_interface: "ansible_{{ ansitheus_network_interface }}"
+    prometheus_alertmanager_ip_address: "{{ hostvars[inventory_hostname][ansible_interface]['ipv4']['address'] }}"
+  uri:
+    url: http://{{ prometheus_alertmanager_ip_address }}:{{ alertmanager_port }}/-/reload
+    method: POST
+  register: result
+  retries: 5
+  delay: 20
+  until: result.status == 200
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+    - alertmanager_config_dirs.changed | bool
+      or alertmanager_custom_confs.changed | bool
+      or alertmanager_custom_templates.changed | bool

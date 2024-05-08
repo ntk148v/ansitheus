@@ -6,12 +6,11 @@
     owner: "{{ config_owner_user }}"
     group: "{{ config_owner_group }}"
     mode: "0755"
-  become: true
 
 - name: Find grafana plugins files (.zip)
   local_action:
     module: find
-    path: "{{ ansitheus_custom_conf }}/grafana/plugins/"
+    path: "{{ ansitheus_custom_config_dir }}/grafana/plugins/"
     pattern: "*.zip"
   run_once: True
   register: grafana_plugins_zip
@@ -23,15 +22,13 @@
     owner: "{{ config_owner_user }}"
     group: "{{ config_owner_group }}"
     mode: "0755"
-  become: true
   when: grafana_plugins_zip is defined and grafana_plugins_zip.files | length > 0
 
 - name: Extract plugins .zip to destination
   unarchive:
-    src: "{{ ansitheus_custom_conf }}/grafana/plugins/{{ item.path | basename }}"
+    src: "{{ ansitheus_custom_config_dir }}/grafana/plugins/{{ item.path | basename }}"
     dest: "{{ grafana_conf }}/plugins"
     mode: "0755"
-  become: true
   register: grafana_plugins
   when: grafana_plugins_zip is defined and grafana_plugins_zip.files | length > 0
   with_items: "{{ grafana_plugins_zip.files }}"
@@ -41,13 +38,12 @@
 - name: Copying over grafana config file
   template:
     src: "{{ item }}"
-    dest: "{{ ansitheus_conf }}/grafana/grafana.ini"
+    dest: "{{ ansitheus_config_dir }}/grafana/grafana.ini"
     mode: "0755"
   register: grafana_confs
-  become: true
   with_first_found:
-    - "{{ ansitheus_custom_conf }}/grafana/{{ inventory_hostname }}/grafana.ini"
-    - "{{ ansitheus_custom_conf }}/grafana/grafana.ini"
+    - "{{ ansitheus_custom_config_dir }}/grafana/{{ inventory_hostname }}/grafana.ini"
+    - "{{ ansitheus_custom_config_dir }}/grafana/grafana.ini"
     - "{{ role_path }}/templates/grafana.ini.j2"
   notify:
     - Recreate grafana container
@@ -55,17 +51,16 @@
 - name: Find extra configuration files
   local_action:
     module: find
-    path: "{{ ansitheus_custom_conf }}/grafana/"
+    path: "{{ ansitheus_custom_config_dir }}/grafana/"
     pattern: "*.yaml"
   changed_when: False
   run_once: True
   register: grafana_extra_confs
 
 - name: Copying over extra configuration files
-  become: True
   template:
     src: "{{ item.path }}"
-    dest: "{{ ansitheus_conf }}/grafana/{{ item.path | basename }}"
+    dest: "{{ ansitheus_config_dir }}/grafana/{{ item.path | basename }}"
     mode: "0755"
   register: grafana_extra_confs
   when: grafana_extra_confs is defined and grafana_extra_confs.files | length > 0
@@ -74,7 +69,6 @@
     - Recreate grafana container
 
 - name: Check grafana containers
-  become: true
   docker_container:
     name: "{{ item.value.container_name }}"
     image: "{{ item.value.image }}"

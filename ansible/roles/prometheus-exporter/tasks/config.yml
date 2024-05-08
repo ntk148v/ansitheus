@@ -1,12 +1,11 @@
 ---
 - name: Ensuring snmp exporter config directories exist
   file:
-    path: "{{ ansitheus_conf }}/{{ item.key }}"
+    path: "{{ ansitheus_config_dir }}/{{ item.key }}"
     state: "directory"
     owner: "{{ config_owner_user }}"
     group: "{{ config_owner_group }}"
     mode: "0755"
-  become: true
   with_dict: "{{ prometheus_exporter_services }}"
   when:
     - inventory_hostname in groups[item.value.group]
@@ -16,7 +15,7 @@
 - name: Find snmp config files for dell server
   local_action:
     module: find
-    path: "{{ ansitheus_custom_conf }}/prometheus_exporter/snmp_exporter/"
+    path: "{{ ansitheus_custom_config_dir }}/prometheus_exporter/snmp_exporter/"
     pattern: "snmp_exporter_dell_server.yml"
   run_once: True
   register: prometheus_snmp_exporter_dell
@@ -25,8 +24,8 @@
 
 - name: Copying over snmp.yml file for dell server
   copy:
-    src: "{{ ansitheus_custom_conf }}/prometheus_exporter/snmp_exporter/{{ item.path | basename }}"
-    dest: "{{ ansitheus_conf }}/prometheus_snmp_exporter_dell_server/snmp.yml"
+    src: "{{ ansitheus_custom_config_dir }}/prometheus_exporter/snmp_exporter/{{ item.path | basename }}"
+    dest: "{{ ansitheus_config_dir }}/prometheus_snmp_exporter_dell_server/snmp.yml"
     mode: "0755"
   register: prometheus_snmp_exporter_dell_confs
   with_items: "{{ prometheus_snmp_exporter_dell.files }}"
@@ -40,7 +39,7 @@
 - name: Find snmp config files for hpe device
   local_action:
     module: find
-    path: "{{ ansitheus_custom_conf }}/prometheus_exporter/snmp_exporter/"
+    path: "{{ ansitheus_custom_config_dir }}/prometheus_exporter/snmp_exporter/"
     pattern: "snmp_exporter_hpe_device.yml"
   run_once: True
   register: prometheus_snmp_exporter_hpe
@@ -49,8 +48,8 @@
 
 - name: Copying over snmp.yml file for hpe device
   copy:
-    src: "{{ ansitheus_custom_conf }}/prometheus_exporter/snmp_exporter/{{ item.path | basename }}"
-    dest: "{{ ansitheus_conf }}/prometheus_snmp_exporter_hpe_device/snmp.yml"
+    src: "{{ ansitheus_custom_config_dir }}/prometheus_exporter/snmp_exporter/{{ item.path | basename }}"
+    dest: "{{ ansitheus_config_dir }}/prometheus_snmp_exporter_hpe_device/snmp.yml"
     mode: "0755"
   register: prometheus_snmp_exporter_hpe_confs
   with_items: "{{ prometheus_snmp_exporter_hpe.files }}"
@@ -64,7 +63,7 @@
 - name: Find snmp config files for fujitsu server
   local_action:
     module: find
-    path: "{{ ansitheus_custom_conf }}/prometheus_exporter/snmp_exporter/"
+    path: "{{ ansitheus_custom_config_dir }}/prometheus_exporter/snmp_exporter/"
     pattern: "snmp_exporter_fujitsu_server.yml"
   run_once: True
   register: prometheus_snmp_exporter_fujitsu
@@ -73,8 +72,8 @@
 
 - name: Copying over snmp.yml file for fujitsu server
   copy:
-    src: "{{ ansitheus_custom_conf }}/prometheus_exporter/snmp_exporter/{{ item.path | basename }}"
-    dest: "{{ ansitheus_conf }}/prometheus_snmp_exporter_fujitsu_server/snmp.yml"
+    src: "{{ ansitheus_custom_config_dir }}/prometheus_exporter/snmp_exporter/{{ item.path | basename }}"
+    dest: "{{ ansitheus_config_dir }}/prometheus_snmp_exporter_fujitsu_server/snmp.yml"
     mode: "0755"
   register: prometheus_snmp_exporter_fujitsu_confs
   with_items: "{{ prometheus_snmp_exporter_fujitsu.files }}"
@@ -88,7 +87,7 @@
 - name: Find snmp config files for switch
   local_action:
     module: find
-    path: "{{ ansitheus_custom_conf }}/prometheus_exporter/snmp_exporter/"
+    path: "{{ ansitheus_custom_config_dir }}/prometheus_exporter/snmp_exporter/"
     pattern: "snmp_exporter_switch.yml"
   run_once: True
   register: prometheus_snmp_exporter_switch
@@ -97,8 +96,8 @@
 
 - name: Copying over snmp.yml file for switch
   copy:
-    src: "{{ ansitheus_custom_conf }}/prometheus_exporter/snmp_exporter/{{ item.path | basename }}"
-    dest: "{{ ansitheus_conf }}/prometheus_snmp_exporter_switch/snmp.yml"
+    src: "{{ ansitheus_custom_config_dir }}/prometheus_exporter/snmp_exporter/{{ item.path | basename }}"
+    dest: "{{ ansitheus_config_dir }}/prometheus_snmp_exporter_switch/snmp.yml"
     mode: "0755"
   register: prometheus_snmp_exporter_switch_confs
   with_items: "{{ prometheus_snmp_exporter_switch.files }}"
@@ -112,7 +111,7 @@
 - name: Find snmp config files for huawei device
   local_action:
     module: find
-    path: "{{ ansitheus_custom_conf }}/prometheus_exporter/snmp_exporter/"
+    path: "{{ ansitheus_custom_config_dir }}/prometheus_exporter/snmp_exporter/"
     pattern: "snmp_exporter_huawei_device.yml"
   run_once: True
   register: prometheus_snmp_exporter_huawei_device
@@ -121,8 +120,8 @@
 
 - name: Copying over snmp.yml file for huawei device
   copy:
-    src: "{{ ansitheus_custom_conf }}/prometheus_exporter/snmp_exporter/{{ item.path | basename }}"
-    dest: "{{ ansitheus_conf }}/prometheus_snmp_exporter_huawei_device/snmp.yml"
+    src: "{{ ansitheus_custom_config_dir }}/prometheus_exporter/snmp_exporter/{{ item.path | basename }}"
+    dest: "{{ ansitheus_config_dir }}/prometheus_snmp_exporter_huawei_device/snmp.yml"
     mode: "0755"
   register: prometheus_snmp_exporter_huawei_device_confs
   with_items: "{{ prometheus_snmp_exporter_huawei_device.files }}"
@@ -134,7 +133,6 @@
     - Restart prometheus_snmp_exporter_huawei_device container
 
 - name: Recreate if not exist running containers
-  become: true
   docker_container:
     name: "{{ item.value.container_name }}"
     image: "{{ item.value.image }}"

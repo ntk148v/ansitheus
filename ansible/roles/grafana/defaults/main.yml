@@ -20,7 +20,7 @@ grafana_services:
     log_driver: "{{ grafana_log_driver }}"
     log_options: "{{ grafana_log_opts }}"
 
-grafana_conf: "{{ ansitheus_conf }}/grafana/"
+grafana_conf: "{{ ansitheus_config_dir }}/grafana/"
 grafana_data_dir: "/var/lib/grafana"
 grafana_log_dir: "/var/log/grafana"
 grafana_plugin_dir: "{{ grafana_data_dir }}/plugins"
@@ -30,7 +30,7 @@ grafana_plugin_dir: "{{ grafana_data_dir }}/plugins"
 ##########
 
 grafana_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ grafana_docker_namespace }}/grafana"
-grafana_tag: "{{ grafana_ver }}"
+grafana_tag: "{{ grafana_version }}"
 grafana_image_full: "{{ grafana_image }}:{{ grafana_tag }}"
 grafana_volume: "grafana"
 grafana_log_volume: "grafana_log"

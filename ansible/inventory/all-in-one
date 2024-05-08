@@ -1,52 +1,27 @@
-[haproxy]
+[common:children]
+haproxy_keepalived
+grafana
+prometheus
+alertmanager
+cadvisor
+node_exporter
+
+[haproxy_keepalived]
 localhost
 
-[keepalived]
-localhost
-
-[fluentd]
-localhost
-
-[prometheus_server]
+[prometheus]
 # These hostname must be resolvable from your deployment host
 localhost       ansible_connection=local
 
-[prometheus_alertmanager]
+[alertmanager]
 # By default, start alertmanager service in the same host with prometheus
 localhost       ansible_connection=local
 
 [grafana]
 localhost       ansible_connection=local
 
-[prometheus_unsee:children]
-prometheus_alertmanager
-
-[prometheus_cadvisor]
+[cadvisor]
 localhost       ansible_connection=local
 
-[prometheus_node_exporter]
-localhost       ansible_connection=local
-
-[prometheus_rabbit_exporter]
-localhost       ansible_connection=local
-
-[prometheus_snmp_exporter]
-localhost       ansible_connection=local
-
-[prometheus_snmp_exporter_switch:children]
-prometheus_snmp_exporter
-
-[prometheus_snmp_exporter_hpe_device:children]
-prometheus_snmp_exporter
-
-[prometheus_snmp_exporter_dell_server:children]
-prometheus_snmp_exporter
-
-[prometheus_snmp_exporter_fujitsu_server:children]
-prometheus_snmp_exporter
-
-[prometheus_snmp_exporter_huawei_device:children]
-prometheus_snmp_exporter
-
-[prometheus_container_status_exporter]
+[node_exporter]
 localhost       ansible_connection=local

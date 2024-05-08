@@ -1,3 +1,1 @@
 ---
-dependencies:
-  - { role: common, when: not skip_common | bool }

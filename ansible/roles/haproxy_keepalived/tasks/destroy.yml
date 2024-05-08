@@ -1,0 +1,41 @@
+---
+- name: Stop and remove containers
+  docker_container:
+    name: "{{ item.value.container_name }}"
+    state: "absent"
+    keep_volumes: "{{ not destroy_include_volumes | bool }}"
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ haproxy_services }}"
+
+- name: Remove keepalived configuration
+  file:
+    state: "absent"
+    path: "{{ item }}"
+  when:
+    - inventory_hostname in groups['haproxy']
+    - enable_haproxy_keepalived | bool and enable_keepalived | bool
+  with_items:
+    - keepalived_conf
+    - haproxy_conf
+
+- name: Remove images
+  docker_image:
+    name: "{{ item.value.image }}"
+    state: "absent"
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+    - destroy_include_images | bool
+  with_dict: "{{ haproxy_services }}"
+
+- name: Remove volumes
+  docker_volume:
+    name: haproxy_socket
+    state: "absent"
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+    - destroy_include_volumes | bool
+  with_dict: "{{ haproxy_services }}"

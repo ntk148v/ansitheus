@@ -1,0 +1,39 @@
+---
+- name: Stop and remove containers
+  docker_container:
+    name: "{{ item.value.container_name }}"
+    state: "absent"
+    keep_volumes: "{{ not destroy_include_volumes | bool }}"
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ alertmanager_services }}"
+
+- name: Remove service configuration
+  file:
+    state: "absent"
+    path: "{{ alertmanager_config_dir }}"
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ alertmanager_services }}"
+
+- name: Remove images
+  docker_image:
+    name: "{{ item.value.image }}"
+    state: "absent"
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+    - destroy_include_images | bool
+  with_dict: "{{ alertmanager_services }}"
+
+- name: Remove volumes
+  docker_volume:
+    name: "{{ alertmanager_volume }}"
+    state: "absent"
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+    - destroy_include_volumes | bool
+  with_dict: "{{ alertmanager_services }}"

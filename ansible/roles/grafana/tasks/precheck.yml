@@ -2,7 +2,7 @@
 - name: Check free port for grafana (listening)
   wait_for:
     host: "{{ hostvars[inventory_hostname]['ansible_' + api_interface]['ipv4']['address'] }}"
-    port: "{{ grafana_listen_port }}"
+    port: "{{ grafana_port }}"
     connect_timeout: 1
     timeout: 1
     state: stopped

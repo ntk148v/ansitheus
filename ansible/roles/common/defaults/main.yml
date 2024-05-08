@@ -1,6 +1,6 @@
 ---
 # defaults file for common
-yum_repository_conf: "{{ ansitheus_conf }}/yum-repository"
+yum_repository_conf: "{{ ansitheus_config_dir }}/yum-repository"
 yum_repository_dir: "/etc/yum.repos.d"
 
 pip_docker_ver: "4.0.2"
