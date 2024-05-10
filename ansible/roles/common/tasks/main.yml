@@ -16,7 +16,7 @@
 
 - name: Create directory
   become: true
-  file:
+  ansible.builtin.file:
     path: "{{ ansitheus_custom_config_dir }}"
     state: directory
     recurse: yes

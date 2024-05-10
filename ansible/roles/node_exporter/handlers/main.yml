@@ -1,2 +1,23 @@
 ---
-# handlers file for node_exporter
+- name: Restart node_exporter container
+  vars:
+    service_name: "node_exporter"
+    service: "{{ node_exporters_service[service_name] }}"
+  become: true
+  community.general.docker_container:
+    name: "{{ service.container_name }}"
+    image: "{{ service.image }}"
+    volumes: "{{ service.volumes }}"
+    command: "{{ service.command }}"
+    state: "{{ service.state }}"
+    restart: "yes"
+    restart_policy: "{{ service.restart_policy }}"
+    privileged: "{{ service.privileged }}"
+    network_mode: "{{ service.network_mode }}"
+    log_driver: "{{ service.log_driver }}"
+    log_options: "{{ service.log_options }}"
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+    - node_exporter_textfile_confs.changed | bool or
+      node_exporter_confs.changed | bool

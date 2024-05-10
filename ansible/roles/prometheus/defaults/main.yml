@@ -1,5 +1,7 @@
 ---
 prometheus_version: "2.52.0"
+prometheus_docker_namespace: "{{ docker_namespace if docker_namespace else 'prom' }}"
+prometheus_port: 9090
 prometheus_config_dir: "{{ ansitheus_config_dir }}/prometheus"
 prometheus_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ prometheus_docker_namespace }}/prometheus:v{{ prometheus_version }}"
 prometheus_volume: "prometheus_data"
@@ -83,13 +85,16 @@ prometheus_services:
       {% if prometheus_version is version('2.24.0', '>=') %}
         --web.config.file=/etc/prometheus/web.yml
       {% endif %}
+        --web.enable-lifecycle
         --web.console.libraries=/etc/prometheus/console_libraries
         --web.console.templates=/etc/prometheus/consoles
         --web.listen-address={{ prometheus_web_listen_address }}
         --web.external-url={{ prometheus_web_external_url }}
       {% for flag, flag_value in prometheus_config_flags_extra.items() %}
       {% if not flag_value %}
+      {% if not flag == "web.enable-lifecycle" %}
         --{{ flag }}
+      {% endif %}
       {% elif flag_value is string %}
         --{{ flag }}={{ flag_value }}
       {% elif flag_value is sequence %}

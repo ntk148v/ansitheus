@@ -1,9 +1,9 @@
 ---
-- name: Pull image without running Prometheus exporter containers
+- name: Pull image without running containers
   docker_image:
     name: "{{ item.value.image }}"
     source: pull
   when:
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool
-  with_dict: "{{ prometheus_exporter_services }}"
+  with_dict: "{{ cadvisor_services }}"

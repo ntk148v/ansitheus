@@ -1,5 +1,7 @@
 ---
 alertmanager_version: "0.27.0"
+alertmanager_port: 9093
+alertmanager_docker_namespace: "{{ docker_namespace if docker_namespace else 'prom' }}"
 alertmanager_config_dir: "{{ ansitheus_config_dir }}/alertmanager"
 alertmanager_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ alertmanager_docker_namespace }}/alertmanager:v{{ alertmanager_version }}"
 alertmanager_volume: "alertmanager_data"

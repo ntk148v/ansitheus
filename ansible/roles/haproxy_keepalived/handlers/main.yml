@@ -2,7 +2,7 @@
 - name: Restart haproxy container
   vars:
     service: "{{ haproxy_services['haproxy'] }}"
-  docker_container:
+  community.general.docker_container:
     name: "{{ service.container_name }}"
     image: "{{ service.image }}"
     privileged: "{{ service.privileged }}"
@@ -21,7 +21,7 @@
 - name: Restart keepalived container
   vars:
     service: "{{ haproxy_services['keepalived'] }}"
-  docker_container:
+  community.general.docker_container:
     name: "{{ service.container_name }}"
     image: "{{ service.image }}"
     privileged: "{{ service.privileged }}"

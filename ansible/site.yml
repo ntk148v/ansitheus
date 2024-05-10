@@ -31,11 +31,7 @@
   hosts:
     - prometheus
   roles:
-    - {
-        role: prometheus,
-        tags: prometheus,
-        when: enable_prometheus | bool,
-      }
+    - { role: prometheus, tags: prometheus, when: enable_prometheus | bool }
 
 - name: Apply role alertmanager
   gather_facts: false
@@ -49,18 +45,6 @@
         when: enable_alertmanager | bool,
       }
 
-- name: Apply role cadvisor
-  gather_facts: false
-  become: true
-  hosts:
-    - cadvisor
-  roles:
-    - {
-        role: cadvisor,
-        tags: prometheus-exporter,
-        when: enable_cadvisor | bool,
-      }
-
 - name: Apply role node_exporter
   gather_facts: false
   become: true
@@ -69,8 +53,20 @@
   roles:
     - {
         role: node_exporter,
-        tags: node_exporter,
+        tags: [exporters, node_exporter],
         when: enable_node_exporter | bool,
+      }
+
+- name: Apply role node_exporter
+  gather_facts: false
+  become: true
+  hosts:
+    - cadvisor
+  roles:
+    - {
+        role: cadvisor,
+        tags: [exporters, cadvisor],
+        when: enable_cadvisor | bool,
       }
 
 - name: Apply role grafana

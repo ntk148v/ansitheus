@@ -21,7 +21,7 @@ remote_read:
 {% if prometheus_alert_rules is defined and prometheus_alert_rules.files | length  > 0 %}
 rule_files:
 {% for rule in prometheus_alert_rules.files %}
-  - "/etc/prometheus/{{ rule.path | basename }}"
+  - "/etc/prometheus/rules/{{ rule.path | basename }}"
 {% endfor %}
 {% endif %}
 {% endif %}

@@ -1,5 +1,5 @@
 ---
-- name: Check free ports for Prometheus exporters
+- name: Check free ports for Cadvisor container
   wait_for:
     host: "{{ hostvars[inventory_hostname]['ansible_' + api_interface]['ipv4']['address'] }}"
     port: "{{ item.value.port }}"
@@ -8,4 +8,4 @@
     state: stopped
   when:
     - inventory_hostname in groups[item.value.group]
-  with_dict: "{{ prometheus_exporter_services }}"
+  with_dict: "{{ cadvisor_services }}"

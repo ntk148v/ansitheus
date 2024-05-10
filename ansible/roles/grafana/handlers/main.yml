@@ -2,7 +2,7 @@
 - name: Recreate grafana container
   vars:
     service: "{{ grafana_services['grafana'] }}"
-  docker_container:
+  community.general.docker_container:
     name: "{{ service.container_name }}"
     image: "{{ service.image }}"
     privileged: "{{ service.privileged }}"

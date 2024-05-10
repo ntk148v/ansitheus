@@ -1,6 +1,6 @@
 ---
 - name: Pull image without running grafana container
-  docker_container:
+  community.general.docker_container:
     name: "{{ item.value.container_name }}"
     image: "{{ item.value.image }}"
     pull: "yes"

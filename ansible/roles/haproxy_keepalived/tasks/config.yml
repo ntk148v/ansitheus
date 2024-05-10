@@ -7,7 +7,7 @@
   when: set_sysctl | bool
 
 - name: Ensuring config directories exist
-  file:
+  ansible.builtin.file:
     path: "{{ ansitheus_config_dir }}/{{ item.key }}"
     state: "directory"
     owner: "{{ config_owner_user }}"
@@ -73,7 +73,7 @@
     - Restart keepalived container
 
 - name: Check haproxy containers
-  docker_container:
+  community.general.docker_container:
     name: "{{ item.value.container_name }}"
     image: "{{ item.value.image }}"
     privileged: "{{ item.value.privileged }}"

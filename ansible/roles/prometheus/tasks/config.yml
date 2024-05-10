@@ -1,6 +1,6 @@
 ---
 - name: Ensuring prometheus config directory exist
-  file:
+  ansible.builtin.file:
     path: "{{ prometheus_config_dir }}"
     state: "directory"
     owner: "{{ config_owner_user }}"
@@ -13,24 +13,26 @@
     path: "{{ ansitheus_custom_config_dir }}/prometheus/rules/"
     pattern: "*.yml,*.yaml"
   run_once: true
+  delegate_to: localhost
   register: prometheus_alert_rules
 
 - name: Ensuring rules directory exist
-  file:
-    path: "{{ ansitheus_custom_config_dir }}/prometheus/rules/"
+  ansible.builtin.file:
+    path: "{{ prometheus_config_dir }}/rules/"
     state: "directory"
     mode: 0755
   when:
     - prometheus_alert_rules is defined and prometheus_alert_rules.files | length > 0
 
 - name: Copying over custom prometheus alert rules files
-  copy:
-    src: "{{ ansitheus_custom_config_dir }}/prometheus/rules"
-    dest: "{{ prometheus_config_dir }}"
+  ansible.builtin.copy:
+    src: "{{ item.path }}"
+    dest: "{{ prometheus_config_dir }}/rules/{{ item.path | basename }}"
     mode: 0755
   register: prometheus_alert_confs
+  with_items: "{{ prometheus_alert_rules.files }}"
   when:
-    - prometheus_alert_rules.stat.isdir is defined and prometheus_alert_rules.stat.isdir
+    - prometheus_alert_rules is defined and prometheus_alert_rules.files | length > 0
   notify:
     - Reload prometheus config
 
@@ -40,16 +42,26 @@
     path: "{{ ansitheus_custom_config_dir }}/prometheus/file_sd"
     pattern: "*.json"
   run_once: true
+  delegate_to: localhost
   register: prometheus_file_sd
 
+- name: Ensuring file_sd directory exist
+  ansible.builtin.file:
+    path: "{{ prometheus_config_dir }}/file_sd/"
+    state: "directory"
+    mode: 0755
+  when:
+    - prometheus_file_sd is defined and prometheus_file_sd.files | length > 0
+
 - name: Copying over custom file_sd
-  copy:
-    src: "{{ ansitheus_custom_config_dir }}/prometheus/file_sd"
-    dest: "{{ prometheus_config_dir }}"
+  ansible.builtin.copy:
+    src: "{{ item.path }}"
+    dest: "{{ prometheus_config_dir }}/file_sd/{{ item.path | basename }}"
     mode: 0755
   register: prometheus_file_sd_confs
+  with_items: "{{ prometheus_file_sd.files }}"
   when:
-    - prometheus_file_sd.stat.isdir is defined and prometheus_file_sd.stat.isdir
+    - prometheus_file_sd is defined and prometheus_file_sd.files | length > 0
   notify:
     - Reload prometheus config
 
@@ -74,7 +86,7 @@
     - Reload prometheus config
 
 - name: Check prometheus containers
-  docker_container:
+  community.general.docker_container:
     name: "{{ item.value.container_name }}"
     image: "{{ item.value.image }}"
     volumes: "{{ item.value.volumes }}"

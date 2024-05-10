@@ -1,2 +1,2 @@
 ---
-# tasks file for node_exporter
+- include_tasks: "{{ ansitheus_action }}.yml"

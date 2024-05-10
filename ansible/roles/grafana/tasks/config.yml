@@ -1,6 +1,6 @@
 ---
 - name: Ensuring config directory exist
-  file:
+  ansible.builtin.file:
     path: "{{ grafana_conf }}"
     state: "directory"
     owner: "{{ config_owner_user }}"
@@ -16,7 +16,7 @@
   register: grafana_plugins_zip
 
 - name: Ensuring custom plugin directory exist
-  file:
+  ansible.builtin.file:
     path: "{{ grafana_conf }}/plugins"
     state: "directory"
     owner: "{{ config_owner_user }}"
@@ -69,7 +69,7 @@
     - Recreate grafana container
 
 - name: Check grafana containers
-  docker_container:
+  community.general.docker_container:
     name: "{{ item.value.container_name }}"
     image: "{{ item.value.image }}"
     volumes: "{{ item.value.volumes }}"

@@ -4,7 +4,7 @@
     service_name: "prometheus"
     service: "{{ prometheus_services[service_name] }}"
   uri:
-    url: http://{{ hostvars[host]['ansible_' + hostvars[host]['api_interface']]['ipv4']['address'] }}:{{ prometheus_port }}/-/reload
+    url: http://{{ api_interface_address }}:{{ prometheus_port }}/-/reload
     method: PUT
   register: result
   retries: 5

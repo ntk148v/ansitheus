@@ -1,6 +1,6 @@
 ---
 - name: Stop and remove containers
-  docker_container:
+  community.general.docker_container:
     name: "{{ item.value.container_name }}"
     state: "absent"
     keep_volumes: "{{ not destroy_include_volumes | bool }}"
@@ -10,7 +10,7 @@
   with_dict: "{{ prometheus_services }}"
 
 - name: Remove service configuration
-  file:
+  ansible.builtin.file:
     state: "absent"
     path: "{{ prometheus_config_dir }}"
   when:

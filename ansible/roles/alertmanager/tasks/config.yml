@@ -1,6 +1,6 @@
 ---
 - name: Ensuring config directory exist
-  file:
+  ansible.builtin.file:
     path: "{{ alertmanager_config_dir }}"
     state: "directory"
     owner: "{{ config_owner_user }}"
@@ -25,7 +25,7 @@
   run_once: True
 
 - name: Ensuring custom template directory exist
-  file:
+  ansible.builtin.file:
     path: "{{ alertmanager_config_dir }}/template/"
     state: "directory"
     mode: 0755
@@ -33,7 +33,7 @@
     - alertmanager_custom_template_files is defined and alertmanager_custom_template_files.files | length > 0
 
 - name: Copying custom prometheus alertmanager custom template files if exists
-  copy:
+  ansible.builtin.copy:
     src: "{{ item.path }}"
     dest: "{{ alertmanager_config_dir }}/template/{{ item.path | basename }}"
     mode: 0755
@@ -47,7 +47,7 @@
 - name: Copying over custom prometheus alertmanager config file if exists
   vars:
     service: "{{ alertmanager_services['alertmanager'] }}"
-  copy:
+  ansible.builtin.copy:
     src: "{{ ansitheus_custom_config_dir }}/alertmanager/config.yml"
     dest: "{{ alertmanager_config_dir }}/config.yml"
   register: alertmanager_custom_confs
@@ -74,7 +74,7 @@
     - Reload alertmanager config
 
 - name: Check alertmanager containers
-  docker_container:
+  community.general.docker_container:
     name: "{{ item.value.container_name }}"
     image: "{{ item.value.image }}"
     volumes: "{{ item.value.volumes }}"

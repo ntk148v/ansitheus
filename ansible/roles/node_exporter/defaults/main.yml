@@ -1,2 +1,80 @@
 ---
-# defaults file for node_exporter
+node_exporter_version: "1.8.0"
+node_exporter_port: 9100
+node_exporter_docker_namespace: "{{ docker_namespace if docker_namespace else 'prom' }}"
+node_exporter_docker_log_driver: "{{ docker_log_driver }}"
+node_exporter_docker_log_opts: "{{ docker_log_opts }}"
+node_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ prometheus_docker_namespace }}/node-exporter:v{{ node_exporter_version }}"
+
+node_exporter_web_disable_exporter_metrics: false
+node_exporter_web_listen_address: "{{ api_interface_address }}:{{ node_exporter_port }}"
+node_exporter_config_dir: "{{ ansitheus_config_dir }}/node_exporter"
+node_exporter_web_telemetry_path: "/metrics"
+
+# Node-exporter arguments
+# -----------------------
+node_exporter_textfile_dir: "{{ node_exporter_config_dir }}/textfile"
+node_exporter_tls_server_config: {}
+node_exporter_http_server_config: {}
+node_exporter_basic_auth_users: {}
+node_exporter_enabled_collectors:
+  - textfile:
+      directory: "{{ node_exporter_textfile_dir }}"
+#  - filesystem:
+#      ignored-mount-points: "^/(sys|proc|dev)($|/)"
+#      ignored-fs-types: "^(sys|proc|auto)fs$"
+node_exporter_disabled_collectors: []
+
+node_exporter_services:
+  node_exporter:
+    container_name: "node_exporter"
+    group: "node_exporter"
+    enabled: "{{ enable_node_exporter }}"
+    image: "{{ node_exporter_image }}"
+    privileged: "no"
+    state: "started"
+    volumes:
+      - "/proc:/host/proc:ro"
+      - "/sys:/host/sys:ro"
+      - "/:/rootfs:ro"
+      - "{{ node_exporter_config_dir }}:/etc/node_exporter"
+    command: >
+      {% for collector in node_exporter_enabled_collectors -%}
+      {%   if not collector is mapping %}
+          '--collector.{{ collector }}'
+      {%   else -%}
+      {%     set name, options = (collector.items()|list)[0] -%}
+          '--collector.{{ name }}'
+      {%     for k,v in options|dictsort %}
+          '--collector.{{ name }}.{{ k }}={{ v }}'
+      {%     endfor -%}
+      {%   endif -%}
+      {% endfor -%}
+      {% for collector in node_exporter_disabled_collectors %}
+          '--no-collector.{{ collector }}'
+      {% endfor %}
+      {% if node_exporter_tls_server_config | length > 0 or node_exporter_http_server_config | length > 0 or node_exporter_basic_auth_users | length > 0 %}
+          {% if node_exporter_version is version('1.5.0', '>=') %}
+          '--web.config.file=/etc/node_exporter/config.yml'
+          {% else %}
+          '--web.config=/etc/node_exporter/config.yml'
+          {% endif %}
+      {% endif %}
+      {% if node_exporter_web_disable_exporter_metrics %}
+          '--web.disable-exporter-metrics'
+      {% endif %}
+      {% if node_exporter_version is version('1.5.0', '>=') and
+            node_exporter_web_listen_address is iterable and
+            node_exporter_web_listen_address is not mapping and
+            node_exporter_web_listen_address is not string %}
+      {%   for address in node_exporter_web_listen_address %}
+          '--web.listen-address={{ address }}'
+      {%   endfor %}
+      {% else %}
+          '--web.listen-address={{ node_exporter_web_listen_address }}'
+      {% endif %}
+          '--web.telemetry-path={{ node_exporter_web_telemetry_path }}'
+    restart_policy: "unless-stopped"
+    network_mode: "host"
+    log_driver: "{{ node_exporter_docker_log_driver }}"
+    log_options: "{{ node_exporter_docker_log_opts }}"
