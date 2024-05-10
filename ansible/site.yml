@@ -10,7 +10,7 @@
     - {
         role: common,
         tags: common,
-        when: not skip_common | bool or enable_common | bool,
+        when: enable_common | bool,
       }
 
 - name: Apply role haproxy_keepalived
@@ -21,7 +21,7 @@
   roles:
     - {
         role: haproxy_keepalived,
-        tags: haproxy,
+        tags: haproxy_keepalived,
         when: enable_haproxy_keepalived | bool,
       }
 

@@ -12,15 +12,12 @@ keepalived_virtual_router_id: "82"
 # The group which own node_config_directory, you can use a non-root
 config_owner_user: "root"
 config_owner_group: "root"
-
 network_interface: "eth0"
 
-###################
-# Haproxy Passwords
-###################
+#####################
+# Keepalived Password
+#####################
 keepalived_password: "{{ keepalived_password }}"
-alertmanager_basic_auth_password: "{{ alertmanager_basic_auth_password }}"
-prometheus_basic_auth_password: "{{ prometheus_basic_auth_password }}"
 
 ################
 # Docker options

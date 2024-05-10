@@ -6,24 +6,28 @@
     - { name: "net.unix.max_dgram_qlen", value: 128 }
   when: set_sysctl | bool
 
-- name: Ensuring config directories exist
+- name: Ensuring haproxy config directory exist
   ansible.builtin.file:
-    path: "{{ ansitheus_config_dir }}/{{ item.key }}"
+    path: "{{ haproxy_config_dir }}"
     state: "directory"
     owner: "{{ config_owner_user }}"
     group: "{{ config_owner_group }}"
-    mode: "0770"
-  when:
-    - inventory_hostname in groups[item.value.group]
-    - item.value.enabled | bool
-  with_dict: "{{ haproxy_services }}"
+    mode: 0770
+
+- name: Ensuring keepalived config directory exist
+  ansible.builtin.file:
+    path: "{{ keepalived_config_dir }}"
+    state: "directory"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+    mode: 0770
 
 - name: Copying over haproxy.cfg
   vars:
-    service: "{{ haproxy_services['haproxy'] }}"
+    service: "{{ haproxy_keepalived_services['haproxy_keepalived'] }}"
   template:
     src: "{{ item }}"
-    dest: "{{ haproxy_conf }}/haproxy.cfg"
+    dest: "{{ haproxy_config_dir }}/haproxy.cfg"
     mode: "0660"
   register: haproxy_copy_config
   when:
@@ -34,14 +38,14 @@
     - "{{ ansitheus_custom_config_dir }}/haproxy/haproxy.cfg"
     - "haproxy.cfg.j2"
   notify:
-    - Restart haproxy container
+    - Restart haproxy_keepalived container
 
 - name: Copying over keepalived.conf
   vars:
-    service: "{{ haproxy_services['keepalived'] }}"
+    service: "{{ haproxy_keepalived_services['haproxy_keepalived'] }}"
   template:
     src: "{{ item }}"
-    dest: "{{ keepalived_conf }}/keepalived.conf"
+    dest: "{{ keepalived_config_dir }}/keepalived.conf"
     mode: "0660"
   register: keepalived_copy_config
   when:
@@ -52,25 +56,26 @@
     - "{{ ansitheus_custom_config_dir }}/keepalived/keepalived.conf"
     - "keepalived.conf.j2"
   notify:
-    - Restart keepalived container
+    - Restart haproxy_keepalived container
 
 - name: Copying over check_haproxy_alive script
+  become: true
   vars:
-    service: "{{ haproxy_services['keepalived'] }}"
+    service: "{{ haproxy_keepalived_services['haproxy_keepalived'] }}"
   template:
     src: "{{ item }}"
-    dest: "{{ keepalived_conf }}/check_haproxy_alive.sh"
+    dest: "{{ keepalived_config_dir }}/check_haproxy_alive.sh"
     mode: "0555"
   register: keepalived_copy_check_script
   when:
     - inventory_hostname in groups[service.group]
     - service.enabled | bool
   with_first_found:
-    - "{{ ansitheus_custom_config_dir }}/keepalived/{{ inventory_hostname }}/check_haproxy_alive.sh"
-    - "{{ ansitheus_custom_config_dir }}/keepalived/check_haproxy_alive.sh"
+    - "{{ ansitheus_custom_conf }}/keepalived/{{ inventory_hostname }}/check_haproxy_alive.sh"
+    - "{{ ansitheus_custom_conf }}/keepalived/check_haproxy_alive.sh"
     - "check_haproxy_alive.sh.j2"
   notify:
-    - Restart keepalived container
+    - Restart haproxy_keepalived container
 
 - name: Check haproxy containers
   community.general.docker_container:
@@ -86,4 +91,4 @@
   when:
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool
-  with_dict: "{{ haproxy_services }}"
+  with_dict: "{{ haproxy_keepalived_services }}"

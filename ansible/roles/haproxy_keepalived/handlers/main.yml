@@ -1,7 +1,7 @@
 ---
-- name: Restart haproxy container
+- name: Restart haproxy_keepalived container
   vars:
-    service: "{{ haproxy_services['haproxy'] }}"
+    service: "{{ haproxy_keepalived_services['haproxy_keepalived'] }}"
   community.general.docker_container:
     name: "{{ service.container_name }}"
     image: "{{ service.image }}"
@@ -17,23 +17,5 @@
     - inventory_hostname in groups[service.group]
     - service.enabled | bool
     - haproxy_copy_config.changed | bool
-
-- name: Restart keepalived container
-  vars:
-    service: "{{ haproxy_services['keepalived'] }}"
-  community.general.docker_container:
-    name: "{{ service.container_name }}"
-    image: "{{ service.image }}"
-    privileged: "{{ service.privileged }}"
-    volumes: "{{ service.volumes }}"
-    state: "{{ service.state }}"
-    restart_policy: "{{ service.restart_policy }}"
-    network_mode: "{{ service.network_mode }}"
-    recreate: "yes"
-    log_driver: "{{ service.log_driver }}"
-    log_options: "{{ service.log_options }}"
-  when:
-    - inventory_hostname in groups[service.group]
-    - service.enabled | bool
-    - keepalived_copy_config.changed | bool
+      or keepalived_copy_config.changed | bool
       or keepalived_copy_check_script.changed | bool
