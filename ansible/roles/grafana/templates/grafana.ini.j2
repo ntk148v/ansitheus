@@ -1,8 +1,8 @@
 # Directories
 [paths]
-data = {{ grafana_data_dir }}
-logs = {{ grafana_log_dir }}
-plugins = {{ grafana_plugin_dir }}
+data = /var/lib/grafana
+logs = /var/log/grafana
+plugins = /var/lib/grafana/plugins
 
 # HTTP options
 [server]
@@ -12,6 +12,20 @@ http_port = {{ grafana_port }}
 router_logging = true
 static_root_path = public
 enable_gzip = false
+
+# HTTP options
+[server]
+{% if grafana_server.protocol is undefined or grafana_server.protocol in ['http', 'https'] %}
+http_addr = {{ grafana_address }}
+http_port = {{ grafana_port }}
+{% endif %}
+domain = {{ grafana_domain }}
+root_url = {{ grafana_url }}
+{% for k,v in grafana_server.items() %}
+{%   if not k in ['http_addr', 'http_port', 'domain', 'root_url'] %}
+{{ k }} = {{ v }}
+{%   endif %}
+{% endfor %}
 
 # Database
 [database]
@@ -35,19 +49,22 @@ enable_gzip = false
 {{ k }} = {{ v }}
 {% endfor %}
 
-# Session
-{% if grafana_session != {} %}
-[session]
-{%   for k,v in grafana_session.items() %}
+# Users management and registration
+{% if grafana_users != {} %}
+[users]
+{%   for k,v in grafana_users.items() %}
 {{ k }} = {{ v }}
 {%   endfor %}
 {% endif %}
+[emails]
+welcome_email_on_sign_up = {{ grafana_welcome_email_on_sign_up }}
 
 # Authentication
 {% if grafana_auth != {} %}
 [auth]
 disable_login_form = {{ grafana_auth.disable_login_form | default('False') }}
 oauth_auto_login = {{ grafana_auth.oauth_auto_login | default('False') }}
+oauth_allow_insecure_email_lookup = {{ grafana_auth.oauth_allow_insecure_email_lookup | default('False') }}
 disable_signout_menu = {{ grafana_auth.disable_signout_menu | default('False') }}
 signout_redirect_url = {{ grafana_auth.signout_redirect_url | default('') }}
 {%  for section, options in grafana_auth.items() %}
@@ -65,10 +82,15 @@ enabled = True
 {%  endfor %}
 {% endif %}
 
-# Users management and registration
-{% if grafana_users != {} %}
-[users]
-{%   for k,v in grafana_users.items() %}
+# Session
+{% if grafana_session != {} %}
+[session]
+{%   for k,v in grafana_session.items() %}
 {{ k }} = {{ v }}
 {%   endfor %}
 {% endif %}
+
+# Logging
+[log]
+mode = {{ grafana_log.mode | default('console, file') }}
+level = {{ grafana_log.level | default('info') }}

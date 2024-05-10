@@ -13,6 +13,6 @@
   when:
     - inventory_hostname in groups[service.group]
     - service.enabled | bool
-    - alertmanager_config_dirs.changed | bool
+    - alertmanager_config.changed | bool
       or alertmanager_custom_confs.changed | bool
       or alertmanager_custom_templates.changed | bool

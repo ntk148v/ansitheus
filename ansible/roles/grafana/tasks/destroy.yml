@@ -11,7 +11,7 @@
 - name: Remove service configuration
   ansible.builtin.file:
     state: "absent"
-    path: "{{ grafana_conf }}"
+    path: "{{ grafana_config_dir }}"
   when:
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool
@@ -29,7 +29,7 @@
 
 - name: Remove volumes
   docker_volume:
-    name: "{{ grafana_volume }}"
+    name: "{{ grafana_data_volume }}"
     state: "absent"
   when:
     - inventory_hostname in groups[item.value.group]
@@ -39,7 +39,7 @@
 
 - name: Remove log volumes
   docker_volume:
-    name: "{{ grafana_log_volume }}"
+    name: "{{ grafana_logs_volume }}"
     state: "absent"
   when:
     - inventory_hostname in groups[item.value.group]

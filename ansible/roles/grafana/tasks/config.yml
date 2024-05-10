@@ -1,7 +1,7 @@
 ---
 - name: Ensuring config directory exist
   ansible.builtin.file:
-    path: "{{ grafana_conf }}"
+    path: "{{ grafana_config_dir }}"
     state: "directory"
     owner: "{{ config_owner_user }}"
     group: "{{ config_owner_group }}"
@@ -17,7 +17,7 @@
 
 - name: Ensuring custom plugin directory exist
   ansible.builtin.file:
-    path: "{{ grafana_conf }}/plugins"
+    path: "{{ grafana_config_dir }}/plugins"
     state: "directory"
     owner: "{{ config_owner_user }}"
     group: "{{ config_owner_group }}"
@@ -27,7 +27,7 @@
 - name: Extract plugins .zip to destination
   unarchive:
     src: "{{ ansitheus_custom_config_dir }}/grafana/plugins/{{ item.path | basename }}"
-    dest: "{{ grafana_conf }}/plugins"
+    dest: "{{ grafana_config_dir }}/plugins"
     mode: "0755"
   register: grafana_plugins
   when: grafana_plugins_zip is defined and grafana_plugins_zip.files | length > 0

@@ -65,7 +65,7 @@
     src: "alertmanager.yml.j2"
     dest: "{{ alertmanager_config_dir }}/config.yml"
     mode: 0755
-  register: alertmanager_config_dirs
+  register: alertmanager_config
   when:
     - inventory_hostname in groups[service.group]
     - service.enabled | bool
