@@ -7,23 +7,15 @@
   hosts:
     - common
   roles:
-    - {
-        role: common,
-        tags: common,
-        when: enable_common | bool,
-      }
+    - { role: common, tags: common, when: enable_common | bool }
 
-- name: Apply role haproxy_keepalived
+- name: Apply role haproxy
   gather_facts: false
   become: true
   hosts:
-    - haproxy_keepalived
+    - haproxy
   roles:
-    - {
-        role: haproxy_keepalived,
-        tags: haproxy_keepalived,
-        when: enable_haproxy_keepalived | bool,
-      }
+    - { role: haproxy, tags: haproxy, when: enable_haproxy | bool }
 
 - name: Apply role prometheus
   gather_facts: false

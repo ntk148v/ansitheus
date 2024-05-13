@@ -1,12 +1,12 @@
 [common:children]
-haproxy_keepalived
+haproxy
 grafana
 prometheus
 alertmanager
 cadvisor
 node_exporter
 
-[haproxy_keepalived]
+[haproxy]
 haproxy-host-01
 haproxy-host-02
 

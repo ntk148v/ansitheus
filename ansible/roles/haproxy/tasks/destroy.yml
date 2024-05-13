@@ -7,15 +7,15 @@
   when:
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool
-  with_dict: "{{ haproxy_keepalived_services }}"
+  with_dict: "{{ haproxy_services }}"
 
-- name: Remove keepalived configuration
+- name: Remove configuration
   ansible.builtin.file:
     state: "absent"
     path: "{{ item }}"
   when:
     - inventory_hostname in groups['haproxy']
-    - enable_haproxy_keepalived | bool and enable_haproxy_keepalived | bool
+    - enable_haproxy | bool and enable_haproxy | bool
   with_items:
     - keepalived_config_dir
     - haproxy_config_dir
@@ -28,7 +28,7 @@
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool
     - destroy_include_images | bool
-  with_dict: "{{ haproxy_keepalived_services }}"
+  with_dict: "{{ haproxy_services }}"
 
 - name: Remove volumes
   docker_volume:
@@ -38,4 +38,10 @@
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool
     - destroy_include_volumes | bool
-  with_dict: "{{ haproxy_keepalived_services }}"
+  with_dict: "{{ haproxy_services }}"
+
+- name: Remove keepalived
+  ansible.builtin.package:
+    name: "{{ keepalived_package_name }}"
+    state: "absent"
+    update_cache: yes

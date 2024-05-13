@@ -1,6 +1,11 @@
+global_defs {
+  enable_script_security
+  script_user root
+}
+
 vrrp_track_process track_haproxy {
-      process haproxy
-      weight 10
+  process haproxy
+  weight 10
 }
 
 vrrp_instance ansible_vip_{{ keepalived_virtual_router_id }} {
@@ -8,13 +13,13 @@ vrrp_instance ansible_vip_{{ keepalived_virtual_router_id }} {
   nopreempt
   interface {{ ansitheus_network_interface }}
   virtual_router_id {{ keepalived_virtual_router_id }}
-  priority {{ groups['haproxy_keepalived'].index(inventory_hostname) + 1 }}
+  priority {{ groups['haproxy'].index(inventory_hostname) + 1 }}
   advert_int 1
 {% if keepalived_traffic_mode == 'unicast' %}
   unicast_src_ip {{ hostvars[inventory_hostname]['ansible_' + ansitheus_network_interface]['ipv4']['address'] }}
-{% if groups['haproxy_keepalived'] | length > 1 %}
+{% if groups['haproxy'] | length > 1 %}
   unicast_peer {
-{% for host in groups['haproxy_keepalived'] %}
+{% for host in groups['haproxy'] %}
 {% set ip_addr = hostvars[host]['ansible_' + hostvars[host]['ansitheus_network_interface']]['ipv4']['address'] %}
 {% if ip_addr != hostvars[inventory_hostname]['ansible_' + ansitheus_network_interface]['ipv4']['address'] %}
     {{ ip_addr }}
@@ -34,4 +39,9 @@ vrrp_instance ansible_vip_{{ keepalived_virtual_router_id }} {
   track_process {
     track_haproxy
   }
+{% if prometheus_single_running_at_time | bool %}
+
+  notify_master "/usr/bin/docker start prometheus"
+  notify_backup "/usr/bin/docker stop prometheus"
+{% endif %}
 }

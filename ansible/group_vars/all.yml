@@ -18,20 +18,10 @@ network_interface: "{{ network_interface }}"
 api_interface: "{{ network_interface }}"
 api_interface_address: "{{ hostvars[inventory_hostname]['ansible_' + api_interface]['ipv4']['address'] }}"
 
-###############
-# Haproxy Users
-###############
-prometheus_server_user: "admin"
-prometheus_alertmanager_user: "admin"
-
 ###################
 # Haproxy Passwords
 ###################
-
 keepalived_password: "{{ keepalived_password }}"
-# Passwords that are used for HAProxy basic auth
-alertmanager_basic_auth_password: "{{ alertmanager_basic_auth_password }}"
-prometheus_basic_auth_password: "{{ prometheus_basic_auth_password }}"
 
 ################
 # Docker options
@@ -44,7 +34,7 @@ docker_registry_password: "{{ docker_registry_password if docker_registry_passwo
 docker_log_driver: "json-file"
 docker_log_opts:
   max-size: 30m
-  max-file: 3
+  max-file: '3'
 
 ##################
 # Service options
@@ -57,7 +47,7 @@ enable_node_exporter: "yes"
 enable_cadvisor: "yes"
 enable_grafana: "yes"
 enable_alertmanager: "yes"
-enable_haproxy_keepalived: "yes"
+enable_haproxy: "yes"
 
 ##################
 # Port mappings
@@ -79,8 +69,7 @@ alertmanager_version: "0.27.0"
 node_exporter_version: "1.8.0"
 cadvisor_version: "v0.35.0"
 grafana_version: "7.2.2"
-haproxy_version: "2.9.7"
-keepalived_version: "2.0.17"
+haproxy_version: "lts-alpine"
 
 ##########################
 # Service docker namespace
@@ -97,7 +86,8 @@ haproxy_docker_namespace: "{{ docker_namespace if docker_namespace else '' }}"
 ####################
 # Prometheus options
 ####################
-
+# Special variable to handle case, you want to only ONE Prometheus running instance at time.
+prometheus_single_running_at_time: "no"
 prometheus_storage_retention: "90d"
 prometheus_external_labels: # This is a dictionary variable
   monitor: "cloud"

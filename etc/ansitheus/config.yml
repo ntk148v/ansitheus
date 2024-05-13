@@ -37,7 +37,7 @@ enable_node_exporter: "yes"
 enable_cadvisor: "yes"
 enable_grafana: "no"
 enable_alertmanager: "yes"
-enable_haproxy_keepalived: "yes"
+enable_haproxy: "yes"
 
 ##################
 # Port mappings

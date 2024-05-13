@@ -1,7 +1,7 @@
 ---
-- name: Restart haproxy_keepalived container
+- name: Restart haproxy container
   vars:
-    service: "{{ haproxy_keepalived_services['haproxy_keepalived'] }}"
+    service: "{{ haproxy_services['haproxy'] }}"
   community.general.docker_container:
     name: "{{ service.container_name }}"
     image: "{{ service.image }}"
@@ -18,4 +18,21 @@
     - service.enabled | bool
     - haproxy_copy_config.changed | bool
       or keepalived_copy_config.changed | bool
-      or keepalived_copy_check_script.changed | bool
+
+- name: Restart keepalived service
+  ansible.builtin.service:
+    name: "keepalived"
+    state: "restarted"
+  register: keepalived_restart
+  when:
+    - keepalived_start is not changed
+
+- name: Reload keepalived service
+  ansible.builtin.service:
+    name: "{{ keepalived_service_name }}"
+    state: "reloaded"
+  register: keepalived_reload
+  when:
+    - keepalived_start is not changed
+      or keepalived_copy_config.changed | bool
+    - keepalived_restart is not defined
