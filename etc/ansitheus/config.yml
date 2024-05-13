@@ -5,7 +5,6 @@
 # Service VIP address
 ######################
 ansitheus_vip_address: "10.10.10.1"
-
 ansitheus_network_interface: "eth0"
 keepalived_virtual_router_id: "82"
 
@@ -17,7 +16,7 @@ network_interface: "eth0"
 #####################
 # Keepalived Password
 #####################
-keepalived_password: "{{ keepalived_password }}"
+keepalived_password: "secret"
 
 ################
 # Docker options
@@ -56,21 +55,7 @@ grafana_port: "3000"
 
 prometheus_version: "2.52.0"
 alertmanager_version: "0.27.0"
-node_exporter_version: "0.18.0"
-prometheus_rabbit_exporter_ver: "v0.29.0"
-cadvisor_version: "v0.33.0"
-prometheus_snmp_exporter_ver: "v0.15.0"
+node_exporter_version: "1.8.0"
+cadvisor_version: "0.49.1"
 grafana_version: "7.2.2"
-haproxy_version: "2.3.1"
-keepalived_version: "2.0.17"
-
-####################
-# Prometheus options
-####################
-
-prometheus_storage_retention: "90d"
-prometheus_external_labels:
-  monitor: "cloud"
-prometheus_scrape_interval: "60s"
-prometheus_scrape_timeout: "30s"
-prometheus_evaluation_interval: "120s"
+haproxy_version: "lts-alpine"
