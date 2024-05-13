@@ -3,9 +3,11 @@ global_defs {
   script_user root
 }
 
-vrrp_track_process track_haproxy {
-  process haproxy
-  weight 10
+vrrp_script track_haproxy {
+  script "/usr/bin/pgrep haproxy"
+  interval 2
+  fall 2
+  rise 10
 }
 
 vrrp_instance ansible_vip_{{ keepalived_virtual_router_id }} {
@@ -36,7 +38,7 @@ vrrp_instance ansible_vip_{{ keepalived_virtual_router_id }} {
     auth_pass {{ keepalived_password }}
   }
 
-  track_process {
+  track_script {
     track_haproxy
   }
 {% if prometheus_single_running_at_time | bool %}
