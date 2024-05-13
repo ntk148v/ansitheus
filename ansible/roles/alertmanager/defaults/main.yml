@@ -15,14 +15,6 @@ alertmanager_web_external_url: "http://{{ alertmanager_vip_address }}:{{ alertma
 alertmanager_config_flags_extra: {}
 # alertmanager_config_flags_extra:
 #   data.retention: 10
-# First read: https://github.com/prometheus/alertmanager#high-availability
-alertmanager_cluster:
-  listen-address: ""
-# alertmanager_cluster:
-#   listen-address: "{{ ansible_default_ipv4.address }}:6783"
-#   peers:
-#     - "{{ ansible_default_ipv4.address }}:6783"
-#     - "alertmanager.demo.do.prometheus.io:6783"
 
 # Alertmanager configuration files
 # --------------------------------
@@ -40,19 +32,19 @@ alertmanager_smtp: {}
 #   require_tls: "True"
 
 # Default values you can see here -> https://prometheus.io/docs/alerting/configuration/
-alertmanager_slack_api_url: ''
-alertmanager_pagerduty_url: ''
-alertmanager_opsgenie_api_key: ''
-alertmanager_opsgenie_api_url: ''
-alertmanager_victorops_api_key: ''
-alertmanager_victorops_api_url: ''
-alertmanager_hipchat_api_url: ''
-alertmanager_hipchat_auth_token: ''
-alertmanager_wechat_url: ''
-alertmanager_wechat_secret: ''
-alertmanager_wechat_corp_id: ''
+alertmanager_slack_api_url: ""
+alertmanager_pagerduty_url: ""
+alertmanager_opsgenie_api_key: ""
+alertmanager_opsgenie_api_url: ""
+alertmanager_victorops_api_key: ""
+alertmanager_victorops_api_url: ""
+alertmanager_hipchat_api_url: ""
+alertmanager_hipchat_auth_token: ""
+alertmanager_wechat_url: ""
+alertmanager_wechat_secret: ""
+alertmanager_wechat_corp_id: ""
 alertmanager_receivers:
-  - name: 'null'
+  - name: "null"
 # alertmanager_receivers:
 #   - name: slack
 #     slack_configs:
@@ -78,7 +70,7 @@ alertmanager_inhibit_rules: []
 #     source_match_re:
 #       label: value3|value5
 alertmanager_route:
-  receiver: 'null'
+  receiver: "null"
 # alertmanager_route:
 #   group_by: ['alertname', 'cluster', 'service']
 #   group_wait: 30s
@@ -146,15 +138,12 @@ alertmanager_services:
       {%- else %}
       {%- set cluster_flag = 'cluster' %}
       {%- endif %}
-      {% for option, value in (alertmanager_cluster.items() | sort) %}
-      {%   if option == "peers" %}
-      {%     for peer in value %}
-        {{ pre }}-{{ cluster_flag }}.peer={{ peer }}
-      {%     endfor %}
-      {%   else %}
-        {{ pre }}-{{ cluster_flag }}.{{ option }}={{ value }}
-      {%   endif %}
+      {% if groups['alertmanager'] | length > 1 %}
+          --{{ cluster_flag }}.listen-address={{ api_interface_address }}:{{ alertmanager_cluster_port }}
+      {% for host in groups['alertmanager'] %}
+          --{{ cluster_flag }}.peer={{ hostvars[host]['ansible_' + hostvars[host]['api_interface']]['ipv4']['address'] }}:{{ alertmanager_cluster_port }}
       {% endfor %}
+      {% endif %}
         {{ pre }}-config.file=/etc/alertmanager/config.yml
         {{ pre }}-storage.path=/alertmanager
       {% if alertmanager_version is version('0.25.0', '>=') and
