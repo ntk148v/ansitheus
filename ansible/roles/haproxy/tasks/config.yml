@@ -33,7 +33,7 @@
 - name: Copying over haproxy.cfg
   vars:
     service: "{{ haproxy_services['haproxy'] }}"
-  template:
+  ansible.builtin.template:
     src: "{{ item }}"
     dest: "{{ haproxy_config_dir }}/haproxy.cfg"
     mode: 0644
@@ -67,7 +67,7 @@
 - name: Copying over keepalived.conf
   vars:
     service: "{{ haproxy_services['haproxy'] }}"
-  template:
+  ansible.builtin.template:
     src: "{{ item }}"
     dest: "{{ keepalived_config_dir }}/keepalived.conf"
     mode: 0644
@@ -83,7 +83,7 @@
     - Reload keepalived service
 
 - name: Creating keepalived systemd service unit
-  ansible.builtin.template:
+  ansible.builtin.ansible.builtin.template:
     src: keepalived.service.j2
     dest: /etc/systemd/system/{{ keepalived_service_name }}
     owner: root

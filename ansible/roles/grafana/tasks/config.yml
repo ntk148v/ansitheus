@@ -36,7 +36,7 @@
     - Recreate grafana container
 
 - name: Copying over grafana config file
-  template:
+  ansible.builtin.template:
     src: "{{ item }}"
     dest: "{{ ansitheus_config_dir }}/grafana/grafana.ini"
     mode: "0755"
@@ -58,7 +58,7 @@
   register: grafana_extra_confs
 
 - name: Copying over extra configuration files
-  template:
+  ansible.builtin.template:
     src: "{{ item.path }}"
     dest: "{{ ansitheus_config_dir }}/grafana/{{ item.path | basename }}"
     mode: "0755"

@@ -37,7 +37,7 @@
     - Restart node_exporter container
 
 - name: Copying over the node_exporter config
-  ansible.builtin.template:
+  ansible.builtin.ansible.builtin.template:
     src: "{{ item }}"
     dest: "{{ node_exporter_config_dir }}/prometheus.yml"
     mode: 0755
