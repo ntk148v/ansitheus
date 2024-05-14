@@ -1,0 +1,102 @@
+---
+- name: Setting sysctl values
+  sysctl: name={{ item.name }} value={{ item.value }} sysctl_set=yes
+  with_items:
+    - { name: "net.ipv4.ip_nonlocal_bind", value: 1 }
+    - { name: "net.unix.max_dgram_qlen", value: 128 }
+  when: set_sysctl | bool
+
+- name: Ensuring haproxy config directory exist
+  ansible.builtin.file:
+    path: "{{ haproxy_config_dir }}"
+    state: "directory"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+    mode: 0777
+
+- name: Ensuring keepalived config directory exist
+  ansible.builtin.file:
+    path: "{{ keepalived_config_dir }}"
+    state: "directory"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+    mode: 0644
+
+- name: Installing keepalived package
+  ansible.builtin.package:
+    name: "{{ keepalived_package_name }}"
+    state: "present"
+    update_cache: yes
+  notify:
+    - Restart keepalived service
+
+- name: Copying over haproxy.cfg
+  vars:
+    service: "{{ haproxy_services['haproxy'] }}"
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ haproxy_config_dir }}/haproxy.cfg"
+    mode: 0644
+  register: haproxy_copy_config
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+  with_first_found:
+    - "{{ ansitheus_custom_config_dir }}/haproxy/{{ inventory_hostname }}/haproxy.cfg"
+    - "{{ ansitheus_custom_config_dir }}/haproxy/haproxy.cfg"
+    - "haproxy.cfg.j2"
+  notify:
+    - Restart haproxy container
+
+- name: Check haproxy containers
+  community.general.docker_container:
+    name: "{{ item.value.container_name }}"
+    image: "{{ item.value.image }}"
+    privileged: "{{ item.value.privileged }}"
+    volumes: "{{ item.value.volumes }}"
+    state: "{{ item.value.state }}"
+    network_mode: "{{ item.value.network_mode }}"
+    restart_policy: "{{ item.value.restart_policy }}"
+    log_driver: "{{ item.value.log_driver }}"
+    log_options: "{{ item.value.log_options }}"
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ haproxy_services }}"
+
+- name: Copying over keepalived.conf
+  vars:
+    service: "{{ haproxy_services['haproxy'] }}"
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ keepalived_config_dir }}/keepalived.conf"
+    mode: 0644
+  register: keepalived_copy_config
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+  with_first_found:
+    - "{{ ansitheus_custom_config_dir }}/keepalived/{{ inventory_hostname }}/keepalived.conf"
+    - "{{ ansitheus_custom_config_dir }}/keepalived/keepalived.conf"
+    - "keepalived.conf.j2"
+  notify:
+    - Reload keepalived service
+
+- name: Creating keepalived systemd service unit
+  ansible.builtin.ansible.builtin.template:
+    src: keepalived.service.j2
+    dest: /etc/systemd/system/{{ keepalived_service_name }}
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Restart keepalived service
+
+- name: Ensuring keepalived is enabled and started
+  ansible.builtin.service:
+    daemon_reload: yes
+    name: "{{ keepalived_service_name }}"
+    state: "started"
+    enabled: "yes"
+    masked: "no"
+  register: keepalived_start

@@ -1,0 +1,38 @@
+---
+- name: Restart haproxy container
+  vars:
+    service: "{{ haproxy_services['haproxy'] }}"
+  community.general.docker_container:
+    name: "{{ service.container_name }}"
+    image: "{{ service.image }}"
+    privileged: "{{ service.privileged }}"
+    volumes: "{{ service.volumes }}"
+    state: "{{ service.state }}"
+    network_mode: "{{ service.network_mode }}"
+    restart_policy: "{{ service.restart_policy }}"
+    log_driver: "{{ service.log_driver }}"
+    log_options: "{{ service.log_options }}"
+    recreate: "yes"
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+    - haproxy_copy_config.changed | bool
+      or keepalived_copy_config.changed | bool
+
+- name: Restart keepalived service
+  ansible.builtin.service:
+    name: "keepalived"
+    state: "restarted"
+  register: keepalived_restart
+  when:
+    - keepalived_start is not changed
+
+- name: Reload keepalived service
+  ansible.builtin.service:
+    name: "{{ keepalived_service_name }}"
+    state: "reloaded"
+  register: keepalived_reload
+  when:
+    - keepalived_start is not changed
+      or keepalived_copy_config.changed | bool
+    - keepalived_restart is not defined

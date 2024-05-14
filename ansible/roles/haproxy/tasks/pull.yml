@@ -1,0 +1,9 @@
+---
+- name: Pull image without running haproxy containers
+  docker_image:
+    name: "{{ item.value.image }}"
+    source: pull
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ haproxy_services }}"

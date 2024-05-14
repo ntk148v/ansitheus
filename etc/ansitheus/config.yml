@@ -5,212 +5,57 @@
 # Service VIP address
 ######################
 ansitheus_vip_address: "10.10.10.1"
-
 ansitheus_network_interface: "eth0"
 keepalived_virtual_router_id: "82"
 
 # The group which own node_config_directory, you can use a non-root
 config_owner_user: "root"
 config_owner_group: "root"
-
 network_interface: "eth0"
 
-###################
-# Haproxy Passwords
-###################
-keepalived_password: "{{ keepalived_password }}"
-prometheus_alertmanager_password: "{{ prometheus_alertmanager_password }}"
-prometheus_server_password: "{{ prometheus_server_password }}"
+#####################
+# Keepalived Password
+#####################
+keepalived_password: "secret"
 
 ################
 # Docker options
 ################
 
-docker_registry: "registry.cloud.com"
-docker_namespace: "cloud"
-docker_registry_username: "cloud"
-docker_registry_password: "passwordcuacloudne"
-# Sets the options used by DNS resolvers by writing an options line
-# into the container's /etc/resolv.conf.
-# For example:
-# docker_dns_servers:
-#   - "8.8.8.8"
-#   - "8.8.4.4"
-docker_dns_servers:
-# Change Docker storage drivers
-# For example: docker_storage_driver: "overlay2"
-docker_storage_driver:
-# Change runtime directory
-# For example: docker_runtime_directory: "/var/lib/docker
-docker_runtime_directory:
-# Can be used to set environment variables for the Docker daemon, such as:
-# docker_daemon_environment:
-#   - "HTTP_PROXY=http://proxy.example.com:3128/"
-#   - "HTTPS_PROXY=http://proxy.example.com:3128/"
-#   - "NO_PROXY=localhost,127.0.0.1"
-docker_daemon_environment: []
-# A set of users will be added to docker group
-docker_users: []
-docker_edition: "ce"
-docker_pkg_version: "18.09"
-# Docker logging driver
-# More details: https://docs.docker.com/config/containers/logging
-docker_log_driver: "json-file"
-docker_log_opts:
-  max-size: 10m
-  max-file: 3
-
-##################
-# Pypi options
-##################
-
-pip_repository: "pip.cloud.repo"
-
-######################
-# Yum Local repository
-######################
-use_local_repo: "yes"
+docker_registry: ""
+docker_namespace: ""
+docker_registry_username: ""
+docker_registry_password: ""
 
 ##################
 # Service options
 ##################
 
-enable_prometheus_server: "yes"
-enable_prometheus_node_exporter: "yes"
-enable_prometheus_rabbit_exporter: "no"
-enable_prometheus_snmp_exporter: "no"
-enable_prometheus_cadvisor: "yes"
+enable_prometheus: "yes"
+enable_node_exporter: "yes"
+enable_cadvisor: "yes"
 enable_grafana: "no"
-enable_prometheus_alertmanager: "yes"
+enable_alertmanager: "yes"
 enable_haproxy: "yes"
-enable_keepalived: "yes"
-enable_prometheus_snmp_exporter_dell_server: "no"
-enable_prometheus_snmp_exporter_hpe_server: "no"
-enable_prometheus_snmp_exporter_fujitsu_server: "no"
-enable_prometheus_snmp_exporter_switch: "no"
-enable_prometheus_nocpro_alert: "no"
-enable_fluentd: "yes"
 
 ##################
 # Port mappings
 #################
 
-prometheus_server_port: "9090"
-prometheus_alertmanager_port: "9093"
-prometheus_alertmanager_cluster_port: "9094"
-prometheus_node_exporter_port: "9100"
-prometheus_rabbit_exporter_port: "5557"
-prometheus_unsee_dashboard_port: "55550"
-prometheus_cadvisor_port: "8080"
-grafana_listen_port: "5555"
-prometheus_snmp_exporter_dell_server_port: "9116"
-prometheus_snmp_exporter_hpe_device_port: "9117"
-prometheus_snmp_exporter_switch_port: "9118"
-prometheus_snmp_exporter_huawei_device_port: "9119"
-prometheus_snmp_exporter_fujitsu_server_port: "9120"
-prometheus_container_status_exporter_port: "9800"
+prometheus_port: "9090"
+alertmanager_port: "9093"
+alertmanager_cluster_port: "9094"
+node_exporter_port: "9100"
+cadvisor_port: "8080"
+grafana_port: "3000"
 
 ###############
 # Image version
 ###############
 
-prometheus_server_ver: "v2.15.1"
-prometheus_alertmanager_ver: "v0.19.0"
-prometheus_node_exporter_ver: "v0.18.0"
-prometheus_rabbit_exporter_ver: "v0.29.0"
-prometheus_cadvisor_ver: "v0.33.0"
-prometheus_snmp_exporter_ver: "v0.15.0"
-grafana_ver: "7.2.2"
-haproxy_ver: "2.3.1"
-keepalived_ver: "2.0.17"
-
-####################
-# Prometheus options
-####################
-
-prometheus_storage_retention: "90d"
-prometheus_external_labels:
-  monitor: "cloud"
-prometheus_scrape_interval: "60s"
-prometheus_scrape_timeout: "30s"
-prometheus_evaluation_interval: "120s"
-
-##########################
-# Rabbit container options
-##########################
-
-rabbit_url: "http://localhost:15672"
-rabbit_user: "admin"
-rabbit_password: "rabbitpassword"
-rabbit_log_level: "debug"
-rabbit_output_format: "json"
-
-#################
-# Grafana options
-#################
-
-grafana_user: "admin"
-grafana_password: "password"
-
-###############
-# Alert options
-###############
-
-alert_via_email: "yes"
-alert_mail_account: "fakeaccount@mail"
-alert_mail_host: "fakehost"
-alert_mail_port: "465"
-alert_mail_password: "supersecurepassword"
-alert_via_slack: "no"
-alert_slack_channel: "fakechannel"
-alert_slack_webhook_id: "longwebhookid"
-
-##################
-# Grafana options
-##################
-grafana_data_dir: "/var/lib/grafana"
-grafana_logs_dir: "/var/log/grafana"
-grafana_plugin_dir: "{{ grafana_data_dir }}/plugins"
-# Please check http://docs.grafana.org/installation/configuration/
-grafana_database:
-  type: sqlite3
-  # name: grafana
-  # username: admin
-  # password: "KbJdz8*U" # Please change me
-grafana_remote_cache: {}
-grafana_security:
-  admin_user: "admin"
-  admin_password: "YJ97&Yz$" # Please change me
-  #  secret_key: ""
-  #  login_remember_days: 7
-  #  cookie_username: grafana_user
-  #  cookie_remember_name: grafana_remember
-  #  disable_gravatar: true
-  #  data_source_proxy_whitelist:
-grafana_session: {}
-#  provider: file
-#  provider_config: "sessions"
-# grafana authentication mechanisms
-grafana_auth: {}
-#  disable_login_form: false
-#  oauth_auto_login: false
-#  disable_signout_menu: false
-#  signout_redirect_url: ""
-#  anonymous:
-#    org_name: "Main Organization"
-#    org_role: Viewer
-#  ldap:
-#    config_file: "/etc/grafana/ldap.toml"
-#    allow_sign_up: false
-#  basic:
-#    enabled: true
-grafana_users:
-  allow_sign_up: false
-  # allow_org_create: true
-  # auto_assign_org: true
-  auto_assign_org_role: Viewer
-  # login_hint: "email or username"
-  default_theme: dark
-  # external_manage_link_url: ""
-  # external_manage_link_name: ""
-  # external_manage_info: ""
+prometheus_version: "2.52.0"
+alertmanager_version: "0.27.0"
+node_exporter_version: "1.8.0"
+cadvisor_version: "0.49.1"
+grafana_version: "7.2.2"
+haproxy_version: "lts-alpine"

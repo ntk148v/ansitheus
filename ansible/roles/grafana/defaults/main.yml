@@ -1,39 +1,123 @@
 ---
-project_name: "grafana"
+grafana_version: "10.4.2"
+grafana_docker_namespace: "{{ docker_namespace if docker_namespace else 'grafana' }}"
+grafana_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ grafana_docker_namespace }}/grafana:{{ grafana_version }}"
+grafana_data_volume: "grafana"
+grafana_logs_volume: "grafana_log"
+grafana_docker_log_driver: "{{ docker_log_driver }}"
+grafana_docker_log_opts: "{{ docker_log_opts }}"
+grafana_config_dir: "{{ ansitheus_config_dir }}/grafana/"
+grafana_data_dir: "/var/lib/grafana"
+grafana_log_dir: "/var/log/grafana"
+grafana_plugin_dir: "{{ grafana_config_dir }}/plugins"
 
+grafana_address: "{{ api_interface_address }}"
+grafana_port: 3000
+
+# Grafana configuration
+# ---------------------
+
+# External Grafana address. Variable maps to "root_url" in grafana server section
+grafana_url: "http://{{ grafana_address }}:{{ grafana_port }}"
+grafana_api_url: "{{ grafana_url }}"
+grafana_domain: "{{ ansible_fqdn | default(ansible_host) | default('localhost') }}"
+
+# Additional options for grafana "server" section
+# This section WILL omit options for: http_addr, http_port, domain, and root_url, as those settings are set by variables listed before
+grafana_server:
+  protocol: http
+  enforce_domain: false
+  socket: ""
+  cert_key: ""
+  cert_file: ""
+  enable_gzip: false
+  static_root_path: public
+  router_logging: false
+  serve_from_sub_path: false
+
+# Variables correspond to ones in grafana.ini configuration file
+# Security
+grafana_security:
+  admin_user: admin
+  admin_password: "admin"
+#  secret_key: ""
+#  login_remember_days: 7
+#  cookie_username: grafana_user
+#  cookie_remember_name: grafana_remember
+#  disable_gravatar: true
+#  data_source_proxy_whitelist:
+
+# Please check http://docs.grafana.org/installation/configuration/
+grafana_database:
+  type: sqlite3
+#  host: 127.0.0.1:3306
+#  name: grafana
+#  user: root
+#  password: ""
+#  url: ""
+#  ssl_mode: disable
+#  path: grafana.db
+#  max_idle_conn: 2
+#  max_open_conn: ""
+#  log_queries: ""
+
+# Remote cache
+grafana_remote_cache: {}
+
+grafana_session: {}
+#  provider: file
+#  provider_config: "sessions"
+
+# grafana authentication mechanisms
+grafana_auth: {}
+#  disable_login_form: false
+#  oauth_auto_login: false
+#  disable_signout_menu: false
+#  signout_redirect_url: ""
+#  anonymous:
+#    org_name: "Main Organization"
+#    org_role: Viewer
+#  ldap:
+#    config_file: "/etc/grafana/ldap.toml"
+#    allow_sign_up: false
+#  basic:
+#    enabled: true
+
+# User management and registration
+grafana_welcome_email_on_sign_up: false
+grafana_users:
+  allow_sign_up: false
+  # allow_org_create: true
+  # auto_assign_org: true
+  auto_assign_org_role: Viewer
+  # login_hint: "email or username"
+  default_theme: dark
+  # external_manage_link_url: ""
+  # external_manage_link_name: ""
+  # external_manage_info: ""
+
+# Grafana logging configuration
+grafana_log:
+# mode: 'console file'
+# level: info
+
+# Container constructors
+# ----------------------
 grafana_services:
   grafana:
     container_name: "grafana"
     group: "grafana"
     enabled: "{{ enable_grafana | bool }}"
-    image: "{{ grafana_image_full }}"
+    image: "{{ grafana_image }}"
     privileged: "no"
     network_mode: "host"
     restart_policy: "unless-stopped"
     state: "started"
     volumes:
-      - "{{ grafana_conf }}:/etc/grafana:rw"
+      - "{{ grafana_config_dir }}:/etc/grafana:rw"
       - "/etc/localtime:/etc/localtime:ro"
-      - "{{ grafana_volume }}:{{ grafana_data_dir }}"
-      - "{{ grafana_conf }}/plugins:{{ grafana_plugin_dir }}"
-      - "{{ grafana_log_volume }}:{{ grafana_log_dir }}"
-    log_driver: "{{ grafana_log_driver }}"
-    log_options: "{{ grafana_log_opts }}"
-
-grafana_conf: "{{ ansitheus_conf }}/grafana/"
-grafana_data_dir: "/var/lib/grafana"
-grafana_log_dir: "/var/log/grafana"
-grafana_plugin_dir: "{{ grafana_data_dir }}/plugins"
-
-##########
-# Docker #
-##########
-
-grafana_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ grafana_docker_namespace }}/grafana"
-grafana_tag: "{{ grafana_ver }}"
-grafana_image_full: "{{ grafana_image }}:{{ grafana_tag }}"
-grafana_volume: "grafana"
-grafana_log_volume: "grafana_log"
-# logging
-grafana_log_driver: "{{ docker_log_driver }}"
-grafana_log_opts: "{{ docker_log_opts }}"
+      - "{{ grafana_data_volume }}:/var/lib/grafana"
+      - "{{ grafana_plugin_dir }}:/var/lib/grafana/plugins"
+      - "{{ grafana_logs_volume }}:/var/log/grafana"
+    log_driver: "{{ grafana_docker_log_driver }}"
+    log_options: "{{ grafana_docker_log_opts }}"

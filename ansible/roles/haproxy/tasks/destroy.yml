@@ -1,0 +1,47 @@
+---
+- name: Stop and remove containers
+  community.general.docker_container:
+    name: "{{ item.value.container_name }}"
+    state: "absent"
+    keep_volumes: "{{ not destroy_include_volumes | bool }}"
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ haproxy_services }}"
+
+- name: Remove configuration
+  ansible.builtin.file:
+    state: "absent"
+    path: "{{ item }}"
+  when:
+    - inventory_hostname in groups['haproxy']
+    - enable_haproxy | bool and enable_haproxy | bool
+  with_items:
+    - keepalived_config_dir
+    - haproxy_config_dir
+
+- name: Remove images
+  docker_image:
+    name: "{{ item.value.image }}"
+    state: "absent"
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+    - destroy_include_images | bool
+  with_dict: "{{ haproxy_services }}"
+
+- name: Remove volumes
+  docker_volume:
+    name: haproxy_socket
+    state: "absent"
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+    - destroy_include_volumes | bool
+  with_dict: "{{ haproxy_services }}"
+
+- name: Remove keepalived
+  ansible.builtin.package:
+    name: "{{ keepalived_package_name }}"
+    state: "absent"
+    update_cache: yes

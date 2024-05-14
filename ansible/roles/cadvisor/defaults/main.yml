@@ -1,0 +1,49 @@
+---
+cadvisor_version: "0.49.1"
+cadvisor_port: "8080"
+cadvisor_docker_namespace: "{{ docker_namespace if docker_namespace else 'cadvisor' }}"
+cadvisor_image: "{{ docker_registry ~ '/' if docker_registry else 'gcr.io/' }}{{ cadvisor_docker_namespace }}/cadvisor:v{{ cadvisor_version }}"
+cadvisor_docker_log_driver: "{{ docker_log_driver }}"
+cadvisor_docker_log_opts: "{{ docker_log_opts }}"
+
+# Cadvisor arguments
+# ------------------
+cadvisor_prometheus_endpoint: "/metrics"
+cadvisor_enable_metrics: []
+cadvisor_disable_metrics: []
+cadvisor_docker_only: false
+
+
+# Container constructor
+# ---------------------
+cadvisor_services:
+  cadvisor:
+    container_name: "cadvisor"
+    group: "cadvisor"
+    enabled: "{{ enable_cadvisor }}"
+    image: "{{ cadvisor_image }}"
+    privileged: "no"
+    volumes:
+      - "/:/rootfs:ro"
+      - "/var/run:/var/run:rw"
+      - "/sys:/sys:ro"
+      - "/var/lib/docker/:/var/lib/docker:ro"
+      - "/cgroup:/cgroup:ro"
+    command: >
+      {% if cadvisor_disable_metrics | length > 0 %}
+        '--disable_metrics={{ cadvisor_disable_metrics | join(',') }}' \
+      {% endif -%}
+      {% if cadvisor_enable_metrics | length > 0 %}
+        '--enable_metrics={{ cadvisor_enable_metrics | join(',') }}' \
+      {% endif -%}
+      {% if cadvisor_docker_only %}
+        '--docker_only={{ cadvisor_docker_only | lower }}' \
+      {% endif -%}
+        '--listen_ip={{ api_interface_address }}' \
+        '--port={{ cadvisor_port }}' \
+        '--prometheus_endpoint={{ cadvisor_prometheus_endpoint }}'
+    restart_policy: "unless-stopped"
+    state: "started"
+    network_mode: "host"
+    log_driver: "{{ cadvisor_docker_log_driver }}"
+    log_options: "{{ cadvisor_docker_log_opts }}"

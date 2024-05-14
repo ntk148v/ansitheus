@@ -1,0 +1,66 @@
+---
+- name: Ensuring node_exporter config directory exist
+  ansible.builtin.file:
+    path: "{{ node_exporter_config_dir }}"
+    state: "directory"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+    mode: 0755
+
+- name: Ensuring textfile directory exist
+  ansible.builtin.file:
+    path: "{{ node_exporter_textfile_dir }}"
+    state: "directory"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+    mode: 0755
+
+- name: Find textfile
+  local_action:
+    module: find
+    path: "{{ ansitheus_custom_config_dir }}/node_exporter/textfile"
+    pattern: "*"
+  run_once: true
+  delegate_to: localhost
+  register: node_exporter_textfile
+
+- name: Copying over textfile files
+  ansible.builtin.copy:
+    src: "{{ item.path }}"
+    dest: "{{ node_exporter_textfile_dir }}/{{ item.path | basename }}"
+    mode: 0755
+  register: node_exporter_textfile_confs
+  with_items: "{{ node_exporter_textfile.files }}"
+  when:
+    - node_exporter_textfile is defined and node_exporter_textfile.files | length > 0
+  notify:
+    - Restart node_exporter container
+
+- name: Copying over the node_exporter config
+  ansible.builtin.ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ node_exporter_config_dir }}/prometheus.yml"
+    mode: 0755
+  register: node_exporter_confs
+  with_first_found:
+    - "{{ ansitheus_custom_config_dir }}/node_exporter/config.yml"
+    - "{{ role_path }}/templates/config.yml.j2"
+  notify:
+    - Restart node_exporter container
+
+- name: Recreating if not exist running containers
+  community.general.docker_container:
+    name: "{{ item.value.container_name }}"
+    image: "{{ item.value.image }}"
+    volumes: "{{ item.value.volumes }}"
+    command: "{{ item.value.command }}"
+    state: "{{ item.value.state }}"
+    restart_policy: "{{ item.value.restart_policy }}"
+    privileged: "{{ item.value.privileged }}"
+    network_mode: "{{ item.value.network_mode }}"
+    log_driver: "{{ item.value.log_driver }}"
+    log_options: "{{ item.value.log_options }}"
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ node_exporter_services }}"

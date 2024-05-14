@@ -1,58 +1,29 @@
+[common:children]
+haproxy
+grafana
+prometheus
+alertmanager
+cadvisor
+node_exporter
+
 [haproxy]
 haproxy-host-01
 haproxy-host-02
 
-[keepalived]
-keep-host-01
-keep-host-02
-
-[fluentd]
-prom-host-01
-
-[prometheus_server]
+[prometheus]
 # These hostname must be resolvable from your deployment host
 prom-host-01
 
-[prometheus_alertmanager]
+[alertmanager]
 # By default, start alertmanager service in the same host with prometheus
 prom-host-01
 
 [grafana]
 grafana-host-01
 
-[prometheus_unsee:children]
-prometheus_alertmanager
-
-[prometheus_cadvisor]
+[cadvisor]
 cadvisor-host-01
 cadvisor-host-02
 
-[prometheus_node_exporter]
+[node_exporter]
 prom-host-01
-
-[prometheus_rabbit_exporter]
-rabbit-host-01
-rabbit-host-02
-
-[prometheus_snmp_exporter]
-snmp-host-01
-snmp-host-02
-
-[prometheus_snmp_exporter_switch:children]
-prometheus_snmp_exporter
-
-[prometheus_snmp_exporter_hpe_device:children]
-prometheus_snmp_exporter
-
-[prometheus_snmp_exporter_dell_server:children]
-prometheus_snmp_exporter
-
-[prometheus_snmp_exporter_fujitsu_server:children]
-prometheus_snmp_exporter
-
-[prometheus_snmp_exporter_huawei_device:children]
-prometheus_snmp_exporter
-
-[prometheus_container_status_exporter]
-container-status-host-01
-container-status-host-02

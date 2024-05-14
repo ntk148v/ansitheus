@@ -1,0 +1,75 @@
+---
+# yamllint disable rule:line-length
+argument_specs:
+  main:
+    short_description: "Prometheus Alertmanager service"
+    description:
+      - "Deploy and manage Prometheus L(alertmanager,https://github.com/prometheus/alertmanager) service using ansible."
+    author:
+      - "Kien Nguyen Tuan"
+    options:
+      alertmanager_version:
+        description: "Alertmanager package version. Also accepts `latest` as parameter."
+        default: 0.27.0
+      alertmanager_web_listen_address:
+        description: "Address on which alertmanager will be listening"
+        default: "<ip-adress>:9093"
+      alertmanager_web_external_url:
+        description: "External address on which alertmanager is available. Useful when behind reverse proxy. Ex. example.org/alertmanager"
+        default: "http://<vip-address>:9093/"
+      alertmanager_config_dir:
+        description: "Path to directory with alertmanager configuration"
+        default: "/etc/ansitheus/alertmanager"
+      alertmanager_config_flags_extra:
+        description: "Additional configuration flags passed to prometheus binary at startup"
+        type: "dict"
+      alertmanager_resolve_timeout:
+        description: "Time after which an alert is declared resolved"
+        default: "3m"
+      alertmanager_smtp:
+        description: "SMTP (email) configuration"
+        type: "dict"
+      alertmanager_http_config:
+        description: "Http config for using custom webhooks"
+        type: "dict"
+      alertmanager_slack_api_url:
+        description: "Slack webhook url"
+      alertmanager_pagerduty_url:
+        description: "Pagerduty webhook url"
+      alertmanager_opsgenie_api_key:
+        description: "Opsgenie webhook key"
+      alertmanager_opsgenie_api_url:
+        description: "Opsgenie webhook url"
+      alertmanager_victorops_api_key:
+        description: "VictorOps webhook key"
+      alertmanager_victorops_api_url:
+        description: "VictorOps webhook url"
+      alertmanager_hipchat_api_url:
+        description: "Hipchat webhook url"
+      alertmanager_hipchat_auth_token:
+        description: "Hipchat authentication token"
+      alertmanager_wechat_url:
+        description: "Enterprise WeChat webhook url"
+      alertmanager_wechat_secret:
+        description: "Enterprise WeChat secret token"
+      alertmanager_wechat_corp_id:
+        description: "Enterprise WeChat corporation id"
+      alertmanager_cluster:
+        description:
+          - "HA cluster network configuration. Disabled by default."
+          - "More information in L(alertmanager readme,https://github.com/prometheus/alertmanager#high-availability)"
+        type: "dict"
+        default:
+          listen-address: ""
+      alertmanager_receivers:
+        description: "A list of notification receivers. Configuration same as in L(official docs,https://prometheus.io/docs/alerting/configuration/#receiver)"
+        type: "list"
+      alertmanager_time_intervals:
+        description: "A list of time intervals. Configuration same as in L(official docs,https://prometheus.io/docs/alerting/latest/configuration/#time_interval)"
+        type: "list"
+      alertmanager_inhibit_rules:
+        description: "List of inhibition rules. Same as in L(official docs,https://prometheus.io/docs/alerting/configuration/#inhibit_rule)"
+        type: "list"
+      alertmanager_route:
+        description: "Alert routing. More in L(official docs,https://prometheus.io/docs/alerting/configuration/#route)"
+        type: "dict"

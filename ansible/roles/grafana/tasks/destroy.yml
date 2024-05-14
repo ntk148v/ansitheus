@@ -1,19 +1,17 @@
 ---
 - name: Stop and remove containers
-  docker_container:
+  community.general.docker_container:
     name: "{{ item.value.container_name }}"
     state: "absent"
-  become: true
   when:
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool
   with_dict: "{{ grafana_services }}"
 
 - name: Remove service configuration
-  file:
+  ansible.builtin.file:
     state: "absent"
-    path: "{{ grafana_conf }}"
-  become: true
+    path: "{{ grafana_config_dir }}"
   when:
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool
@@ -23,7 +21,6 @@
   docker_image:
     name: "{{ item.value.image }}"
     state: "absent"
-  become: true
   when:
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool
@@ -32,9 +29,8 @@
 
 - name: Remove volumes
   docker_volume:
-    name: "{{ grafana_volume }}"
+    name: "{{ grafana_data_volume }}"
     state: "absent"
-  become: true
   when:
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool
@@ -43,9 +39,8 @@
 
 - name: Remove log volumes
   docker_volume:
-    name: "{{ grafana_log_volume }}"
+    name: "{{ grafana_logs_volume }}"
     state: "absent"
-  become: true
   when:
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool

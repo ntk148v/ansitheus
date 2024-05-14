@@ -2,7 +2,7 @@
 
 # This script can be used to interact with ansitheus
 function find_base_dir() {
-    local real_path=$(python -c "import os;print(os.path.realpath('$0'))")
+    local real_path=$(python3 -c "import os;print(os.path.realpath('$0'))")
     local dir_name="$(dirname "$real_path")"
     # TODO: Check in /usr/lib etc...
     BASEDIR="$(dirname ${dir_name})"
@@ -19,7 +19,6 @@ Options:
     --tags, -t <tags>                Only run plays and tasks tagged with these values
     --limit <host>                   Specify host to run plays
     --help, -h                       Show this usage information
-    --skip-common                    Skip common role
     --skip-gather-fact               Skip gather fact
     --ask-vault-pass                 Ask for vault password
     --vault-password-file            Provide the vault password file
@@ -44,7 +43,7 @@ function process_cmd() {
 }
 
 SHORT_OPTS="hi:c:t:v"
-LONG_OPTS="help,inventory:,configdir:,tags:,limit:,vault-password-file:,verbose,include-images,include-volumes,skip-common,skip-gather-fact,ask-vault-pass"
+LONG_OPTS="help,inventory:,configdir:,tags:,limit:,vault-password-file:,verbose,include-images,include-volumes,skip-gather-fact,ask-vault-pass"
 ARGS=$(getopt -o "${SHORT_OPTS}" -l "${LONG_OPTS}" --name "$0" -- "$@") || {
     usage >&2
     exit 2
@@ -61,7 +60,6 @@ EXTRA_OPTS=${EXTRA_OPTS}
 CONFIG_DIR="/etc/ansitheus"
 REMOVE_INCLUDE_IMAGES="no"
 REMOVE_INCLUDE_VOLUMES="no"
-SKIP_COMMON="no"
 SKIP_GATHER_FACT="no"
 ASK_VAULT_PASS="no"
 
@@ -103,11 +101,6 @@ while [ "$#" -gt 0 ]; do
         shift 1
         ;;
 
-    --skip-common)
-        SKIP_COMMON="yes"
-        shift 1
-        ;;
-
     --skip-gather-fact)
         SKIP_GATHER_FACT="yes"
         shift 1
@@ -144,28 +137,24 @@ case "$1" in
 deploy)
     ACTION="Deploying ansitheus containers with docker-compose"
     EXTRA_OPTS="${EXTRA_OPTS} -e ansitheus_action=deploy"
-    EXTRA_OPTS="${EXTRA_OPTS} -e skip_common=${SKIP_COMMON}"
     EXTRA_OPTS="${EXTRA_OPTS} -e skip_gather_fact=${SKIP_GATHER_FACT}"
     ;;
 
 pull)
     ACTION="Pull all images without running containers"
     EXTRA_OPTS="${EXTRA_OPTS} -e ansitheus_action=pull"
-    EXTRA_OPTS="${EXTRA_OPTS} -e skip_common=${SKIP_COMMON}"
     EXTRA_OPTS="${EXTRA_OPTS} -e skip_gather_fact=${SKIP_GATHER_FACT}"
     ;;
 
 precheck)
     ACTION="Precheck port and docker installation in target hosts"
     EXTRA_OPTS="${EXTRA_OPTS} -e ansitheus_action=precheck"
-    EXTRA_OPTS="${EXTRA_OPTS} -e skip_common=yes" # Force skip common role
     EXTRA_OPTS="${EXTRA_OPTS} -e skip_gather_fact=${SKIP_GATHER_FACT}"
     ;;
 
 destroy)
     ACTION="Destroy Prometheus containers and service configuration"
     EXTRA_OPTS="${EXTRA_OPTS} -e ansitheus_action=destroy"
-    EXTRA_OPTS="${EXTRA_OPTS} -e skip_common=yes" # Force skip common role
     EXTRA_OPTS="${EXTRA_OPTS} -e skip_gather_fact=${SKIP_GATHER_FACT}"
     EXTRA_OPTS="${EXTRA_OPTS} -e destroy_include_images=${REMOVE_INCLUDE_IMAGES}"
     EXTRA_OPTS="${EXTRA_OPTS} -e destroy_include_volumes=${REMOVE_INCLUDE_VOLUMES}"

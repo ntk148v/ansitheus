@@ -1,0 +1,41 @@
+global
+  daemon
+  maxconn {{ haproxy_max_connections }}
+
+defaults
+  log global
+  mode http
+  option redispatch
+  option httplog
+  retries 3
+  timeout http-request 10s
+  timeout queue 1m
+  timeout connect 10s
+  timeout client {{ haproxy_client_timeout }}
+  timeout server {{ haproxy_server_timeout }}
+  timeout check 10s
+  balance {{ haproxy_defaults_balance }}
+
+
+{% if enable_prometheus | bool %}
+listen prometheus
+  bind {{ ansitheus_vip_address }}:{{ prometheus_port }}
+  option httpchk GET /-/ready
+  http-check expect status 200
+  http-request del-header X-Forwarded-Proto
+  http-request set-header X-Forwarded-Proto https if { ssl_fc }
+{% for host in groups['prometheus'] %}
+  server {{ hostvars[host]['ansible_hostname'] }} {{ hostvars[host]['ansible_' + hostvars[host]['ansitheus_network_interface']]['ipv4']['address'] }}:{{ prometheus_port }} check inter 2000 rise 2 fall 5 {% if not loop.first %}backup{% endif %}
+
+{% endfor %}
+{% endif %}
+
+{% if enable_alertmanager | bool %}
+listen alertmanager
+  bind {{ ansitheus_vip_address }}:{{ alertmanager_port }}
+  http-request del-header X-Forwarded-Proto
+  http-request set-header X-Forwarded-Proto https if { ssl_fc }
+{% for host in groups['alertmanager'] %}
+  server {{ hostvars[host]['ansible_hostname'] }} {{ hostvars[host]['ansible_' + hostvars[host]['ansitheus_network_interface']]['ipv4']['address'] }}:{{ alertmanager_port }} check inter 2000 rise 2 fall 5
+{% endfor %}
+{% endif %}

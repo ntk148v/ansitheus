@@ -1,0 +1,83 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+{{ ansible_managed | comment }}
+# http://prometheus.io/docs/operating/configuration/
+
+global:
+  {{ prometheus_global | to_nice_yaml(indent=2,sort_keys=False) | indent(2, False) }}
+  external_labels:
+    {{ prometheus_external_labels | to_nice_yaml(indent=2,sort_keys=False) | indent(4, False) }}
+
+{% if prometheus_remote_write != [] %}
+remote_write:
+  {{ prometheus_remote_write | to_nice_yaml(indent=2,sort_keys=False) | indent(2, False) }}
+{% endif %}
+
+{% if prometheus_remote_read != [] %}
+remote_read:
+  {{ prometheus_remote_read | to_nice_yaml(indent=2,sort_keys=False) | indent(2, False) }}
+{% endif %}
+
+{% if not prometheus_agent_mode %}
+{% if prometheus_alert_rules is defined and prometheus_alert_rules.files | length  > 0 %}
+rule_files:
+{% for rule in prometheus_alert_rules.files %}
+  - "/etc/prometheus/rules/{{ rule.path | basename }}"
+{% endfor %}
+{% endif %}
+{% endif %}
+
+{% if enable_alertmanager | bool %}
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+{% for host in groups["alertmanager"] %}
+        - '{{ hostvars[host]['ansible_' + hostvars[host]['api_interface']]['ipv4']['address'] }}:{{ alertmanager_port }}'
+{% endfor %}
+{% endif %}
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets:
+{% for host in groups['prometheus'] | sort %}
+        - '{{ hostvars[host]['ansible_' + hostvars[host]['api_interface']]['ipv4']['address'] }}:{{ prometheus_port }}'
+{% endfor %}
+
+{% if enable_alertmanager | bool %}
+  - job_name: alertmanager
+    static_configs:
+{% for host in groups['alertmanager'] %}
+      - targets:
+        - '{{ hostvars[host]['ansible_' + hostvars[host]['api_interface']]['ipv4']['address'] }}:{{ alertmanager_port }}'
+{% endfor %}
+{% endif %}
+
+{% if enable_node_exporter | bool %}
+  - job_name: node-exporter
+    static_configs:
+      - targets:
+{% for host in groups['node_exporter'] | sort %}
+        - '{{ hostvars[host]['ansible_' + hostvars[host]['api_interface']]['ipv4']['address'] }}:{{ hostvars[host]['node_exporter_port'] }}'
+{% endfor %}
+{% endif %}
+
+{% if enable_cadvisor | bool %}
+  - job_name: cadvisor
+    static_configs:
+      - targets:
+{% for host in groups['cadvisor'] | sort %}
+        - '{{ hostvars[host]['ansible_' + hostvars[host]['api_interface']]['ipv4']['address'] }}:{{ hostvars[host]['cadvisor_port'] }}'
+{% endfor %}
+{% endif %}
+
+{% if prometheus_file_sd is defined and prometheus_file_sd.files | length > 0 %}
+{% for f in prometheus_file_sd.files %}
+  - job_name: {{ f.path | basename | regex_replace('.json', '') }}-file-sd
+    scrape_interval: 180s
+    scrape_timeout: 150s
+    file_sd_configs:
+      - files:
+        - "/etc/prometheus/file_sd/{{ f.path | basename }}"
+{% endfor %}
+{% endif %}

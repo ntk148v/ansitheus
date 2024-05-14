@@ -1,0 +1,33 @@
+---
+- name: Validate prometheus config
+  vars:
+    service_name: "prometheus"
+    service: "{{ prometheus_services[service_name] }}"
+  ansible.builtin.command: >
+    /usr/bin/docker run --rm -v {{ prometheus_config_dir }}:/etc/prometheus {{ promtool_image }} sh -c 'promtool \
+            check config /etc/prometheus/prometheus.yml && promtool check rules /etc/prometheus/rules/*'
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+    - prometheus_confs.changed | bool
+      or prometheus_alert_confs.changed | bool
+      or prometheus_file_sd_confs.changed | bool
+
+- name: Reload prometheus config
+  vars:
+    service_name: "prometheus"
+    service: "{{ prometheus_services[service_name] }}"
+  uri:
+    url: http://{{ api_interface_address }}:{{ prometheus_port }}/-/reload
+    method: PUT
+  register: result
+  retries: 5
+  delay: 20
+  until: result.status == 200
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+    - prometheus_confs.changed | bool
+      or prometheus_alert_confs.changed | bool
+      or prometheus_file_sd_confs.changed | bool
+      or prometheus_tls_confs.changed | bool

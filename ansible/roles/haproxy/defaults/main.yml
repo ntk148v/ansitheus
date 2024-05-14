@@ -1,0 +1,43 @@
+---
+haproxy_version: "lts-alpine"
+haproxy_docker_namespace: "{{ docker_namespace ~ '/' if docker_namespace else '' }}"
+haproxy_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ haproxy_docker_namespace }}haproxy:{{ haproxy_version }}"
+haproxy_docker_log_driver: "{{ docker_log_driver }}"
+haproxy_docker_log_opts: "{{ docker_log_opts }}"
+
+haproxy_config_dir: "{{ ansitheus_config_dir }}/haproxy/"
+set_sysctl: "yes"
+haproxy_max_connections: 6000
+haproxy_client_timeout: "1m"
+haproxy_server_timeout: "1m"
+haproxy_defaults_balance: "roundrobin"
+
+keepalived_traffic_mode: "multicast"
+keepalived_config_dir: "{{ ansitheus_config_dir }}/keepalived/"
+keepalived_package_name: "keepalived"
+keepalived_service_name: "keepalived.service"
+
+# Special variable to handle case, you want to only ONE Prometheus running instance at time.
+prometheus_single_running_at_time: "no"
+
+# Container constructor
+# ---------------------
+haproxy_services:
+  haproxy:
+    container_name: "haproxy"
+    group: "haproxy"
+    enabled: "{{ enable_haproxy }}"
+    image: "{{ haproxy_image }}"
+    privileged: "no"
+    network_mode: "host"
+    restart_policy: "unless-stopped"
+    state: "started"
+    volumes:
+      - "{{ haproxy_config_dir }}:/usr/local/etc/haproxy/:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    log_driver: "{{ haproxy_docker_log_driver }}"
+    log_options: "{{ haproxy_docker_log_opts }}"
+    # Uncomment if you want to use vrrp_track_process
+    # pid_mode: host
+    cap_add:
+      - NET_ADMIN

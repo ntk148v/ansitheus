@@ -2,67 +2,68 @@
 - import_playbook: gather-facts.yml
   when: not skip_gather_fact | bool
 
-- name: Apply role fluentd
+- name: Apply role common
   gather_facts: false
   hosts:
-    - fluentd
+    - common
   roles:
-    - { role: fluentd, tags: fluentd, when: enable_fluentd | bool }
+    - { role: common, tags: common, when: enable_common | bool }
 
-- name: Apply role haproxy-keepalived
+- name: Apply role haproxy
   gather_facts: false
+  become: true
   hosts:
     - haproxy
-    - keepalived
+  roles:
+    - { role: haproxy, tags: haproxy, when: enable_haproxy | bool }
+
+- name: Apply role prometheus
+  gather_facts: false
+  become: true
+  hosts:
+    - prometheus
+  roles:
+    - { role: prometheus, tags: prometheus, when: enable_prometheus | bool }
+
+- name: Apply role alertmanager
+  gather_facts: false
+  become: true
+  hosts:
+    - alertmanager
   roles:
     - {
-        role: haproxy-keepalived,
-        tags: haproxy,
-        when: enable_haproxy | bool and enable_keepalived | bool,
+        role: alertmanager,
+        tags: alertmanager,
+        when: enable_alertmanager | bool,
       }
 
-- name: Apply role prometheus-server
+- name: Apply role node_exporter
   gather_facts: false
+  become: true
   hosts:
-    - prometheus_server
+    - node_exporter
   roles:
     - {
-        role: prometheus-server,
-        tags: prometheus-server,
-        when: enable_prometheus_server | bool,
+        role: node_exporter,
+        tags: [exporters, node_exporter],
+        when: enable_node_exporter | bool,
       }
 
-- name: Apply role prometheus-alertmanager
+- name: Apply role node_exporter
   gather_facts: false
+  become: true
   hosts:
-    - prometheus_alertmanager
+    - cadvisor
   roles:
     - {
-        role: prometheus-alertmanager,
-        tags: prometheus-alertmanager,
-        when: enable_prometheus_alertmanager | bool,
-      }
-
-- name: Apply role prometheus-exporter
-  gather_facts: false
-  hosts:
-    - all
-  roles:
-    - {
-        role: prometheus-exporter,
-        tags: prometheus-exporter,
-        when: enable_prometheus_node_exporter | bool or
-          enable_prometheus_cadvisor | bool or
-          enable_prometheus_snmp_exporter_dell_server | bool or
-          enable_prometheus_snmp_exporter_hpe_device | bool or
-          enable_prometheus_snmp_exporter_fujitsu_server | bool or
-          enable_prometheus_snmp_exporter_switch | bool or
-          enable_prometheus_snmp_exporter_huawei_device | bool or
-          enable_prometheus_container_status_exporter| bool,
+        role: cadvisor,
+        tags: [exporters, cadvisor],
+        when: enable_cadvisor | bool,
       }
 
 - name: Apply role grafana
   gather_facts: false
+  become: true
   hosts:
     - grafana
   roles:
