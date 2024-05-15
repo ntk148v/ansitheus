@@ -83,7 +83,7 @@
     - Reload keepalived service
 
 - name: Creating keepalived systemd service unit
-  ansible.builtin.ansible.builtin.template:
+  ansible.builtin.template:
     src: keepalived.service.j2
     dest: /etc/systemd/system/{{ keepalived_service_name }}
     owner: root
