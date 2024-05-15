@@ -40,9 +40,13 @@ scrape_configs:
   - job_name: prometheus
     static_configs:
       - targets:
+{% if prometheus_vip_address is defined and prometheus_vip_address != "" and prometheus_single_running_at_time | bool %}
+        - '{{ prometheus_vip_address }}:{{ prometheus_port }}'
+{% else %}
 {% for host in groups['prometheus'] | sort %}
         - '{{ hostvars[host]['ansible_' + hostvars[host]['api_interface']]['ipv4']['address'] }}:{{ prometheus_port }}'
 {% endfor %}
+{% endif %}
 
 {% if enable_alertmanager | bool %}
   - job_name: alertmanager
