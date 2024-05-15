@@ -40,7 +40,7 @@ scrape_configs:
   - job_name: prometheus
     static_configs:
       - targets:
-{% if prometheus_vip_address is defined and prometheus_vip_address != "" and prometheus_single_running_at_time | bool %}
+{% if prometheus_vip_address is defined and prometheus_vip_address != "" and prometheus_active_passive_mode | bool %}
         - '{{ prometheus_vip_address }}:{{ prometheus_port }}'
 {% else %}
 {% for host in groups['prometheus'] | sort %}

@@ -105,3 +105,7 @@
     log_driver: "{{ item.value.log_driver }}"
     log_options: "{{ item.value.log_options }}"
   with_dict: "{{ prometheus_services }}"
+  register: prometheus_container
+  notify:
+    - Restart keepalived service
+

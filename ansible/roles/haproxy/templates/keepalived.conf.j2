@@ -41,7 +41,7 @@ vrrp_instance ansible_vip_{{ keepalived_virtual_router_id }} {
   track_script {
     track_haproxy
   }
-{% if prometheus_single_running_at_time | bool %}
+{% if prometheus_active_passive_mode | bool %}
 
   notify_master "/usr/bin/docker start prometheus"
   notify_backup "/usr/bin/docker stop prometheus"

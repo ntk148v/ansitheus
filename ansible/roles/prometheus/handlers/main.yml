@@ -31,3 +31,15 @@
       or prometheus_alert_confs.changed | bool
       or prometheus_file_sd_confs.changed | bool
       or prometheus_tls_confs.changed | bool
+
+# NOTE(kiennt26): Force restart keepalived to trigger notify script.
+#                 Prometheus instances must be deployed in the same nodes as Haproxy and Keepalived. 
+- name: Restart keepalived service
+  ansible.builtin.service:
+    name: "keepalived"
+    state: "restarted"
+  register: keepalived_restart
+  when:
+    - inventory_hostname in groups['haproxy'] and inventory_hostname in groups['prometheus']
+    - prometheus_active_passive_mode | bool
+    - prometheus_container.changed | bool

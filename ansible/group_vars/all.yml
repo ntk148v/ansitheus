@@ -49,6 +49,9 @@ enable_grafana: "yes"
 enable_alertmanager: "yes"
 enable_haproxy: "yes"
 
+# Special variable to handle case, you want to only ONE Prometheus running instance at time.
+prometheus_active_passive_mode: "no"
+
 ##################
 # Port mappings
 #################

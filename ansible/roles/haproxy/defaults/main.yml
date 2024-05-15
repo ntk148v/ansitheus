@@ -18,7 +18,7 @@ keepalived_package_name: "keepalived"
 keepalived_service_name: "keepalived.service"
 
 # Special variable to handle case, you want to only ONE Prometheus running instance at time.
-prometheus_single_running_at_time: "no"
+prometheus_active_passive_mode: "no"
 
 # Container constructor
 # ---------------------
