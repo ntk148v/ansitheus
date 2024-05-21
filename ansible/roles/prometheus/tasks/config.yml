@@ -36,7 +36,6 @@
   when:
     - prometheus_alert_rules is defined and prometheus_alert_rules.files | length > 0
   notify:
-    - Validate prometheus config
     - Reload prometheus config
 
 - name: Check custom file_sd files exists
@@ -66,7 +65,6 @@
   when:
     - prometheus_file_sd is defined and prometheus_file_sd.files | length > 0
   notify:
-    - Validate prometheus config
     - Reload prometheus config
 
 - name: Configure Prometheus web
