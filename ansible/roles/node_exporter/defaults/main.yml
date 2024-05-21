@@ -33,6 +33,7 @@ node_exporter_services:
     image: "{{ node_exporter_image }}"
     privileged: "no"
     state: "started"
+    port: "{{ node_exporter_port }}"
     volumes:
       - "/proc:/host/proc:ro"
       - "/sys:/host/sys:ro"

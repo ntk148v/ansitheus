@@ -124,6 +124,7 @@ alertmanager_services:
     enabled: "{{ enable_alertmanager }}"
     image: "{{ alertmanager_image }}"
     state: "started"
+    port: "{{ alertmanager_port }}"
     volumes:
       - "{{ alertmanager_config_dir }}:/etc/alertmanager"
       - "{{ alertmanager_volume }}:/alertmanager"

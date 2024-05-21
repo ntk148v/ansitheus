@@ -108,6 +108,7 @@ grafana_services:
     container_name: "grafana"
     group: "grafana"
     enabled: "{{ enable_grafana | bool }}"
+    port: "{{ grafana_port }}"
     image: "{{ grafana_image }}"
     privileged: "no"
     network_mode: "host"

@@ -65,6 +65,7 @@ prometheus_services:
     enabled: "{{ enable_prometheus }}"
     image: "{{ prometheus_image }}"
     state: "started"
+    port: "{{ prometheus_port }}"
     volumes:
       - "{{ prometheus_config_dir }}:/etc/prometheus"
       - "{{ prometheus_volume }}:/prometheus"

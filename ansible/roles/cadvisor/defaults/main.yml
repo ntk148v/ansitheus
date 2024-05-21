@@ -23,6 +23,7 @@ cadvisor_services:
     enabled: "{{ enable_cadvisor }}"
     image: "{{ cadvisor_image }}"
     privileged: "no"
+    port: "{{ cadvisor_port }}"
     volumes:
       - "/:/rootfs:ro"
       - "/var/run:/var/run:rw"
