@@ -2,7 +2,7 @@
 - name: Restart node_exporter container
   vars:
     service_name: "node_exporter"
-    service: "{{ node_exporter_service[service_name] }}"
+    service: "{{ node_exporter_services[service_name] }}"
   become: true
   community.general.docker_container:
     name: "{{ service.container_name }}"
