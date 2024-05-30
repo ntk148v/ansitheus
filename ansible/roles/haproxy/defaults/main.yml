@@ -1,7 +1,7 @@
 ---
 haproxy_version: "lts-alpine"
-haproxy_docker_namespace: "{{ docker_namespace ~ '/' if docker_namespace else '' }}"
-haproxy_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ haproxy_docker_namespace }}haproxy:{{ haproxy_version }}"
+haproxy_docker_namespace: "{{ docker_namespace if docker_namespace else '' }}"
+haproxy_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ haproxy_docker_namespace ~ '/' if haproxy_docker_namespace else '' }}haproxy:{{ haproxy_version }}"
 haproxy_docker_log_driver: "{{ docker_log_driver }}"
 haproxy_docker_log_opts: "{{ docker_log_opts }}"
 
@@ -37,7 +37,5 @@ haproxy_services:
       - "/etc/localtime:/etc/localtime:ro"
     log_driver: "{{ haproxy_docker_log_driver }}"
     log_options: "{{ haproxy_docker_log_opts }}"
-    # Uncomment if you want to use vrrp_track_process
-    # pid_mode: host
     cap_add:
       - NET_ADMIN
