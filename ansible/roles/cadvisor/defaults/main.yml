@@ -32,16 +32,16 @@ cadvisor_services:
       - "/cgroup:/cgroup:ro"
     command: >
       {% if cadvisor_disable_metrics | length > 0 %}
-        '--disable_metrics={{ cadvisor_disable_metrics | join(',') }}' \
+        '--disable_metrics={{ cadvisor_disable_metrics | join(',') }}'
       {% endif -%}
       {% if cadvisor_enable_metrics | length > 0 %}
-        '--enable_metrics={{ cadvisor_enable_metrics | join(',') }}' \
+        '--enable_metrics={{ cadvisor_enable_metrics | join(',') }}'
       {% endif -%}
       {% if cadvisor_docker_only %}
-        '--docker_only={{ cadvisor_docker_only | lower }}' \
+        '--docker_only={{ cadvisor_docker_only | lower }}'
       {% endif -%}
-        '--listen_ip={{ api_interface_address }}' \
-        '--port={{ cadvisor_port }}' \
+        '--listen_ip={{ api_interface_address }}'
+        '--port={{ cadvisor_port }}'
         '--prometheus_endpoint={{ cadvisor_prometheus_endpoint }}'
     restart_policy: "unless-stopped"
     state: "started"
