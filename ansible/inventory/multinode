@@ -27,3 +27,6 @@ cadvisor-host-02
 
 [node_exporter]
 prom-host-01
+
+[mysqld_exporter]
+prom-host-01

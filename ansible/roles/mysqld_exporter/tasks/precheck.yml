@@ -1,0 +1,11 @@
+---
+- name: Check free ports for mysqld_exporter
+  wait_for:
+    host: "{{ hostvars[inventory_hostname]['ansible_' + api_interface]['ipv4']['address'] }}"
+    port: "{{ item.value.port }}"
+    connect_timeout: 1
+    timeout: 1
+    state: stopped
+  when:
+    - inventory_hostname in groups[item.value.group]
+  with_dict: "{{ mysqld_exporter_services }}"

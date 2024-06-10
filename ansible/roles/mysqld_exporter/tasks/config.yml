@@ -1,0 +1,52 @@
+---
+- name: Ensuring mysqld_exporter config directory exist
+  ansible.builtin.file:
+    path: "{{ mysqld_exporter_config_dir }}"
+    state: "directory"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+    mode: 0755
+
+- name: Copying over the mysqld_exporter config
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ mysqld_exporter_config_dir }}/my.cnf"
+    mode: 0755
+  register: mysqld_exporter_my_cnf
+  with_first_found:
+    - "{{ ansitheus_custom_config_dir }}/mysqld_exporter/my.cnf"
+    - "{{ role_path }}/templates/my.cnf.j2"
+  notify:
+    - Restart mysqld_exporter container
+
+- name: Configure mysqld_exporter web config
+  when: ( mysqld_exporter_tls_server_config | length > 0 ) or
+    ( mysqld_exporter_http_server_config | length > 0 ) or
+    ( mysqld_exporter_basic_auth_users | length > 0 )
+  block:
+    - name: Copy the mysqld_exporter web config file
+      ansible.builtin.template:
+        src: "{{ role_path }}/templates/web_config.yaml.j2"
+        dest: "{{ mysqld_exporter_config_dir }}/web_config.yaml"
+        owner: root
+        mode: "0640"
+      register: mysqld_exporter_web_conf
+      notify:
+        - Restart mysqld_exporter container
+
+- name: Recreating if not exist running containers
+  community.general.docker_container:
+    name: "{{ item.value.container_name }}"
+    image: "{{ item.value.image }}"
+    volumes: "{{ item.value.volumes }}"
+    command: "{{ item.value.command }}"
+    state: "{{ item.value.state }}"
+    restart_policy: "{{ item.value.restart_policy }}"
+    privileged: "{{ item.value.privileged }}"
+    network_mode: "{{ item.value.network_mode }}"
+    log_driver: "{{ item.value.log_driver }}"
+    log_options: "{{ item.value.log_options }}"
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ mysqld_exporter_services }}"

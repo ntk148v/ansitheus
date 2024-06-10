@@ -48,6 +48,7 @@ enable_cadvisor: "yes"
 enable_grafana: "yes"
 enable_alertmanager: "yes"
 enable_haproxy: "yes"
+enable_mysqld_exporter: "no"
 
 # Special variable to handle case, you want to only ONE Prometheus running instance at time.
 prometheus_active_passive_mode: "no"
@@ -62,6 +63,7 @@ alertmanager_cluster_port: "9094"
 node_exporter_port: "9100"
 cadvisor_port: "8080"
 grafana_port: "3000"
+mysqld_exporter_port: "9104"
 
 ###############
 # Image version
@@ -73,6 +75,7 @@ node_exporter_version: "1.8.0"
 cadvisor_version: "0.49.1"
 grafana_version: "7.2.2"
 haproxy_version: "lts-alpine"
+mysqld_exporter_version: "0.15.1"
 
 ##########################
 # Service docker namespace
@@ -85,3 +88,4 @@ grafana_docker_namespace: "{{ docker_namespace if docker_namespace else 'grafana
 cadvisor_docker_namespace: "{{ docker_namespace if docker_namespace else 'cadvisor' }}"
 keepalived_docker_namespace: "{{ docker_namespace if docker_namespace else 'kiennt26' }}"
 haproxy_docker_namespace: "{{ docker_namespace if docker_namespace else '' }}"
+mysqld_exporter_docker_namespace: "{{ docker_namespace if docker_namespace else 'prom' }}"

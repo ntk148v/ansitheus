@@ -25,3 +25,6 @@ localhost       ansible_connection=local
 
 [node_exporter]
 localhost       ansible_connection=local
+
+[mysqld_exporter]
+localhost       ansible_connection=local

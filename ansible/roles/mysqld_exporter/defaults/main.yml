@@ -1,0 +1,77 @@
+---
+mysqld_exporter_version: "0.15.1"
+mysqld_exporter_port: 9104
+mysqld_exporter_docker_namespace: "{{ docker_namespace if docker_namespace else 'prom' }}"
+mysqld_exporter_docker_log_driver: "{{ docker_log_driver }}"
+mysqld_exporter_docker_log_opts: "{{ docker_log_opts }}"
+mysqld_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ prometheus_docker_namespace }}/mysqld-exporter:v{{ mysqld_exporter_version }}"
+
+mysqld_exporter_web_listen_address: "{{ api_interface_address }}:{{ mysqld_exporter_port }}"
+mysqld_exporter_config_dir: "{{ ansitheus_config_dir }}/mysqld_exporter"
+mysqld_exporter_web_telemetry_path: "/metrics"
+
+mysqld_exporter_username: exporter
+mysqld_exporter_password: secret
+mysqld_exporter_target_host: "{{ api_interface_address }}"
+mysqld_exporter_target_port: 3306
+mysqld_exporter_target_socket: null
+# mysqld_exporter_target_socket: "/run/mysqld/mysqld.sock"
+
+# mysqld-exporter arguments
+# ------------------------
+mysqld_exporter_tls_server_config: {}
+mysqld_exporter_http_server_config: {}
+mysqld_exporter_basic_auth_users: {}
+mysqld_exporter_enabled_collectors: []
+#  - engine_innodb_status
+#  - perf_schema.eventsstatements
+mysqld_exporter_disabled_collectors: []
+
+mysqld_exporter_services:
+  mysqld_exporter:
+    container_name: "mysqld_exporter"
+    group: "mysqld_exporter"
+    enabled: "{{ enable_mysqld_exporter }}"
+    image: "{{ mysqld_exporter_image }}"
+    privileged: "no"
+    state: "started"
+    port: "{{ mysqld_exporter_port }}"
+    volumes:
+      - "/proc:/host/proc:ro"
+      - "/sys:/host/sys:ro"
+      - "/:/rootfs:ro"
+      - "{{ mysqld_exporter_config_dir }}:/etc/mysqld_exporter"
+    command: >
+      {% for collector in mysqld_exporter_enabled_collectors -%}
+      {%   if not collector is mapping %}
+          --collect.{{ collector }}
+      {%   else -%}
+      {%     set name, options = (collector.items()|list)[0] -%}
+          --collect.{{ name }}
+      {%     for k,v in options|dictsort %}
+          --collect.{{ name }}.{{ k }}={{ v | quote }}
+      {%     endfor -%}
+      {%   endif -%}
+      {% endfor -%}
+      {% for collector in mysqld_exporter_disabled_collectors %}
+          --no-collect.{{ collector }}
+      {% endfor %}
+      {% if mysqld_exporter_tls_server_config | length > 0 or mysqld_exporter_http_server_config | length > 0 or mysqld_exporter_basic_auth_users | length > 0 %}
+          --web.config.file=/etc/mysqld_exporter/web_config.yaml
+      {% endif %}
+      {% if mysqld_exporter_version is version('0.15.0', '>=') and
+            mysqld_exporter_web_listen_address is iterable and
+            mysqld_exporter_web_listen_address is not mapping and
+            mysqld_exporter_web_listen_address is not string %}
+      {%   for address in mysqld_exporter_web_listen_address %}
+          --web.listen-address={{ address }}
+      {%   endfor %}
+      {% else %}
+          --web.listen-address={{ mysqld_exporter_web_listen_address }}
+      {% endif %}
+          --web.telemetry-path={{ mysqld_exporter_web_telemetry_path }}
+          --config.my-cnf=/etc/mysqld_exporter/my.cnf
+    restart_policy: "unless-stopped"
+    network_mode: "host"
+    log_driver: "{{ mysqld_exporter_docker_log_driver }}"
+    log_options: "{{ mysqld_exporter_docker_log_opts }}"

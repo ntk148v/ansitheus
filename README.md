@@ -52,6 +52,7 @@ Ansitheus allows users to configure & deploy the following components:
 - [Prometheus Server](https://github.com/prometheus/prometheus)
 - [Prometheus Alertmanager](https://github.com/prometheus/alertmanager)
 - [Prometheus Node-exporter](https://github.com/prometheus/node_exporter)
+- [Prometheus Mysqld-exporter](https://github.com/prometheus/mysqld_exporter)
 - [Google Cadvisor](https://github.com/google/cadvisor)
 - [Haproxy](http://www.haproxy.org/)
 - [Keepalived](https://www.keepalived.org/)
