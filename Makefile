@@ -1,6 +1,6 @@
 GIT_TAG=$(shell git describe --abbrev=0 --tags)
-DOCKER_NAMESPACE="kiennt26"
-DOCKER_IMAGE="ansitheus"
+DOCKER_NAMESPACE?="kiennt26"
+DOCKER_IMAGE?="ansitheus"
 
 .PHONY: clean
 clean:
