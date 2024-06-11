@@ -10,11 +10,11 @@ defaults
   retries 3
   timeout http-request 10s
   timeout queue 1m
-  timeout connect 10s
+  timeout connect {{ haproxy_connect_timeout }}
   timeout client {{ haproxy_client_timeout }}
   timeout server {{ haproxy_server_timeout }}
-  timeout check 10s
-  balance {{ haproxy_defaults_balance }}
+  timeout check {{ haproxy_check_timeout }}
+  balance {{ haproxy_balance_algorithm }}
 
 
 {% if enable_prometheus | bool %}

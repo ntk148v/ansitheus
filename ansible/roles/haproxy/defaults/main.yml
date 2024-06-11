@@ -10,7 +10,9 @@ set_sysctl: "yes"
 haproxy_max_connections: 6000
 haproxy_client_timeout: "1m"
 haproxy_server_timeout: "1m"
-haproxy_defaults_balance: "roundrobin"
+haproxy_check_timeout: "10s"
+haproxy_connect_timeout: "10s"
+haproxy_balance_algorithm: "roundrobin"
 
 keepalived_traffic_mode: "multicast"
 keepalived_config_dir: "{{ ansitheus_config_dir }}/keepalived/"
