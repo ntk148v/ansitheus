@@ -16,7 +16,7 @@ build:
 	@echo 'Done.'
 
 .PHONY: push
-push: clean build
+push: build
 	@echo "+ $@"
 	@docker push ${DOCKER_NAMESPACE}/${DOCKER_IMAGE}:${GIT_TAG}
 	@docker push ${DOCKER_NAMESPACE}/${DOCKER_IMAGE}:latest
