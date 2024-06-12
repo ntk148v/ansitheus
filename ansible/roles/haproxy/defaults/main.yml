@@ -7,12 +7,13 @@ haproxy_docker_log_opts: "{{ docker_log_opts }}"
 
 haproxy_config_dir: "{{ ansitheus_config_dir }}/haproxy/"
 set_sysctl: "yes"
-haproxy_max_connections: 6000
+haproxy_max_connections: 10000
 haproxy_client_timeout: "1m"
 haproxy_server_timeout: "1m"
 haproxy_check_timeout: "10s"
 haproxy_connect_timeout: "10s"
 haproxy_balance_algorithm: "roundrobin"
+haproxy_http_reuse: "safe"
 
 keepalived_traffic_mode: "multicast"
 keepalived_config_dir: "{{ ansitheus_config_dir }}/keepalived/"
