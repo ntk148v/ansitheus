@@ -6,14 +6,15 @@ ansitheus_vip_address: ""
 prometheus_vip_address: "{{ ansitheus_vip_address }}"
 alertmanager_vip_address: "{{ ansitheus_vip_address }}"
 
-ansitheus_network_interface: "eth0"
+# Get interface from the default interface: https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_vars_facts.html#ansible-facts
+ansitheus_network_interface: "{{ ansible_default_ipv4.interface }}"
 ansitheus_config_dir: "/etc/ansitheus"
 ansitheus_custom_config_dir: "{{ ansitheus_config_dir }}/config"
 # The group which own node_config_directory, you can use a non-root
 config_owner_user: "root"
 config_owner_group: "root"
 
-network_interface: "{{ network_interface }}"
+network_interface: "{{ ansitheus_network_interface }}"
 api_interface: "{{ network_interface }}"
 api_interface_address: "{{ hostvars[inventory_hostname]['ansible_' + api_interface]['ipv4']['address'] }}"
 

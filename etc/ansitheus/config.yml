@@ -5,13 +5,13 @@
 # Service VIP address
 ######################
 ansitheus_vip_address: "10.10.10.1"
-ansitheus_network_interface: "eth0"
+# ansitheus_network_interface: "eth0"
 keepalived_virtual_router_id: "82"
 
 # The group which own node_config_directory, you can use a non-root
 config_owner_user: "root"
 config_owner_group: "root"
-network_interface: "eth0"
+# network_interface: "eth0"
 
 #####################
 # Keepalived Password
