@@ -1,6 +1,6 @@
-# Ansible Role: cadvisor
+# Ansible Role: prometheus
 
-Deploy [cadvisor](https://github.com/google/cadvisor) using Ansible and Docker.
+Deploy [prometheus](https://github.com/prometheus/prometheus) using Ansible and Docker.
 
 ## Requirements
 
@@ -15,5 +15,5 @@ All variables which can be overridden are stored in [defaults/main.yml](./defaul
 ```yaml
 - hosts: all
   roles:
-      - { role: cadvisor }
+      - { role: prometheus }
 ```
