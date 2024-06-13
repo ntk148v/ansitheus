@@ -12,7 +12,8 @@ cadvisor_prometheus_endpoint: "/metrics"
 cadvisor_enable_metrics: []
 cadvisor_disable_metrics: []
 cadvisor_docker_only: false
-
+# Related issue: https://github.com/google/cadvisor/issues/2523
+cadvisor_housekeeping_interval: 30s
 
 # Container constructor
 # ---------------------
@@ -40,6 +41,9 @@ cadvisor_services:
       {% if cadvisor_docker_only %}
         '--docker_only={{ cadvisor_docker_only | lower }}'
       {% endif -%}
+      {% if cadvisor_housekeeping_interval %}
+        '--housekeeping_interval={{ cadvisor_housekeeping_interval }}'
+      {% endif %}
         '--listen_ip={{ api_interface_address }}'
         '--port={{ cadvisor_port }}'
         '--prometheus_endpoint={{ cadvisor_prometheus_endpoint }}'

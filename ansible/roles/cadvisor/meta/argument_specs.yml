@@ -53,3 +53,7 @@ argument_specs:
         description: "do not report raw cgroup metrics, except the root cgroup"
         type: "bool"
         default: false
+      cadvisor_housekeeping_interval:
+        description: "interval between container housekeepings"
+        type: "str"
+        default: "30s"
