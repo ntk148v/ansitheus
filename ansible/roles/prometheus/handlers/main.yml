@@ -18,7 +18,7 @@
     service_name: "prometheus"
     service: "{{ prometheus_services[service_name] }}"
   uri:
-    url: http://{{ api_interface_address }}:{{ prometheus_port }}/-/reload
+    url: http://{{ prometheus_vip_address if prometheus_vip_address is defined and prometheus_vip_address != "" else api_interface_address }}:{{ prometheus_port }}/-/reload
     method: PUT
   register: result
   retries: 5
@@ -33,7 +33,7 @@
       or prometheus_tls_confs.changed | bool
 
 # NOTE(kiennt26): Force restart keepalived to trigger notify script.
-#                 Prometheus instances must be deployed in the same nodes as Haproxy and Keepalived. 
+#                 Prometheus instances must be deployed in the same nodes as Haproxy and Keepalived.
 - name: Restart keepalived service
   ansible.builtin.service:
     name: "keepalived"
