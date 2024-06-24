@@ -4,6 +4,10 @@ haproxy_docker_namespace: "{{ docker_namespace if docker_namespace else '' }}"
 haproxy_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ haproxy_docker_namespace ~ '/' if haproxy_docker_namespace else '' }}haproxy:{{ haproxy_version }}"
 haproxy_docker_log_driver: "{{ docker_log_driver }}"
 haproxy_docker_log_opts: "{{ docker_log_opts }}"
+# Docker resource limit
+haproxy_docker_memory_limit: "{{ docker_memory_limit }}"
+haproxy_docker_memory_swap_limit: "{{ docker_memory_swap_limit }}"
+haproxy_docker_cpus_limit: "{{ docker_cpus_limit }}"
 
 haproxy_config_dir: "{{ ansitheus_config_dir }}/haproxy/"
 set_sysctl: "yes"
@@ -42,3 +46,6 @@ haproxy_services:
     log_options: "{{ haproxy_docker_log_opts }}"
     cap_add:
       - NET_ADMIN
+    memory: "{{ haproxy_docker_memory_limit }}"
+    memory_swap: "{{ haproxy_docker_memory_swap_limit }}"
+    cpus: "{{ haproxy_docker_cpus_limit }}"

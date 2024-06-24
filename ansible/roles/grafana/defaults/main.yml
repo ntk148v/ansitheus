@@ -6,6 +6,11 @@ grafana_data_volume: "grafana"
 grafana_logs_volume: "grafana_log"
 grafana_docker_log_driver: "{{ docker_log_driver }}"
 grafana_docker_log_opts: "{{ docker_log_opts }}"
+# Docker resource limit
+grafana_docker_memory_limit: "{{ docker_memory_limit }}"
+grafana_docker_memory_swap_limit: "{{ docker_memory_swap_limit }}"
+grafana_docker_cpus_limit: "{{ docker_cpus_limit }}"
+
 grafana_config_dir: "{{ ansitheus_config_dir }}/grafana/"
 grafana_data_dir: "/var/lib/grafana"
 grafana_log_dir: "/var/log/grafana"
@@ -122,3 +127,6 @@ grafana_services:
       - "{{ grafana_logs_volume }}:/var/log/grafana"
     log_driver: "{{ grafana_docker_log_driver }}"
     log_options: "{{ grafana_docker_log_opts }}"
+    memory: "{{ grafana_docker_memory_limit }}"
+    memory_swap: "{{ grafana_docker_memory_swap_limit }}"
+    cpus: "{{ grafana_docker_cpus_limit }}"

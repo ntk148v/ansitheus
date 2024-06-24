@@ -7,6 +7,11 @@ alertmanager_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ al
 alertmanager_volume: "alertmanager_data"
 alertmanager_docker_log_driver: "{{ docker_log_driver }}"
 alertmanager_docker_log_opts: "{{ docker_log_opts }}"
+# Docker resource limit
+alertmanager_docker_memory_limit: "{{ docker_memory_limit }}"
+alertmanager_docker_memory_swap_limit: "{{ docker_memory_swap_limit }}"
+alertmanager_docker_cpus_limit: "{{ docker_cpus_limit }}"
+
 amtool_docker_namespace: "{{ docker_namespace if docker_namespace else 'kiennt26' }}"
 amtool_version: "v2.52.0-v0.27.0"
 amtool_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ amtool_docker_namespace }}/pramtool:{{ amtool_version }}"
@@ -164,3 +169,6 @@ alertmanager_services:
         {{ pre }}-{{ flag }}={{ flag_value }}{% endfor %}
     log_driver: "{{ alertmanager_docker_log_driver }}"
     log_options: "{{ alertmanager_docker_log_opts }}"
+    memory: "{{ alertmanager_docker_memory_limit }}"
+    memory_swap: "{{ alertmanager_docker_memory_swap_limit }}"
+    cpus: "{{ alertmanager_docker_cpus_limit }}"

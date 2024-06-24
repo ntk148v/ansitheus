@@ -70,6 +70,9 @@
     network_mode: "{{ item.value.network_mode }}"
     log_driver: "{{ item.value.log_driver }}"
     log_options: "{{ item.value.log_options }}"
+    memory: "{{ item.value.memory }}"
+    memory_swap: "{{ item.value.memory_swap }}"
+    cpus: "{{ item.value.cpus }}"
   when:
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool
