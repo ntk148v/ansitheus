@@ -5,6 +5,10 @@ mysqld_exporter_docker_namespace: "{{ docker_namespace if docker_namespace else 
 mysqld_exporter_docker_log_driver: "{{ docker_log_driver }}"
 mysqld_exporter_docker_log_opts: "{{ docker_log_opts }}"
 mysqld_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ prometheus_docker_namespace }}/mysqld-exporter:v{{ mysqld_exporter_version }}"
+# Docker resource limit
+mysqld_exporter_docker_memory_limit: "{{ docker_memory_limit }}"
+mysqld_exporter_docker_memory_swap_limit: "{{ docker_memory_swap_limit }}"
+mysqld_exporter_docker_cpus_limit: "{{ docker_cpus_limit }}"
 
 mysqld_exporter_web_listen_address: "{{ api_interface_address }}:{{ mysqld_exporter_port }}"
 mysqld_exporter_config_dir: "{{ ansitheus_config_dir }}/mysqld_exporter"
@@ -75,3 +79,6 @@ mysqld_exporter_services:
     network_mode: "host"
     log_driver: "{{ mysqld_exporter_docker_log_driver }}"
     log_options: "{{ mysqld_exporter_docker_log_opts }}"
+    memory: "{{ mysqld_exporter_docker_memory_limit }}"
+    memory_swap: "{{ mysqld_exporter_docker_memory_swap_limit }}"
+    cpus: "{{ mysqld_exporter_docker_cpus_limit }}"

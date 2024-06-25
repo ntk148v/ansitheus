@@ -7,6 +7,11 @@ prometheus_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ prom
 prometheus_volume: "prometheus_data"
 prometheus_docker_log_driver: "{{ docker_log_driver }}"
 prometheus_docker_log_opts: "{{ docker_log_opts }}"
+# Docker resource limit
+prometheus_docker_memory_limit: "{{ docker_memory_limit }}"
+prometheus_docker_memory_swap_limit: "{{ docker_memory_swap_limit }}"
+prometheus_docker_cpus_limit: "{{ docker_cpus_limit }}"
+
 prometheus_web_listen_address: "{{ api_interface_address }}:{{ prometheus_port }}"
 prometheus_web_external_url: "http://{{ prometheus_vip_address }}:{{ prometheus_port }}"
 promtool_docker_namespace: "{{ docker_namespace if docker_namespace else 'kiennt26' }}"
@@ -54,7 +59,6 @@ prometheus_remote_read: []
 
 prometheus_external_labels:
   environment: "{{ ansible_fqdn | default(ansible_host) | default(inventory_hostname) }}"
-
 
 # Container constructor
 # ---------------------
@@ -109,3 +113,6 @@ prometheus_services:
       {% endfor %}
     log_driver: "{{ prometheus_docker_log_driver }}"
     log_options: "{{ prometheus_docker_log_opts }}"
+    memory: "{{ prometheus_docker_memory_limit }}"
+    memory_swap: "{{ prometheus_docker_memory_swap_limit }}"
+    cpus: "{{ prometheus_docker_cpus_limit }}"

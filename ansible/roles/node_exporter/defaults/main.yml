@@ -5,6 +5,10 @@ node_exporter_docker_namespace: "{{ docker_namespace if docker_namespace else 'p
 node_exporter_docker_log_driver: "{{ docker_log_driver }}"
 node_exporter_docker_log_opts: "{{ docker_log_opts }}"
 node_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ prometheus_docker_namespace }}/node-exporter:v{{ node_exporter_version }}"
+# Docker resource limit
+node_exporter_docker_memory_limit: "{{ docker_memory_limit }}"
+node_exporter_docker_memory_swap_limit: "{{ docker_memory_swap_limit }}"
+node_exporter_docker_cpus_limit: "{{ docker_cpus_limit }}"
 
 node_exporter_web_disable_exporter_metrics: false
 node_exporter_web_listen_address: "{{ api_interface_address }}:{{ node_exporter_port }}"
@@ -79,3 +83,6 @@ node_exporter_services:
     network_mode: "host"
     log_driver: "{{ node_exporter_docker_log_driver }}"
     log_options: "{{ node_exporter_docker_log_opts }}"
+    memory: "{{ node_exporter_docker_memory_limit }}"
+    memory_swap: "{{ node_exporter_docker_memory_swap_limit }}"
+    cpus: "{{ node_exporter_docker_cpus_limit }}"

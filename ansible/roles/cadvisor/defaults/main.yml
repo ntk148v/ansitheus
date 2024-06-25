@@ -5,6 +5,10 @@ cadvisor_docker_namespace: "{{ docker_namespace if docker_namespace else 'cadvis
 cadvisor_image: "{{ docker_registry ~ '/' if docker_registry else 'gcr.io/' }}{{ cadvisor_docker_namespace }}/cadvisor:v{{ cadvisor_version }}"
 cadvisor_docker_log_driver: "{{ docker_log_driver }}"
 cadvisor_docker_log_opts: "{{ docker_log_opts }}"
+# Docker resource limit
+cadvisor_docker_memory_limit: "{{ docker_memory_limit }}"
+cadvisor_docker_cpus_limit: "{{ docker_cpus_limit }}"
+cadvisor_docker_memory_swap_limit: "{{ docker_memory_swap_limit }}"
 
 # Cadvisor arguments
 # ------------------
@@ -52,3 +56,6 @@ cadvisor_services:
     network_mode: "host"
     log_driver: "{{ cadvisor_docker_log_driver }}"
     log_options: "{{ cadvisor_docker_log_opts }}"
+    memory: "{{ cadvisor_docker_memory_limit }}"
+    memory_swap: "{{ cadvisor_docker_memory_swap_limit }}"
+    cpus: "{{ cadvisor_docker_cpus_limit }}"
