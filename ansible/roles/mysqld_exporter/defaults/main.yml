@@ -1,6 +1,7 @@
 ---
 mysqld_exporter_version: "0.15.1"
 mysqld_exporter_port: 9104
+mysqld_exporter_container_name: "mysqld_exporter"
 mysqld_exporter_docker_namespace: "{{ docker_namespace if docker_namespace else 'prom' }}"
 mysqld_exporter_docker_log_driver: "{{ docker_log_driver }}"
 mysqld_exporter_docker_log_opts: "{{ docker_log_opts }}"
@@ -33,7 +34,7 @@ mysqld_exporter_disabled_collectors: []
 
 mysqld_exporter_services:
   mysqld_exporter:
-    container_name: "mysqld_exporter"
+    container_name: "{{ mysqld_exporter_container_name }}"
     group: "mysqld_exporter"
     enabled: "{{ enable_mysqld_exporter }}"
     image: "{{ mysqld_exporter_image }}"

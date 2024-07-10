@@ -1,5 +1,6 @@
 ---
 grafana_version: "10.4.2"
+grafana_container_name: "grafana"
 grafana_docker_namespace: "{{ docker_namespace if docker_namespace else 'grafana' }}"
 grafana_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ grafana_docker_namespace }}/grafana:{{ grafana_version }}"
 grafana_data_volume: "grafana"
@@ -110,7 +111,7 @@ grafana_log:
 # ----------------------
 grafana_services:
   grafana:
-    container_name: "grafana"
+    container_name: "{{ grafana_container_name }}"
     group: "grafana"
     enabled: "{{ enable_grafana | bool }}"
     port: "{{ grafana_port }}"

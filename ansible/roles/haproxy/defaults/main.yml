@@ -1,5 +1,6 @@
 ---
 haproxy_version: "lts-alpine"
+haproxy_container_name: "haproxy"
 haproxy_docker_namespace: "{{ docker_namespace if docker_namespace else '' }}"
 haproxy_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ haproxy_docker_namespace ~ '/' if haproxy_docker_namespace else '' }}haproxy:{{ haproxy_version }}"
 haproxy_docker_log_driver: "{{ docker_log_driver }}"
@@ -31,7 +32,7 @@ prometheus_active_passive_mode: "no"
 # ---------------------
 haproxy_services:
   haproxy:
-    container_name: "haproxy"
+    container_name: "{{ haproxy_container_name }}"
     group: "haproxy"
     enabled: "{{ enable_haproxy }}"
     image: "{{ haproxy_image }}"

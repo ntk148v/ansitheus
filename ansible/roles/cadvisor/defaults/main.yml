@@ -1,6 +1,7 @@
 ---
 cadvisor_version: "0.49.1"
 cadvisor_port: "8080"
+cadvisor_container_name: "cadvisor"
 cadvisor_docker_namespace: "{{ docker_namespace if docker_namespace else 'cadvisor' }}"
 cadvisor_image: "{{ docker_registry ~ '/' if docker_registry else 'gcr.io/' }}{{ cadvisor_docker_namespace }}/cadvisor:v{{ cadvisor_version }}"
 cadvisor_docker_log_driver: "{{ docker_log_driver }}"
@@ -23,7 +24,7 @@ cadvisor_housekeeping_interval: 30s
 # ---------------------
 cadvisor_services:
   cadvisor:
-    container_name: "cadvisor"
+    container_name: "{{ cadvisor_container_name }}"
     group: "cadvisor"
     enabled: "{{ enable_cadvisor }}"
     image: "{{ cadvisor_image }}"

@@ -2,6 +2,7 @@
 prometheus_version: "2.52.0"
 prometheus_docker_namespace: "{{ docker_namespace if docker_namespace else 'prom' }}"
 prometheus_port: 9090
+prometheus_container_name: "prometheus"
 prometheus_config_dir: "{{ ansitheus_config_dir }}/prometheus"
 prometheus_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ prometheus_docker_namespace }}/prometheus:v{{ prometheus_version }}"
 prometheus_volume: "prometheus_data"
@@ -64,7 +65,7 @@ prometheus_external_labels:
 # ---------------------
 prometheus_services:
   prometheus:
-    container_name: prometheus
+    container_name: "{{ prometheus_container_name }}"
     group: prometheus
     enabled: "{{ enable_prometheus }}"
     image: "{{ prometheus_image }}"
