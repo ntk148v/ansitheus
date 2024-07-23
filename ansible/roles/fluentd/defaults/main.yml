@@ -1,0 +1,31 @@
+---
+fluentd_version: "1.17"
+fluentd_container_name: "fluentd"
+fluentd_docker_namespace: "{{ docker_namespace if docker_namespace else 'kiennt26' }}"
+fluentd_docker_log_driver: "{{ docker_log_driver }}"
+fluentd_docker_log_opts: "{{ docker_log_opts }}"
+fluentd_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ fluentd_docker_namespace }}/fluentd:v{{ fluentd_version }}"
+# Docker resource limit
+fluentd_docker_memory_limit: "{{ docker_memory_limit }}"
+fluentd_docker_memory_swap_limit: "{{ docker_memory_swap_limit }}"
+fluentd_docker_cpus_limit: "{{ docker_cpus_limit }}"
+
+fluentd_config_dir: "{{ ansitheus_config_dir }}/fluentd"
+
+fluentd_services:
+  fluentd:
+    container_name: "{{ fluentd_container_name }}"
+    group: "fluentd"
+    enabled: "{{ enable_fluentd }}"
+    image: "{{ fluentd_image }}"
+    privileged: "no"
+    state: "started"
+    volumes:
+      - "{{ fluentd_config_dir }}:/fluentd/etc"
+    restart_policy: "unless-stopped"
+    network_mode: "host"
+    log_driver: "{{ fluentd_docker_log_driver }}"
+    log_options: "{{ fluentd_docker_log_opts }}"
+    memory: "{{ fluentd_docker_memory_limit }}"
+    memory_swap: "{{ fluentd_docker_memory_swap_limit }}"
+    cpus: "{{ fluentd_docker_cpus_limit }}"

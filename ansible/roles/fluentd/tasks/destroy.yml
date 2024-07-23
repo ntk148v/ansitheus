@@ -1,0 +1,20 @@
+---
+- name: Stop and remove containers
+  community.general.docker_container:
+    name: "{{ item.value.container_name }}"
+    state: "absent"
+    keep_volumes: "{{ not destroy_include_volumes | bool }}"
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ fluentd_services }}"
+
+- name: Remove images
+  docker_image:
+    name: "{{ item.value.image }}"
+    state: "absent"
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+    - destroy_include_images | bool
+  with_dict: "{{ fluentd_services }}"

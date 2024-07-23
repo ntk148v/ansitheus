@@ -30,3 +30,6 @@ prom-host-01
 
 [mysqld_exporter]
 prom-host-01
+
+[fluentd]
+prom-host-01

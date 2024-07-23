@@ -1,0 +1,10 @@
+@include config.d/*.conf
+
+# Setup the Prometheus plugin.
+# Default config
+<source>
+  @type prometheus
+  bind 0.0.0.0
+  port 24231
+  metrics_path /metrics
+</source>

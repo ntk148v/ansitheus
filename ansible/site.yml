@@ -80,3 +80,11 @@
     - grafana
   roles:
     - { role: grafana, tags: grafana, when: enable_grafana | bool }
+
+- name: Apply role fluentd
+  gather_facts: false
+  become: true
+  hosts:
+    - fluentd
+  roles:
+    - { role: fluentd, tags: fluentd, when: enable_fluentd | bool }

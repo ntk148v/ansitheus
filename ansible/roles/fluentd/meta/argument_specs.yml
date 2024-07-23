@@ -1,0 +1,13 @@
+---
+# yamllint disable rule:line-length
+argument_specs:
+  main:
+    short_description: "Fluentd"
+    description:
+      - "Deploy Fluentd using ansible"
+    author:
+      - "Kien Nguyen Tuan"
+    options:
+      fluentd_version:
+        description: "Fluentd version"
+        default: "1.17"
