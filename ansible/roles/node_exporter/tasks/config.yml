@@ -39,7 +39,7 @@
 - name: Copying over the node_exporter config
   ansible.builtin.template:
     src: "{{ item }}"
-    dest: "{{ node_exporter_config_dir }}/prometheus.yml"
+    dest: "{{ node_exporter_config_dir }}/config.yml"
     mode: 0755
   register: node_exporter_confs
   with_first_found:
