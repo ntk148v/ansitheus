@@ -1,0 +1,39 @@
+---
+# yamllint disable rule:line-length
+argument_specs:
+  main:
+    short_description: "Prometheus Openstack Exporter"
+    description:
+      - "Deploy prometheus openstack-exporter (https://github.com/openstack-exporter/openstack-exporter) using ansible"
+    author:
+      - "Kien Nguyen Tuan"
+    options:
+      openstack_exporter_version:
+        description: "Openstack-exporter version."
+        default: "1.8.0"
+      openstack_exporter_web_listen_address:
+        description: "Address on which openstack-exporter will listen"
+        default: "<ip-address>:9180"
+      openstack_exporter_web_telemetry_path:
+        description: "Path under which to expose metrics"
+        default: "/metrics"
+      openstack_exporter_disable_services:
+        description:
+          - "List of disable services."
+        type: "list"
+        elements: "str"
+      openstack_exporter_endpoint_type:
+        description: "openstack endpoint type to use (i.e: public, internal, admin)"
+        type: "str"
+      openstack_exporter_disable_deprecated_metrics:
+        description: "Disable deprecated metrics"
+        type: "bool"
+      openstack_exporter_disable_slow_metrics:
+        description: "Disable slow metrics for performance reasons"
+        type: "bool"
+      openstack_exporter_enable_cache:
+        description: "Enable Cache mechanism globally"
+        type: "bool"
+      openstack_exporter_cache_ttl:
+        description: "TTL duration for cache expiry(eg. 10s, 11m, 1h)"
+        type: "str"

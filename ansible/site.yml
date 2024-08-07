@@ -73,6 +73,18 @@
         when: enable_mysqld_exporter | bool,
       }
 
+- name: Apply role openstack_exporter
+  gather_facts: false
+  become: true
+  hosts:
+    - openstack_exporter
+  roles:
+    - {
+        role: openstack_exporter,
+        tags: [exporters, openstack_exporter],
+        when: enable_openstack_exporter | bool,
+      }
+
 - name: Apply role grafana
   gather_facts: false
   become: true

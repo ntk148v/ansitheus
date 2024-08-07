@@ -5,6 +5,7 @@ prometheus
 alertmanager
 cadvisor
 node_exporter
+openstack_exporter
 
 [haproxy]
 haproxy-host-01
@@ -13,10 +14,11 @@ haproxy-host-02
 [prometheus]
 # These hostname must be resolvable from your deployment host
 prom-host-01
+prom-host-02
 
 [alertmanager]
 # By default, start alertmanager service in the same host with prometheus
-prom-host-01
+am-hot-01
 
 [grafana]
 grafana-host-01
@@ -26,10 +28,13 @@ cadvisor-host-01
 cadvisor-host-02
 
 [node_exporter]
-prom-host-01
+node-host-01
 
 [mysqld_exporter]
-prom-host-01
+mysql-host-01
 
 [fluentd]
-prom-host-01
+fluentd-host-01
+
+[openstack_exporter]
+openstack-host-01
