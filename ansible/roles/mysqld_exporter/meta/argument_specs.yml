@@ -59,3 +59,7 @@ argument_specs:
       mysqld_exporter_basic_auth_users:
         description: "Dictionary of users and password for basic authentication. Passwords are automatically hashed with bcrypt."
         type: "dict"
+      mysqld_exporter_config_flags_extra:
+        description:
+          - "Additional configuration flags passed to mysqld-exporter binary at startup"
+        type: "dict"

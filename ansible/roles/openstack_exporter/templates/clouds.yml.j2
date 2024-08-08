@@ -1,0 +1,18 @@
+---
+{{ ansible_managed | comment }}
+clouds:
+ {{ openstack_cloud_name }}:
+   region_name: {{ openstack_region_name }}
+   identity_api_version: 3
+   identity_interface: "internal"
+   volume_api_version: 3
+   auth:
+     username: {{ openstack_keystone_admin_user }}
+     password: {{ openstack_keystone_admin_password }}
+     project_name: {{ openstack_keystone_admin_project }}
+     project_domain_name: 'Default'
+     user_domain_name: 'Default'
+{% if openstack_cacert != '' %}
+     cacert: {{ openstack_cacert }}
+{% endif %}
+     auth_url: {{ openstack_keystone_internal_url }}

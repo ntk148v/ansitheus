@@ -31,6 +31,7 @@ mysqld_exporter_enabled_collectors: []
 #  - engine_innodb_status
 #  - perf_schema.eventsstatements
 mysqld_exporter_disabled_collectors: []
+mysqld_exporter_config_flags_extras: {}
 
 mysqld_exporter_services:
   mysqld_exporter:
@@ -76,6 +77,9 @@ mysqld_exporter_services:
       {% endif %}
           --web.telemetry-path={{ mysqld_exporter_web_telemetry_path }}
           --config.my-cnf=/etc/mysqld_exporter/my.cnf
+      {% for flag, flag_value in mysqld_exporter_config_flags_extra.items() %}
+        {{ pre }}-{{ flag }}={{ flag_value }}
+      {% endfor %}
     restart_policy: "unless-stopped"
     network_mode: "host"
     log_driver: "{{ mysqld_exporter_docker_log_driver }}"

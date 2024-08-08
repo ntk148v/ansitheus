@@ -57,3 +57,7 @@ argument_specs:
         description: "interval between container housekeepings"
         type: "str"
         default: "30s"
+      cadvisor_config_flags_extra:
+        description:
+          - "Additional configuration flags passed to cadvisor binary at startup"
+        type: "dict"

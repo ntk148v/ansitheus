@@ -65,6 +65,7 @@ enable_alertmanager: "yes"
 enable_haproxy: "yes"
 enable_mysqld_exporter: "no"
 enable_fluentd: "no"
+enable_openstack_exporter: "no"
 
 # Special variable to handle case, you want to only ONE Prometheus running instance at time.
 prometheus_active_passive_mode: "no"
@@ -80,6 +81,7 @@ node_exporter_port: "9100"
 cadvisor_port: "8080"
 grafana_port: "3000"
 mysqld_exporter_port: "9104"
+openstack_exporter_port: "9180"
 
 ###############
 # Image version

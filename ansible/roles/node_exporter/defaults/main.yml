@@ -29,6 +29,7 @@ node_exporter_enabled_collectors:
 #      ignored-mount-points: "^/(sys|proc|dev)($|/)"
 #      ignored-fs-types: "^(sys|proc|auto)fs$"
 node_exporter_disabled_collectors: []
+node_exporter_config_flags_extra: {}
 
 node_exporter_services:
   node_exporter:
@@ -80,6 +81,9 @@ node_exporter_services:
           '--web.listen-address={{ node_exporter_web_listen_address }}'
       {% endif %}
           '--web.telemetry-path={{ node_exporter_web_telemetry_path }}'
+      {% for flag, flag_value in node_exporter_config_flags_extra.items() %}
+          {{ pre }}-{{ flag }}={{ flag_value }}
+      {% endfor %}
     restart_policy: "unless-stopped"
     network_mode: "host"
     log_driver: "{{ node_exporter_docker_log_driver }}"

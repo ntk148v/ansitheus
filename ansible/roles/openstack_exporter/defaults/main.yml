@@ -1,0 +1,86 @@
+---
+# NOTE(kiennt26): Normally, I prevent using 'latest' tag as much as possible.
+#                 But only latest build contains the most wanted feature [1].
+#                 Will come back later when openstack-exporter releases new tag.
+#                 [1] <https://github.com/openstack-exporter/openstack-exporter/issues/351>
+openstack_exporter_version: "latest"
+openstack_exporter_port: 9180
+openstack_exporter_container_name: "openstack_exporter"
+openstack_exporter_docker_namespace: "{{ docker_namespace if docker_namespace else 'openstack-exporter' }}"
+openstack_exporter_docker_log_driver: "{{ docker_log_driver }}"
+openstack_exporter_docker_log_opts: "{{ docker_log_opts }}"
+openstack_exporter_image: "{{ docker_registry ~ '/' if docker_registry else 'ghcr.io/' }}{{ openstack_exporter_docker_namespace }}/openstack-exporter:{{ openstack_exporter_version }}"
+# Docker resource limit
+openstack_exporter_docker_memory_limit: "{{ docker_memory_limit }}"
+openstack_exporter_docker_memory_swap_limit: "{{ docker_memory_swap_limit }}"
+openstack_exporter_docker_cpus_limit: "{{ docker_cpus_limit }}"
+
+# openstack-exporter arguments
+# ----------------------------
+openstack_exporter_web_listen_address: "{{ api_interface_address }}:{{ openstack_exporter_port }}"
+openstack_exporter_config_dir: "{{ ansitheus_config_dir }}/openstack_exporter"
+openstack_exporter_web_telemetry_path: "/metrics"
+openstack_exporter_disable_services:
+  - gnocchi
+  - dns
+  - database
+  - object-store
+openstack_exporter_endpoint_type: "internal"
+openstack_exporter_disable_deprecated_metrics: "yes"
+openstack_exporter_disable_slow_metrics: "yes"
+openstack_exporter_enable_cache: "yes"
+openstack_exporter_cache_ttl: "300s"
+openstack_exporter_config_flag_extras: {}
+
+# openstack credentials
+openstack_region_name: "RegionOne"
+openstack_keystone_admin_user: "admin"
+openstack_keystone_admin_project: "admin"
+openstack_keystone_admin_password: "secret"
+openstack_keystone_internal_url: "http://localhost:5000"
+# openstack_cacert: |
+#   ---- BEGIN CERTIFICATE ---
+#   ...
+openstack_cacert: ""
+openstack_cloud_name: "cloud01"
+
+openstack_exporter_services:
+  openstack_exporter:
+    container_name: "{{ openstack_exporter_container_name }}"
+    group: "openstack_exporter"
+    enabled: "{{ enable_openstack_exporter }}"
+    image: "{{ openstack_exporter_image }}"
+    privileged: "no"
+    state: "started"
+    port: "{{ openstack_exporter_port }}"
+    volumes:
+      - "{{ openstack_exporter_config_dir }}:/etc/openstack"
+    command: >
+      '--endpoint-type={{ openstack_exporter_endpoint_type }}'
+      '--os-client-config=/etc/openstack/clouds.yml'
+      '--web.listen-address={{ openstack_exporter_web_listen_address }}'
+      '--web.telemetry-path={{ openstack_exporter_web_telemetry_path }}'
+      {% for service in openstack_exporter_disable_services -%}
+      '--disable-service.{{ service }}'
+      {% endfor -%}
+      {% if openstack_exporter_disable_deprecated_metrics %}
+      '--disable-deprecated-metrics'
+      {% endif %}
+      {% if openstack_exporter_disable_slow_metrics %}
+      '--disable-slow-metrics'
+      {% endif %}
+      {% if openstack_exporter_enable_cache %}
+      '--cache'
+      '--cache-ttl={{ openstack_exporter_cache_ttl }}'
+      {% endif %}
+      {% for flag, flag_value in openstack_exporter_config_flags_extra.items() %}
+      {{ pre }}-{{ flag }}={{ flag_value }}
+      {% endfor %}
+      {{ openstack_cloud_name }}
+    restart_policy: "unless-stopped"
+    network_mode: "host"
+    log_driver: "{{ openstack_exporter_docker_log_driver }}"
+    log_options: "{{ openstack_exporter_docker_log_opts }}"
+    memory: "{{ openstack_exporter_docker_memory_limit }}"
+    memory_swap: "{{ openstack_exporter_docker_memory_swap_limit }}"
+    cpus: "{{ openstack_exporter_docker_cpus_limit }}"

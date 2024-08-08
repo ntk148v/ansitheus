@@ -2,21 +2,21 @@
 # yamllint disable rule:line-length
 argument_specs:
   main:
-    short_description: "Prometheus Node Exporter"
+    short_description: "Prometheus node-exporter"
     description:
-      - "Deploy prometheus L(node exporter,https://github.com/prometheus/node_exporter) using ansible"
+      - "Deploy prometheus L(node-exporter,https://github.com/prometheus/node_exporter) using ansible"
     author:
       - "Kien Nguyen Tuan"
     options:
       node_exporter_version:
-        description: "Node exporter package version. Also accepts latest as parameter."
+        description: "node-exporter package version. Also accepts latest as parameter."
         default: "1.8.0"
       node_exporter_web_disable_exporter_metrics:
         description: "Exclude metrics about the exporter itself (promhttp_*, process_*, go_*)."
         type: bool
         default: false
       node_exporter_web_listen_address:
-        description: "Address on which node exporter will listen"
+        description: "Address on which node-exporter will listen"
         default: "<ip-address>:9100"
       node_exporter_web_telemetry_path:
         description: "Path under which to expose metrics"
@@ -53,4 +53,8 @@ argument_specs:
         type: "dict"
       node_exporter_basic_auth_users:
         description: "Dictionary of users and password for basic authentication. Passwords are automatically hashed with bcrypt."
+        type: "dict"
+      node_exporter_config_flags_extra:
+        description:
+          - "Additional configuration flags passed to node-exporter binary at startup"
         type: "dict"

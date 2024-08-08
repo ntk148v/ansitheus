@@ -19,6 +19,7 @@ cadvisor_disable_metrics: []
 cadvisor_docker_only: false
 # Related issue: https://github.com/google/cadvisor/issues/2523
 cadvisor_housekeeping_interval: 30s
+cadvisor_config_flags_extra: {}
 
 # Container constructor
 # ---------------------
@@ -52,6 +53,9 @@ cadvisor_services:
         '--listen_ip={{ api_interface_address }}'
         '--port={{ cadvisor_port }}'
         '--prometheus_endpoint={{ cadvisor_prometheus_endpoint }}'
+      {% for flag, flag_value in cadvisor_config_flags_extra.items() %}
+        {{ pre }}-{{ flag }}={{ flag_value }}
+      {% endfor %}
     restart_policy: "unless-stopped"
     state: "started"
     network_mode: "host"

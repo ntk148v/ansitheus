@@ -31,3 +31,6 @@ localhost       ansible_connection=local
 
 [fluentd]
 localhost       ansible_connection=local
+
+[openstack_exporter]
+localhost       ansible_connection=local
