@@ -30,7 +30,7 @@ openstack_exporter_disable_deprecated_metrics: "yes"
 openstack_exporter_disable_slow_metrics: "yes"
 openstack_exporter_enable_cache: "yes"
 openstack_exporter_cache_ttl: "300s"
-openstack_exporter_config_flag_extras: {}
+openstack_exporter_config_flags_extra: {}
 
 # openstack credentials
 openstack_region_name: "RegionOne"
