@@ -1,6 +1,6 @@
-# Ansible Role: node-exporter
+# Ansible Role: openstack-exporter
 
-Deploy [node-exporter](https://github.com/prometheus/openstack_exporter) using Ansible and Docker.
+Deploy [openstack-exporter](https://github.com/openstack-exporter/openstack-exporter) using Ansible and Docker.
 
 ## Requirements
 
