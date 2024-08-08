@@ -37,3 +37,7 @@ argument_specs:
       openstack_exporter_cache_ttl:
         description: "TTL duration for cache expiry(eg. 10s, 11m, 1h)"
         type: "str"
+      openstack_exporter_config_flags_extra:
+        description:
+          - "Additional configuration flags passed to openstack-exporter binary at startup"
+        type: "dict"

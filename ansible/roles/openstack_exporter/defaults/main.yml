@@ -30,7 +30,7 @@ openstack_exporter_disable_deprecated_metrics: "yes"
 openstack_exporter_disable_slow_metrics: "yes"
 openstack_exporter_enable_cache: "yes"
 openstack_exporter_cache_ttl: "300s"
-openstack_exporter_cmdline_extras: ""
+openstack_exporter_config_flag_extras: {}
 
 # openstack credentials
 openstack_region_name: "RegionOne"
@@ -41,8 +41,8 @@ openstack_keystone_internal_url: "http://localhost:5000"
 # openstack_cacert: |
 #   ---- BEGIN CERTIFICATE ---
 #   ...
-openstack_cacert: ''
-openstack_cloud_name: 'cloud01'
+openstack_cacert: ""
+openstack_cloud_name: "cloud01"
 
 openstack_exporter_services:
   openstack_exporter:
@@ -73,9 +73,9 @@ openstack_exporter_services:
       '--cache'
       '--cache-ttl={{ openstack_exporter_cache_ttl }}'
       {% endif %}
-      {% if openstack_exporter_cmdline_extras != "" %}
-      {{ openstack_exporter_cmdline_extras }}
-      {% endif %}
+      {% for flag, flag_value in openstack_exporter_config_flags_extra.items() %}
+      {{ pre }}-{{ flag }}={{ flag_value }}
+      {% endfor %}
       {{ openstack_cloud_name }}
     restart_policy: "unless-stopped"
     network_mode: "host"
