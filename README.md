@@ -13,6 +13,9 @@
         <a href="https://github.com/ntk148v/ansitheus/tags">
             <img alt="Github tag" src="https://img.shields.io/github/tag/ntk148v/ansitheus?style=for-the-badge">
         </a>
+        <a href="https://hub.docker.com/r/kiennt26/ansitheus/tags">
+            <img alt="Docker tag" src="https://img.shields.io/docker/v/kiennt26/ansitheus?style=for-the-badge">
+        </a>
 	</p><br>
 </div>
 
