@@ -21,7 +21,7 @@
 
 - name: Ensuring custom template directory exist
   ansible.builtin.file:
-    path: "{{ alertmanager_config_dir }}/template/"
+    path: "{{ alertmanager_config_dir }}/templates/"
     state: "directory"
     mode: 0755
   when:
@@ -30,7 +30,7 @@
 - name: Copying custom alertmanager custom template files if exists
   ansible.builtin.copy:
     src: "{{ item.path }}"
-    dest: "{{ alertmanager_config_dir }}/template/{{ item.path | basename }}"
+    dest: "{{ alertmanager_config_dir }}/templates/{{ item.path | basename }}"
     mode: 0755
   register: alertmanager_custom_templates
   when:
