@@ -21,8 +21,6 @@
     path: "{{ prometheus_config_dir }}/rules/"
     state: "directory"
     mode: 0755
-  when:
-    - prometheus_alert_rules is defined and prometheus_alert_rules.files | length > 0
 
 - name: Copying over custom prometheus alert rules files
   vars:
@@ -52,8 +50,6 @@
     path: "{{ prometheus_config_dir }}/file_sd/"
     state: "directory"
     mode: 0755
-  when:
-    - prometheus_file_sd is defined and prometheus_file_sd.files | length > 0
 
 - name: Copying over custom file_sd
   ansible.builtin.copy:
