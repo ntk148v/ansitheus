@@ -135,25 +135,25 @@ done
 case "$1" in
 
 deploy)
-    ACTION="Deploying ansitheus containers with docker-compose"
+    ACTION="Deploying Prometheus containers using Ansible"
     EXTRA_OPTS="${EXTRA_OPTS} -e ansitheus_action=deploy"
     EXTRA_OPTS="${EXTRA_OPTS} -e skip_gather_fact=${SKIP_GATHER_FACT}"
     ;;
 
 pull)
-    ACTION="Pull all images without running containers"
+    ACTION="Pulling all images without running containers"
     EXTRA_OPTS="${EXTRA_OPTS} -e ansitheus_action=pull"
     EXTRA_OPTS="${EXTRA_OPTS} -e skip_gather_fact=${SKIP_GATHER_FACT}"
     ;;
 
 precheck)
-    ACTION="Precheck port and docker installation in target hosts"
+    ACTION="Prechecking port and docker installation in target hosts"
     EXTRA_OPTS="${EXTRA_OPTS} -e ansitheus_action=precheck"
     EXTRA_OPTS="${EXTRA_OPTS} -e skip_gather_fact=${SKIP_GATHER_FACT}"
     ;;
 
 destroy)
-    ACTION="Destroy Prometheus containers and service configuration"
+    ACTION="Destroying Prometheus containers and service configuration"
     EXTRA_OPTS="${EXTRA_OPTS} -e ansitheus_action=destroy"
     EXTRA_OPTS="${EXTRA_OPTS} -e skip_gather_fact=${SKIP_GATHER_FACT}"
     EXTRA_OPTS="${EXTRA_OPTS} -e destroy_include_images=${REMOVE_INCLUDE_IMAGES}"
