@@ -21,7 +21,11 @@ defaults
 listen prometheus
   bind {{ ansitheus_vip_address }}:{{ prometheus_port }}
   option httpchk GET /-/ready
+{% if prometheus_web_config.basic_auth_users | length > 0 %}
+  http-check expect status 401
+{% else %}
   http-check expect status 200
+{% endif %}
   http-request del-header X-Forwarded-Proto
   http-request set-header X-Forwarded-Proto https if { ssl_fc }
 {% for host in groups['prometheus'] %}
