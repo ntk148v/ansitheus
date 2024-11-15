@@ -21,7 +21,7 @@ defaults
 listen prometheus
   bind {{ ansitheus_vip_address }}:{{ prometheus_port }}
   option httpchk GET /-/ready
-{% if prometheus_web_config.basic_auth_users | length > 0 %}
+{% if prometheus_web_config is defined and prometheus_web_config.basic_auth_users | length > 0 %}
   http-check expect status 401
 {% else %}
   http-check expect status 200
