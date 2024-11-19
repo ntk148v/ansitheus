@@ -4,13 +4,3 @@ roles:
     src: https://github.com/geerlingguy/ansible-role-docker
   - name: geerlingguy.pip
     src: https://github.com/geerlingguy/ansible-role-pip
-
-collections:
-  - name: https://github.com/ansible-collections/community.docker
-    type: git
-  - name: https://github.com/ansible-collections/community.general
-    type: git
-  - name: https://github.com/ansible-collections/community.crypto
-    type: git
-  - name: https://github.com/ansible-collections/ansible.posix
-    type: git
