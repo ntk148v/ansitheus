@@ -24,7 +24,7 @@ node_exporter_http_server_config: {}
 node_exporter_basic_auth_users: {}
 node_exporter_enabled_collectors:
   - textfile:
-      directory: "{{ node_exporter_textfile_dir }}"
+      directory: "/etc/node_exporter"
 #  - filesystem:
 #      ignored-mount-points: "^/(sys|proc|dev)($|/)"
 #      ignored-fs-types: "^(sys|proc|auto)fs$"
