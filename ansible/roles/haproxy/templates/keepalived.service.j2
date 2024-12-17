@@ -6,7 +6,7 @@ Wants=network-online.target
 ConditionFileNotEmpty={{ keepalived_config_dir }}keepalived.conf
 
 [Service]
-Type=keepalived
+Type=notify
 # Read configuration variable file if it is present
 EnvironmentFile=-/etc/default/keepalived
 ExecStart=/usr/sbin/keepalived --dont-fork $DAEMON_ARGS --use-file {{ keepalived_config_dir }}keepalived.conf
