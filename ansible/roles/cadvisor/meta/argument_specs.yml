@@ -10,7 +10,7 @@ argument_specs:
     options:
       cadvisor_version:
         description: "cAdvisor package version. Also accepts latest as parameter."
-        default: "0.49.1"
+        default: "0.49.2"
       cadvisor_port:
         description: "Port on which cadvisor will listen"
         default: "8080"

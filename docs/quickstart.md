@@ -156,7 +156,7 @@ Commands:
     ```yaml
     network_interface: "eth0"
     ```
-    
+
     - Next we need to provide the VIP for the multi nodes deployment:
 
     ```yaml
@@ -171,7 +171,7 @@ Commands:
   prometheus_version: "3.1.0"
   alertmanager_version: "0.28.0"
   node_exporter_version: "1.8.2"
-  cadvisor_version: "0.49.1"
+  cadvisor_version: "0.49.2"
   grafana_version: "7.2.2"
   haproxy_version: "lts-alpine"
   ```

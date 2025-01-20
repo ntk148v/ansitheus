@@ -1,5 +1,5 @@
 ---
-cadvisor_version: "0.49.1"
+cadvisor_version: "0.49.2"
 cadvisor_port: "8080"
 cadvisor_container_name: "cadvisor"
 cadvisor_docker_namespace: "{{ docker_namespace if docker_namespace else 'cadvisor' }}"
