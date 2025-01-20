@@ -1,5 +1,5 @@
 ---
-prometheus_version: "2.52.0"
+prometheus_version: "3.1.0"
 prometheus_docker_namespace: "{{ docker_namespace if docker_namespace else 'prom' }}"
 prometheus_port: 9090
 prometheus_container_name: "prometheus"
@@ -16,7 +16,7 @@ prometheus_docker_cpus_limit: "{{ docker_cpus_limit }}"
 prometheus_web_listen_address: "{{ api_interface_address }}:{{ prometheus_port }}"
 prometheus_web_external_url: "http://{{ prometheus_vip_address }}:{{ prometheus_port }}"
 promtool_docker_namespace: "{{ docker_namespace if docker_namespace else 'kiennt26' }}"
-promtool_version: "v2.52.0-v0.27.0"
+promtool_version: "v3.1.0-v0.27.0"
 promtool_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ promtool_docker_namespace }}/pramtool:{{ promtool_version }}"
 
 # Prometheus arguments
