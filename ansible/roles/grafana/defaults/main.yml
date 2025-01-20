@@ -1,5 +1,5 @@
 ---
-grafana_version: "10.4.2"
+grafana_version: "11.4.0"
 grafana_container_name: "grafana"
 grafana_docker_namespace: "{{ docker_namespace if docker_namespace else 'grafana' }}"
 grafana_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ grafana_docker_namespace }}/grafana:{{ grafana_version }}"
