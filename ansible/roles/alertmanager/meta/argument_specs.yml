@@ -10,7 +10,7 @@ argument_specs:
     options:
       alertmanager_version:
         description: "Alertmanager package version. Also accepts `latest` as parameter."
-        default: 0.27.0
+        default: 0.28.0
       alertmanager_web_listen_address:
         description: "Address on which alertmanager will be listening"
         default: "<ip-adress>:9093"
