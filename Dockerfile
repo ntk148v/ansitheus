@@ -9,7 +9,8 @@ ENV ANSIBLE_LOOKUP_PLUGINS=/usr/lib/python3.10/site-packages/ara/plugins/lookup
 COPY etc/ansible.example.cfg /etc/ansible/ansible.cfg
 COPY . /opt/ansitheus
 WORKDIR /opt/ansitheus
-RUN ansible-galaxy install -r requirements.yml
+RUN ansible-galaxy install -r requirements.yml && \
+    pip install -r requirements.txt
 # Mitogen needs sudo command to execute
 RUN apk add --no-cache sudo
 ENTRYPOINT ["/opt/ansitheus/tools/ansitheus"]
