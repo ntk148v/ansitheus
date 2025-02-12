@@ -61,6 +61,10 @@ prometheus_remote_read: []
 prometheus_external_labels:
   environment: "{{ ansible_fqdn | default(ansible_host) | default(inventory_hostname) }}"
 
+# Prometheus environment variables
+# -------------------------------
+prometheus_env: "{{ docker_container_env }}"
+
 # Container constructor
 # ---------------------
 prometheus_services:
@@ -117,3 +121,4 @@ prometheus_services:
     memory: "{{ prometheus_docker_memory_limit }}"
     memory_swap: "{{ prometheus_docker_memory_swap_limit }}"
     cpus: "{{ prometheus_docker_cpus_limit }}"
+    env: "{{ prometheus_env }}"

@@ -121,6 +121,10 @@ alertmanager_route:
 #             owner: team-Y
 #           receiver: team-Y-pager
 
+# Alertmanager environment variables
+# ----------------------------------
+alertmanager_env: "{{ docker_container_env}}"
+
 # Container constructors
 # ----------------------
 alertmanager_services:
@@ -175,3 +179,4 @@ alertmanager_services:
     memory: "{{ alertmanager_docker_memory_limit }}"
     memory_swap: "{{ alertmanager_docker_memory_swap_limit }}"
     cpus: "{{ alertmanager_docker_cpus_limit }}"
+    env: "{{ alertmanager_env }}"

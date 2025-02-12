@@ -28,6 +28,10 @@ keepalived_service_name: "keepalived.service"
 # Special variable to handle case, you want to only ONE Prometheus running instance at time.
 prometheus_active_passive_mode: "no"
 
+# HaProxy environment variables
+# ----------------------------
+haproxy_env: "{{ docker_container_env }}"
+
 # Container constructor
 # ---------------------
 haproxy_services:
@@ -50,3 +54,4 @@ haproxy_services:
     memory: "{{ haproxy_docker_memory_limit }}"
     memory_swap: "{{ haproxy_docker_memory_swap_limit }}"
     cpus: "{{ haproxy_docker_cpus_limit }}"
+    env: "{{ haproxy_env }}"

@@ -12,6 +12,8 @@ fluentd_docker_cpus_limit: "{{ docker_cpus_limit }}"
 
 fluentd_config_dir: "{{ ansitheus_config_dir }}/fluentd"
 
+fluentd_env: "{{ docker_container_env }}"
+
 fluentd_services:
   fluentd:
     container_name: "{{ fluentd_container_name }}"
@@ -29,3 +31,4 @@ fluentd_services:
     memory: "{{ fluentd_docker_memory_limit }}"
     memory_swap: "{{ fluentd_docker_memory_swap_limit }}"
     cpus: "{{ fluentd_docker_cpus_limit }}"
+    env: "{{ fluentd_env }}"

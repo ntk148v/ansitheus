@@ -107,6 +107,10 @@ grafana_log:
 # mode: 'console file'
 # level: info
 
+# Grafana environment variables
+# -----------------------------
+grafana_env: "{{ docker_container_env }}"
+
 # Container constructors
 # ----------------------
 grafana_services:
@@ -131,3 +135,4 @@ grafana_services:
     memory: "{{ grafana_docker_memory_limit }}"
     memory_swap: "{{ grafana_docker_memory_swap_limit }}"
     cpus: "{{ grafana_docker_cpus_limit }}"
+    env: "{{ grafana_env }}"

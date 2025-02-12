@@ -58,3 +58,7 @@ argument_specs:
         description:
           - "Additional configuration flags passed to node-exporter binary at startup"
         type: "dict"
+      node_exporter_env:
+        description: "Dictionary of environment variables to pass to the container"
+        type: "dict"
+        default: "{{ docker_container_env }}"

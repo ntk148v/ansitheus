@@ -11,3 +11,6 @@ argument_specs:
       fluentd_version:
         description: "Fluentd version"
         default: "1.17"
+      fluentd_env:
+        description: "Fluentd environment variables"
+        default: "{{ docker_container_env}}"

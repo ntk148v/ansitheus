@@ -49,6 +49,7 @@
     memory: "{{ item.value.memory }}"
     memory_swap: "{{ item.value.memory_swap }}"
     cpus: "{{ item.value.cpus }}"
+    env: "{{ item.value.env }}"
   when:
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool

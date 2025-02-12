@@ -61,3 +61,7 @@ argument_specs:
         description:
           - "Additional configuration flags passed to cadvisor binary at startup"
         type: "dict"
+      cadvisor_env:
+        description: "Environment variables for cadvisor container"
+        type: "dict"
+        default: "{{ docker_container_env }}"

@@ -41,3 +41,7 @@ argument_specs:
         description:
           - "Additional configuration flags passed to openstack-exporter binary at startup"
         type: "dict"
+      openstack_exporter_env:
+        description: "Environment variables for openstack-exporter container"
+        type: "dict"
+        default: "{{ docker_container_env }}"

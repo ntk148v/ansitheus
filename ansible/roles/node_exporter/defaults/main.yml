@@ -31,6 +31,10 @@ node_exporter_enabled_collectors:
 node_exporter_disabled_collectors: []
 node_exporter_config_flags_extra: {}
 
+# Node-exporter environment variables
+# -----------------------------------
+node_exporter_env: "{{ docker_container_env }}"
+
 node_exporter_services:
   node_exporter:
     container_name: "{{ node_exporter_container_name }}"
@@ -91,3 +95,4 @@ node_exporter_services:
     memory: "{{ node_exporter_docker_memory_limit }}"
     memory_swap: "{{ node_exporter_docker_memory_swap_limit }}"
     cpus: "{{ node_exporter_docker_cpus_limit }}"
+    env: "{{ node_exporter_env }}"

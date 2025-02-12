@@ -44,6 +44,10 @@ openstack_keystone_internal_url: "http://localhost:5000"
 openstack_cacert: ""
 openstack_cloud_name: "cloud01"
 
+# openstack-exporter environment variables
+# ---------------------------------------
+openstack_exporter_env: "{{ docker_container_env }}"
+
 openstack_exporter_services:
   openstack_exporter:
     container_name: "{{ openstack_exporter_container_name }}"
@@ -84,3 +88,4 @@ openstack_exporter_services:
     memory: "{{ openstack_exporter_docker_memory_limit }}"
     memory_swap: "{{ openstack_exporter_docker_memory_swap_limit }}"
     cpus: "{{ openstack_exporter_docker_cpus_limit }}"
+    env: "{{ openstack_exporter_env }}"

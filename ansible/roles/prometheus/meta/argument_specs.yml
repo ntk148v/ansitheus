@@ -75,3 +75,7 @@ argument_specs:
         type: "dict"
         default:
           environment: "{{ ansible_fqdn | default(ansible_host) | default(inventory_hostname) }}"
+      prometheus_env:
+        description: "Environment variables for prometheus container"
+        type: "dict"
+        default: "{{ docker_container_env }}"

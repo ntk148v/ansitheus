@@ -73,3 +73,7 @@ argument_specs:
       alertmanager_route:
         description: "Alert routing. More in L(official docs,https://prometheus.io/docs/alerting/configuration/#route)"
         type: "dict"
+      alertmanager_env:
+        description: "Environment variables for alertmanager container"
+        type: "dict"
+        default: "{{ docker_container_env }}"

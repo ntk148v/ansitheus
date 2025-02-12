@@ -101,6 +101,7 @@
     memory: "{{ item.value.memory }}"
     memory_swap: "{{ item.value.memory_swap }}"
     cpus: "{{ item.value.cpus }}"
+    env: "{{ item.value.env }}"
   with_dict: "{{ prometheus_services }}"
   register: prometheus_container
   notify:

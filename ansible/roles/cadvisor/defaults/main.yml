@@ -21,6 +21,10 @@ cadvisor_docker_only: false
 cadvisor_housekeeping_interval: 30s
 cadvisor_config_flags_extra: {}
 
+# Cadvisor environment variables
+# ----------------------------------
+cadvisor_env: "{{ docker_container_env}}"
+
 # Container constructor
 # ---------------------
 cadvisor_services:
@@ -64,3 +68,4 @@ cadvisor_services:
     memory: "{{ cadvisor_docker_memory_limit }}"
     memory_swap: "{{ cadvisor_docker_memory_swap_limit }}"
     cpus: "{{ cadvisor_docker_cpus_limit }}"
+    env: "{{ cadvisor_env }}"

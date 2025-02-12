@@ -50,6 +50,12 @@ docker_memory_limit: "{{ ansible_memtotal_mb }}M"
 docker_memory_swap_limit: "{{ docker_memory_limit }}"
 # How much of the available CPU resources a container can use.
 docker_cpus_limit: "{{ ansible_processor_count }}"
+# Container global environment variables. It will be applied to all containers.
+# docker_container_env:
+#   http_proxy: http://localhost:8000
+#   https_proxy: http://localhost:8000
+#   no_proxy: localhost, 127.0.0.1
+docker_container_env: {}
 
 ##################
 # Service options
