@@ -43,3 +43,13 @@ listen alertmanager
   server {{ hostvars[host]['ansible_hostname'] }} {{ hostvars[host]['ansible_' + hostvars[host]['ansitheus_network_interface']]['ipv4']['address'] }}:{{ alertmanager_port }} check inter 2000 rise 2 fall 5
 {% endfor %}
 {% endif %}
+
+{% if enable_openstack_exporter | bool %}
+listen openstack_exporter
+  bind {{ ansitheus_vip_address }}:{{ openstack_exporter_port }}
+  http-request del-header X-Forwarded-Proto
+  http-request set-header X-Forwarded-Proto https if { ssl_fc }
+{% for host in groups['openstack_exporter'] %}
+  server {{ hostvars[host]['ansible_hostname'] }} {{ hostvars[host]['ansible_' + hostvars[host]['ansitheus_network_interface']]['ipv4']['address'] }}:{{ openstack_exporter_port }} check inter 2000 rise 2 fall 5
+{% endfor %}
+{% endif %}
