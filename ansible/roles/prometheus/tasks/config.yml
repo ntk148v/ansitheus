@@ -40,7 +40,10 @@
   local_action:
     module: find
     path: "{{ ansitheus_custom_config_dir }}/prometheus/file_sd"
-    pattern: "*.json"
+    pattern:
+      - "*.json"
+      - "*.yaml"
+      - "*.yml"
   run_once: true
   delegate_to: localhost
   register: prometheus_file_sd
