@@ -18,7 +18,7 @@
     service_name: "prometheus"
     service: "{{ prometheus_services[service_name] }}"
   ansible.builtin.uri:
-    url: http://{{ prometheus_vip_address if prometheus_vip_address is defined and prometheus_vip_address != "" else api_interface_address }}:{{ prometheus_port }}/-/reload
+    url: http://{{ prometheus_vip_address if prometheus_vip_address is defined and prometheus_vip_address != "" and prometheus_active_passive_mode | bool else api_interface_address }}:{{ prometheus_port }}/-/reload
     method: PUT
     use_proxy: false
   register: result
