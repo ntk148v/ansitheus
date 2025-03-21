@@ -16,7 +16,7 @@
     service_name: "alertmanager"
     service: "{{ alertmanager_services[service_name] }}"
   ansible.builtin.uri:
-    url: http://{{ alertmanager_vip_address if alertmanager_vip_address is defined and alertmanager_vip_address != "" else api_interface_address }}:{{ alertmanager_port }}/-/reload
+    url: http://{{ api_interface_address }}:{{ alertmanager_port }}/-/reload
     method: POST
     use_proxy: false
   register: result
