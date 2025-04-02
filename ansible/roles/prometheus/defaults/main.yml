@@ -95,7 +95,7 @@ prometheus_services:
         --storage.agent.path=/prometheus
       {% endif %}
         --config.file=/etc/prometheus/prometheus.yml
-      {% if prometheus_version is version('2.24.0', '>=') %}
+      {% if prometheus_web_config is defined and prometheus_version is version('2.24.0', '>=') %}
         --web.config.file=/etc/prometheus/web.yml
       {% endif %}
         --web.enable-lifecycle
