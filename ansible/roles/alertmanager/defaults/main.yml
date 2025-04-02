@@ -177,7 +177,7 @@ alertmanager_services:
         {{ pre }}-web.listen-address={{ alertmanager_web_listen_address }}
       {% endif %}
       {% if alertmanager_web_config is defined and alertmanager_version is version('0.22.0', '>=') %}
-        {{ pre }}--web.config.file=/etc/alertmanager/web.yml
+        {{ pre }}-web.config.file=/etc/alertmanager/web.yml
       {% endif %}
         {{ pre }}-web.external-url={{ alertmanager_web_external_url }}
       {% for flag, flag_value in alertmanager_config_flags_extra.items() %}\
