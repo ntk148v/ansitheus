@@ -77,3 +77,6 @@ argument_specs:
         description: "Environment variables for alertmanager container"
         type: "dict"
         default: "{{ docker_container_env }}"
+      alertmanager_web_config:
+        description: "A Alertmanager L(web config yaml,https://prometheus.io/docs/alerting/latest/https) for configuring TLS and auth."
+        type: "dict"

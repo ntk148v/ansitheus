@@ -125,6 +125,12 @@ alertmanager_route:
 # ----------------------------------
 alertmanager_env: "{{ docker_container_env}}"
 
+# Alertmanager web config https://prometheus.io/docs/alerting/latest/https/
+alertmanager_web_config:
+  tls_server_config: {}
+  http_server_config: {}
+  basic_auth_users: {}
+
 # Container constructors
 # ----------------------
 alertmanager_services:
@@ -166,12 +172,15 @@ alertmanager_services:
             alertmanager_web_listen_address is not string %}
       {%   for address in alertmanager_web_listen_address %}
         {{ pre }}-web.listen-address={{ address }}
-      {%   endfor %}
+      {% endfor %}
       {% else %}
         {{ pre }}-web.listen-address={{ alertmanager_web_listen_address }}
       {% endif %}
+      {% if alertmanager_web_config is defined and alertmanager_version is version('0.22.0', '>=') %}
+        {{ pre }}--web.config.file=/etc/alertmanager/web.yml
+      {% endif %}
         {{ pre }}-web.external-url={{ alertmanager_web_external_url }}
-      {% for flag, flag_value in alertmanager_config_flags_extra.items() %}
+      {% for flag, flag_value in alertmanager_config_flags_extra.items() %}\
         {{ pre }}-{{ flag }}={{ flag_value }}
       {% endfor %}
     log_driver: "{{ alertmanager_docker_log_driver }}"

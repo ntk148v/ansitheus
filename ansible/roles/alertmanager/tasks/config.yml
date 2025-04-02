@@ -39,6 +39,13 @@
   notify:
     - Reload alertmanager config
 
+- name: Configure Alertmanager web
+  ansible.builtin.copy:
+    content: "{{ alertmanager_web_config | to_nice_yaml(indent=2, sort_keys=False) }}"
+    dest: "{{ alertmanager_config_dir }}/web.yml"
+    force: true
+    mode: 0755
+
 - name: Copying over alertmanager config file
   vars:
     service: "{{ alertmanager_services['alertmanager'] }}"
