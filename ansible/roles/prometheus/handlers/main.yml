@@ -13,18 +13,20 @@
       or prometheus_alert_confs.changed | bool
       or prometheus_file_sd_confs.changed | bool
 
+# NOTE(kiennt26): Reloading the config by sending SIGHUP to the main process, instead of sending a POST request
+#                 to the /-/reload endpoint, because the latter doesn't work when the basic auth is enabled.
+#                 The password for the basic auth is encrypted using bcrypt, and I don't want to store the raw password
+#                 The SIGHUP signal is sent to the process with PID 1 in the container, which is the main process.
 - name: Reload prometheus config
   vars:
     service_name: "prometheus"
     service: "{{ prometheus_services[service_name] }}"
-  ansible.builtin.uri:
-    url: http://{{ prometheus_vip_address if prometheus_vip_address is defined and prometheus_vip_address != "" and prometheus_active_passive_mode | bool else api_interface_address }}:{{ prometheus_port }}/-/reload
-    method: PUT
-    use_proxy: false
+  ansible.builtin.command: >
+    /usr/bin/docker exec -i {{ prometheus_container_name }} kill -SIGHUP 1
   register: result
   retries: 5
   delay: 20
-  until: result.status == 200
+  until: result.rc == 0
   when:
     - inventory_hostname in groups[service.group]
     - service.enabled | bool
