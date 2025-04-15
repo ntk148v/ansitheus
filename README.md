@@ -58,6 +58,7 @@ Ansitheus allows users to configure & deploy the following components:
 - [Prometheus Mysqld-exporter](https://github.com/prometheus/mysqld_exporter)
 - [Prometheus Openstack-exporter](https://github.com/openstack-exporter/openstack-exporter)
 - [Google Cadvisor](https://github.com/google/cadvisor)
+- [Prometheus Nginx-exporter](https://github.com/nginx/nginx-prometheus-exporter)
 - [Haproxy](http://www.haproxy.org/)
 - [Keepalived](https://www.keepalived.org/)
 - [Grafana](https://github.com/grafana/grafana)

@@ -72,6 +72,7 @@ enable_haproxy: "yes"
 enable_mysqld_exporter: "no"
 enable_fluentd: "no"
 enable_openstack_exporter: "no"
+enable_nginx_exporter: "no"
 
 # Special variable to handle case, you want to only ONE Prometheus running instance at time.
 prometheus_active_passive_mode: "no"

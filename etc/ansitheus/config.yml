@@ -39,6 +39,8 @@ enable_alertmanager: "yes"
 enable_haproxy: "yes"
 enable_mysqld_exporter: "no"
 enable_fluentd: "no"
+enable_openstack_exporter: "no"
+enable_nginx_exporter: "no"
 
 ##################
 # Port mappings

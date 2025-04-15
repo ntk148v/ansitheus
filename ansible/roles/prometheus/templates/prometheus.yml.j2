@@ -66,6 +66,24 @@ scrape_configs:
 {% endfor %}
 {% endif %}
 
+{% if enable_nginx_exporter | bool %}
+  - job_name: nginx-exporter
+    static_configs:
+      - targets:
+{% for host in groups['nginx_exporter'] | sort %}
+        - '{{ hostvars[host]['ansible_' + hostvars[host]['api_interface']]['ipv4']['address'] }}:{{ hostvars[host]['nginx_exporter_port'] }}'
+{% endfor %}
+{% endif %}
+
+{% if enable_openstack_exporter | bool %}
+  - job_name: openstack-exporter
+    static_configs:
+      - targets:
+{% for host in groups['openstack_exporter'] | sort %}
+        - '{{ hostvars[host]['ansible_' + hostvars[host]['api_interface']]['ipv4']['address'] }}:{{ hostvars[host]['openstack_exporter_port'] }}'
+{% endfor %}
+{% endif %}
+
 {% if enable_mysqld_exporter | bool %}
   - job_name: mysqld-exporter
     static_configs:
