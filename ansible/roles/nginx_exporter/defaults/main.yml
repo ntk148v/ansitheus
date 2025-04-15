@@ -21,7 +21,7 @@ nginx_exporter_web_telemetry_path: "/metrics"
 
 nginx_exporter_tls_server_config: {}
 nginx_exporter_http_server_config: {}
-node_exporter_basic_auth_users: {}
+nginx_exporter_basic_auth_users: {}
 
 # Nginx-exporter environment variables
 # -----------------------------------
