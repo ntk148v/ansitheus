@@ -1,0 +1,29 @@
+---
+- name: Ensuring nginx_exporter config directory exist
+  ansible.builtin.file:
+    path: "{{ nginx_exporter_config_dir }}"
+    state: "directory"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+    mode: 0755
+
+- name: Recreating if not exist running containers
+  community.general.docker_container:
+    name: "{{ item.value.container_name }}"
+    image: "{{ item.value.image }}"
+    volumes: "{{ item.value.volumes }}"
+    command: "{{ item.value.command }}"
+    state: "{{ item.value.state }}"
+    restart_policy: "{{ item.value.restart_policy }}"
+    privileged: "{{ item.value.privileged }}"
+    network_mode: "{{ item.value.network_mode }}"
+    log_driver: "{{ item.value.log_driver }}"
+    log_options: "{{ item.value.log_options }}"
+    memory: "{{ item.value.memory }}"
+    memory_swap: "{{ item.value.memory_swap }}"
+    cpus: "{{ item.value.cpus }}"
+    env: "{{ item.value.env }}"
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ nginx_exporter_services }}"

@@ -1,0 +1,66 @@
+---
+nginx_exporter_version: "1.4.1"
+nginx_exporter_port: 9113
+nginx_exporter_container_name: "nginx_exporter"
+nginx_exporter_docker_namespace: "{{ docker_namespace if docker_namespace else 'nginx' }}"
+nginx_exporter_docker_log_driver: "{{ docker_log_driver }}"
+nginx_exporter_docker_log_opts: "{{ docker_log_opts }}"
+nginx_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ nginx_exporter_docker_namespace }}/nginx-prometheus-exporter:{{ nginx_exporter_version }}"
+# Docker resource limit
+nginx_exporter_docker_memory_limit: "{{ docker_memory_limit }}"
+nginx_exporter_docker_memory_swap_limit: "{{ docker_memory_swap_limit }}"
+nginx_exporter_docker_cpus_limit: "{{ docker_cpus_limit }}"
+
+# Nginx-exporter arguments
+# -----------------------
+nginx_exporter_plus: false
+nginx_exporter_scrape_uri: "http://{{ api_interface_address }}/stub_status"
+nginx_exporter_web_listen_address: "{{ api_interface_address }}:{{ nginx_exporter_port }}"
+nginx_exporter_config_dir: "{{ ansitheus_config_dir }}/nginx_exporter"
+nginx_exporter_web_telemetry_path: "/metrics"
+
+nginx_exporter_tls_server_config: {}
+nginx_exporter_http_server_config: {}
+node_exporter_basic_auth_users: {}
+
+# Nginx-exporter environment variables
+# -----------------------------------
+nginx_exporter_env: "{{ docker_container_env }}"
+
+nginx_exporter_services:
+  nginx_exporter:
+    container_name: "{{ nginx_exporter_container_name }}"
+    group: "nginx_exporter"
+    enabled: "{{ enable_nginx_exporter }}"
+    image: "{{ nginx_exporter_image }}"
+    privileged: "no"
+    state: "started"
+    port: "{{ nginx_exporter_port }}"
+    volumes:
+      - "{{ nginx_exporter_config_dir }}:/etc/nginx_exporter"
+    command: >
+      '--nginx.scrape-uri={{ nginx_exporter_scrape_uri }}'
+      {% if nginx_exporter_tls_server_config | length > 0 or nginx_exporter_http_server_config | length > 0 or nginx_exporter_basic_auth_users | length > 0 %}
+          '--web.config.file=/etc/nginx_exporter/config.yml'
+      {% endif %}
+      {% if nginx_exporter_web_listen_address is iterable and
+            nginx_exporter_web_listen_address is not mapping and
+            nginx_exporter_web_listen_address is not string %}
+      {% for address in nginx_exporter_web_listen_address %}
+          '--web.listen-address={{ address }}'
+      {% endfor %}
+      {% else %}
+          '--web.listen-address={{ nginx_exporter_web_listen_address }}'
+      {% endif %}
+          '--web.telemetry-path={{ nginx_exporter_web_telemetry_path }}'
+      {% if nginx_exporter_plus %}
+          '--nginx.plus'
+      {% endif %}
+    restart_policy: "unless-stopped"
+    network_mode: "host"
+    log_driver: "{{ nginx_exporter_docker_log_driver }}"
+    log_options: "{{ nginx_exporter_docker_log_opts }}"
+    memory: "{{ nginx_exporter_docker_memory_limit }}"
+    memory_swap: "{{ nginx_exporter_docker_memory_swap_limit }}"
+    cpus: "{{ nginx_exporter_docker_cpus_limit }}"
+    env: "{{ nginx_exporter_env }}"

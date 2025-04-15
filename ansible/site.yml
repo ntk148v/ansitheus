@@ -85,6 +85,18 @@
         when: enable_openstack_exporter | bool,
       }
 
+- name: Apply role nginx_exporter
+  gather_facts: false
+  become: true
+  hosts:
+    - nginx_exporter
+  roles:
+    - {
+        role: nginx_exporter,
+        tags: [exporters, nginx_exporter],
+        when: enable_nginx_exporter | bool,
+      }
+
 - name: Apply role grafana
   gather_facts: false
   become: true
