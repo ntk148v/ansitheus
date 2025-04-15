@@ -34,3 +34,6 @@ localhost       ansible_connection=local
 
 [openstack_exporter]
 localhost       ansible_connection=local
+
+[nginx_exporter]
+localhost       ansible_connection=local

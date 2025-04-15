@@ -38,3 +38,6 @@ fluentd-host-01
 
 [openstack_exporter]
 openstack-host-01
+
+[nginx_exporter]
+nginx-host-01
