@@ -85,8 +85,45 @@
     - "{{ ansitheus_custom_config_dir }}/prometheus/{{ inventory_hostname }}/prometheus.yml"
     - "{{ ansitheus_custom_config_dir }}/prometheus/prometheus.yml"
     - "{{ role_path }}/templates/prometheus.yml.j2"
+
+- name: Shard target configurations
+  inject_sharding_config:
+    source: "{{ prometheus_config_dir }}/prometheus.yml"
+    modulus: "{{ groups['prometheus'] | length }}"
+    hash_value: "{{ groups['prometheus'].index(inventory_hostname) }}"
+  when: enable_target_sharding == 'yes'
+
+- name: Find file_sd YAML configurations
+  find:
+    paths: "{{ prometheus_config_dir }}/file_sd"
+    patterns: "*.yml,*.yaml"
+    use_regex: false
+  register: file_sd_yaml
+  when:
+    - enable_target_sharding == 'yes'
+    - prometheus_file_sd is defined
+    - prometheus_file_sd.files | length > 0
+
+- name: Shard target configurations file_sd
+  inject_sharding_config:
+    source: "{{ item.path }}"
+    modulus: "{{ groups['prometheus'] | length }}"
+    hash_value: "{{ groups['prometheus'].index(inventory_hostname) }}"
+  loop: "{{ file_sd_yaml.files }}"
+  when:
+    - enable_target_sharding == 'yes'
+    - file_sd_yaml.files is defined
+
+- name: Validate prometheus config
+  debug:
+    msg: "Validating prometheus config"
   notify:
     - Validate prometheus config
+
+- name: Reload prometheus config
+  debug:
+    msg: "Reloading prometheus config"
+  notify:
     - Reload prometheus config
 
 - name: Check prometheus containers

@@ -40,6 +40,9 @@ prometheus_web_config:
   http_server_config: {}
   basic_auth_users: {}
 
+# Prometheus customized arguments
+enable_target_sharding: "no"
+
 # Configuration file options
 # --------------------------
 prometheus_global:
