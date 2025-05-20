@@ -41,7 +41,7 @@ prometheus_web_config:
   basic_auth_users: {}
 
 # Prometheus customized arguments
-enable_target_sharding: "no"
+prometheus_enable_target_sharding: false
 
 # Configuration file options
 # --------------------------
