@@ -43,6 +43,12 @@ enable_openstack_exporter: "no"
 enable_nginx_exporter: "no"
 
 ##################
+# Prometheus options
+##################
+
+prometheus_enable_target_sharding: true
+
+##################
 # Port mappings
 #################
 
