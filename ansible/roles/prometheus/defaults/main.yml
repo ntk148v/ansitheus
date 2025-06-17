@@ -42,6 +42,7 @@ prometheus_web_config:
 
 # Prometheus customized arguments
 prometheus_enable_target_sharding: false
+sharding_ignorances: []
 
 # Configuration file options
 # --------------------------
