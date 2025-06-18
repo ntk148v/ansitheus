@@ -45,6 +45,8 @@ prometheus_web_config:
 prometheus_enable_target_sharding: false
 # Job names to ignore sharding
 prometheus_sharding_ignorances: []
+# prometheus_sharding_ignorances:
+#   - prometheus
 
 # Configuration file options
 # --------------------------

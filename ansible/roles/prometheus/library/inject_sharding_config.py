@@ -24,8 +24,7 @@ def save_config_file(data, path):
 def add_sharding(config, modulus, hash_value, ignorances):
     for job in config.get('scrape_configs', []):
         if job.get('job_name', '') not in ignorances:
-            job['relabel_configs'] = job.get('relabel_configs', [])
-            job['relabel_configs'].extend([
+            job.setdefault('relabel_configs', []).extend([
                 {
                     'source_labels': ['__address__'],
                     'modulus': modulus,
