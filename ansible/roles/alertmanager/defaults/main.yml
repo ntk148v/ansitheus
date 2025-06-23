@@ -180,7 +180,7 @@ alertmanager_services:
         {{ pre }}-web.config.file=/etc/alertmanager/web.yml
       {% endif %}
         {{ pre }}-web.external-url={{ alertmanager_web_external_url }}
-      {% for flag, flag_value in alertmanager_config_flags_extra.items() %}\
+      {% for flag, flag_value in alertmanager_config_flags_extra.items() %}
         {{ pre }}-{{ flag }}={{ flag_value }}
       {% endfor %}
     log_driver: "{{ alertmanager_docker_log_driver }}"
