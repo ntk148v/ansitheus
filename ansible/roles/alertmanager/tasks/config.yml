@@ -63,24 +63,9 @@
 - name: Validate alertmanager config
   vars:
     service: "{{ alertmanager_services['alertmanager'] }}"
-  ansible.builtin.command: >
-    /usr/bin/docker run --rm -v {{ alertmanager_config_dir }}:/etc/alertmanager {{ alertmanager_image }} sh -c 'amtool \
-            check-config /etc/alertmanager/config.yml'
-  register: alertmanager_config_validation_results
-  when:
-    - inventory_hostname in groups[service.group]
-    - service.enabled | bool
-
-- name: Assert alertmanager config files are valid
-  vars:
-    service: "{{ alertmanager_services['alertmanager'] }}"
-  assert:
-    that: "alertmanager_config_validation_results.rc == 0"
-    fail_msg: >-
-      "{{ service.container_name }} config files are invalid, the output was:
-       {{ alertmanager_config_validation_results.stdout }}"
-    success_msg: >-
-      "{{ service.container_name }} config files are valid"
+  ansible.builtin.shell: |
+    /usr/bin/docker run --rm -v {{ alertmanager_config_dir }}:/etc/alertmanager --entrypoint "/bin/amtool" \
+      {{ alertmanager_image }} check-config /etc/alertmanager/config.yml
   when:
     - inventory_hostname in groups[service.group]
     - service.enabled | bool

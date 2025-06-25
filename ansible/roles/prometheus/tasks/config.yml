@@ -29,6 +29,7 @@
     src: "{{ item.path }}"
     dest: "{{ prometheus_config_dir }}/rules/{{ item.path | basename }}"
     mode: 0755
+    validate: "/usr/bin/docker run --rm -v {{ prometheus_config_dir }}:/etc/prometheus --entrypoint '/bin/promtool' {{ prometheus_image }} check rules %s"
   register: prometheus_alert_confs
   with_items: "{{ prometheus_alert_rules.files }}"
   when:
@@ -116,25 +117,11 @@
 - name: Validate prometheus config
   vars:
     service: "{{ prometheus_services['prometheus'] }}"
-  ansible.builtin.command: >
-    /usr/bin/docker run --rm -v {{ prometheus_config_dir }}:/etc/prometheus {{ prometheus_image }} sh -c 'promtool \
-            check config /etc/prometheus/prometheus.yml'
-  register: "prometheus_config_validation_results"
-  check_mode: false
-  when:
-    - inventory_hostname in groups[service.group]
-    - service.enabled | bool
-
-- name: Assert prometheus config files are valid
-  vars:
-    service: "{{ prometheus_services['prometheus'] }}"
-  assert:
-    that: "prometheus_config_validation_results.rc == 0"
-    fail_msg: >-
-      "{{ service.container_name }} config files are invalid, the output was:
-       {{ prometheus_config_validation_results.stdout }}"
-    success_msg: >-
-      "{{ service.container_name }} config files are valid"
+  ansible.builtin.shell: |
+    /usr/bin/docker run --rm -v {{ prometheus_config_dir }}:/etc/prometheus --entrypoint "/bin/promtool" \
+      {{ prometheus_image }} check config /etc/prometheus/prometheus.yml && \
+    /usr/bin/docker run --rm -v {{ prometheus_config_dir }}:/etc/prometheus --entrypoint "/bin/promtool" \
+      {{ prometheus_image }} check web-config /etc/prometheus/web.yml
   when:
     - inventory_hostname in groups[service.group]
     - service.enabled | bool
