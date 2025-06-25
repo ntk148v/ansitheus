@@ -29,12 +29,11 @@
     src: "{{ item.path }}"
     dest: "{{ prometheus_config_dir }}/rules/{{ item.path | basename }}"
     mode: 0755
+    validate: "/usr/bin/docker run --rm -v {{ prometheus_config_dir }}:/etc/prometheus --entrypoint '/bin/promtool' {{ prometheus_image }} check rules %s"
   register: prometheus_alert_confs
   with_items: "{{ prometheus_alert_rules.files }}"
   when:
     - prometheus_alert_rules is defined and prometheus_alert_rules.files | length > 0
-  notify:
-    - Reload prometheus config
 
 - name: Check custom file_sd files exists
   local_action:
@@ -63,8 +62,6 @@
   with_items: "{{ prometheus_file_sd.files }}"
   when:
     - prometheus_file_sd is defined and prometheus_file_sd.files | length > 0
-  notify:
-    - Reload prometheus config
 
 - name: Configure Prometheus web
   ansible.builtin.copy:
@@ -118,14 +115,33 @@
     - host_file_sd.files | length > 0
 
 - name: Validate prometheus config
-  meta: noop
-  notify:
-    - Validate prometheus config
+  vars:
+    service: "{{ prometheus_services['prometheus'] }}"
+  ansible.builtin.shell: |
+    /usr/bin/docker run --rm -v {{ prometheus_config_dir }}:/etc/prometheus --entrypoint "/bin/promtool" \
+      {{ prometheus_image }} check config /etc/prometheus/prometheus.yml && \
+    /usr/bin/docker run --rm -v {{ prometheus_config_dir }}:/etc/prometheus --entrypoint "/bin/promtool" \
+      {{ prometheus_image }} check web-config /etc/prometheus/web.yml
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
 
+# NOTE(kiennt26): Reloading the config by sending SIGHUP to the main process, instead of sending a POST request
+#                 to the /-/reload endpoint, because the latter doesn't work when the basic auth is enabled.
+#                 The password for the basic auth is encrypted using bcrypt, and I don't want to store the raw password
+#                 The SIGHUP signal is sent to the process with PID 1 in the container, which is the main process.
 - name: Reload prometheus config
-  meta: noop
-  notify:
-    - Reload prometheus config
+  vars:
+    service: "{{ prometheus_services['prometheus'] }}"
+  ansible.builtin.command: >
+    /usr/bin/docker exec -i {{ prometheus_container_name }} kill -SIGHUP 1
+  register: result
+  retries: 5
+  delay: 20
+  until: result.rc == 0
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
 
 - name: Check prometheus containers
   community.general.docker_container:

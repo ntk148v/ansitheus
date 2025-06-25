@@ -36,8 +36,6 @@
   when:
     - alertmanager_custom_template_files is defined and alertmanager_custom_template_files.files | length > 0
   with_items: "{{ alertmanager_custom_template_files.files }}"
-  notify:
-    - Reload alertmanager config
 
 - name: Configure Alertmanager web
   ansible.builtin.copy:
@@ -61,9 +59,33 @@
   when:
     - inventory_hostname in groups[service.group]
     - service.enabled | bool
-  notify:
-    - Validate alertmanager config
-    - Reload alertmanager config
+
+- name: Validate alertmanager config
+  vars:
+    service: "{{ alertmanager_services['alertmanager'] }}"
+  ansible.builtin.shell: |
+    /usr/bin/docker run --rm -v {{ alertmanager_config_dir }}:/etc/alertmanager --entrypoint "/bin/amtool" \
+      {{ alertmanager_image }} check-config /etc/alertmanager/config.yml
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+
+# NOTE(kiennt26): Reloading the config by sending SIGHUP to the main process, instead of sending a POST request
+#                 to the /-/reload endpoint, because the latter doesn't work when the basic auth is enabled.
+#                 The password for the basic auth is encrypted using bcrypt, and I don't want to store the raw password
+#                 The SIGHUP signal is sent to the process with PID 1 in the container, which is the main process.
+- name: Reload alertmanager config
+  vars:
+    service: "{{ alertmanager_services['alertmanager'] }}"
+  ansible.builtin.command: >
+    /usr/bin/docker exec -i {{ alertmanager_container_name }} kill -SIGHUP 1
+  register: result
+  retries: 5
+  delay: 20
+  until: result.rc == 0
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
 
 - name: Check alertmanager containers
   community.general.docker_container:
