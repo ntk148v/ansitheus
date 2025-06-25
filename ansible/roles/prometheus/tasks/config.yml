@@ -118,7 +118,7 @@
     service_name: "prometheus"
     service: "{{ prometheus_services[service_name] }}"
   ansible.builtin.command: >
-    /usr/bin/docker run --rm -v {{ prometheus_config_dir }}:/etc/prometheus {{ promtool_image }} sh -c 'promtool \
+    /usr/bin/docker run --rm -v {{ prometheus_config_dir }}:/etc/prometheus {{ prometheus_image }} sh -c 'promtool \
             check config /etc/prometheus/prometheus.yml'
   when:
     - inventory_hostname in groups[service.group]

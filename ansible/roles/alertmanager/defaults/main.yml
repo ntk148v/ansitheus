@@ -13,10 +13,6 @@ alertmanager_docker_memory_limit: "{{ docker_memory_limit }}"
 alertmanager_docker_memory_swap_limit: "{{ docker_memory_swap_limit }}"
 alertmanager_docker_cpus_limit: "{{ docker_cpus_limit }}"
 
-amtool_docker_namespace: "{{ docker_namespace if docker_namespace else 'kiennt26' }}"
-amtool_version: "v3.1.0-v0.28.0"
-amtool_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ amtool_docker_namespace }}/pramtool:{{ amtool_version }}"
-
 # Alertmanager agruments
 # ----------------------
 alertmanager_web_listen_address: "{{ api_interface_address }}:{{ alertmanager_port }}"

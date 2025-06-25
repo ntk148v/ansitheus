@@ -65,7 +65,7 @@
     service_name: "alertmanager"
     service: "{{ alertmanager_services[service_name] }}"
   ansible.builtin.command: >
-    /usr/bin/docker run --rm -v {{ alertmanager_config_dir }}:/etc/alertmanager {{ amtool_image }} sh -c 'amtool \
+    /usr/bin/docker run --rm -v {{ alertmanager_config_dir }}:/etc/alertmanager {{ alertmanager_image }} sh -c 'amtool \
             check-config /etc/alertmanager/config.yml'
   when:
     - inventory_hostname in groups[service.group]
