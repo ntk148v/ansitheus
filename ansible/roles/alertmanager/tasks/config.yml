@@ -62,11 +62,25 @@
 
 - name: Validate alertmanager config
   vars:
-    service_name: "alertmanager"
-    service: "{{ alertmanager_services[service_name] }}"
+    service: "{{ alertmanager_services['alertmanager'] }}"
   ansible.builtin.command: >
     /usr/bin/docker run --rm -v {{ alertmanager_config_dir }}:/etc/alertmanager {{ alertmanager_image }} sh -c 'amtool \
             check-config /etc/alertmanager/config.yml'
+  register: alertmanager_config_validation_results
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+
+- name: Assert alertmanager config files are valid
+  vars:
+    service: "{{ alertmanager_services['alertmanager'] }}"
+  assert:
+    that: "alertmanager_config_validation_results.rc == 0"
+    fail_msg: >-
+      "{{ service.container_name }} config files are invalid, the output was:
+       {{ alertmanager_config_validation_results.stdout }}"
+    success_msg: >-
+      "{{ service.container_name }} config files are valid"
   when:
     - inventory_hostname in groups[service.group]
     - service.enabled | bool
@@ -77,8 +91,7 @@
 #                 The SIGHUP signal is sent to the process with PID 1 in the container, which is the main process.
 - name: Reload alertmanager config
   vars:
-    service_name: "alertmanager"
-    service: "{{ alertmanager_services[service_name] }}"
+    service: "{{ alertmanager_services['alertmanager'] }}"
   ansible.builtin.command: >
     /usr/bin/docker exec -i {{ alertmanager_container_name }} kill -SIGHUP 1
   register: result

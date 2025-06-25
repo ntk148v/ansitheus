@@ -115,11 +115,26 @@
 
 - name: Validate prometheus config
   vars:
-    service_name: "prometheus"
-    service: "{{ prometheus_services[service_name] }}"
+    service: "{{ prometheus_services['prometheus'] }}"
   ansible.builtin.command: >
     /usr/bin/docker run --rm -v {{ prometheus_config_dir }}:/etc/prometheus {{ prometheus_image }} sh -c 'promtool \
             check config /etc/prometheus/prometheus.yml'
+  register: "prometheus_config_validation_results"
+  check_mode: false
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+
+- name: Assert prometheus config files are valid
+  vars:
+    service: "{{ prometheus_services['prometheus'] }}"
+  assert:
+    that: "prometheus_config_validation_results.rc == 0"
+    fail_msg: >-
+      "{{ service.container_name }} config files are invalid, the output was:
+       {{ prometheus_config_validation_results.stdout }}"
+    success_msg: >-
+      "{{ service.container_name }} config files are valid"
   when:
     - inventory_hostname in groups[service.group]
     - service.enabled | bool
@@ -130,8 +145,7 @@
 #                 The SIGHUP signal is sent to the process with PID 1 in the container, which is the main process.
 - name: Reload prometheus config
   vars:
-    service_name: "prometheus"
-    service: "{{ prometheus_services[service_name] }}"
+    service: "{{ prometheus_services['prometheus'] }}"
   ansible.builtin.command: >
     /usr/bin/docker exec -i {{ prometheus_container_name }} kill -SIGHUP 1
   register: result
