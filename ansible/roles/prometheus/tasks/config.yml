@@ -29,7 +29,7 @@
     src: "{{ item.path }}"
     dest: "{{ prometheus_config_dir }}/rules/{{ item.path | basename }}"
     mode: 0755
-    validate: "/usr/bin/docker run --rm -v {{ prometheus_config_dir }}:/etc/prometheus --entrypoint '/bin/promtool' {{ prometheus_image }} check rules %s"
+    validate: "/usr/bin/docker run --rm -v %s:/etc/prometheus/rule.yml:rw --entrypoint '/bin/promtool' {{ prometheus_image }} check rules /etc/prometheus/rule.yml"
   register: prometheus_alert_confs
   with_items: "{{ prometheus_alert_rules.files }}"
   when:
