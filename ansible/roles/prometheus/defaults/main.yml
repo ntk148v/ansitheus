@@ -1,4 +1,5 @@
 ---
+prometheus_repo: "github.com/prometheus/prometheus"
 prometheus_version: "3.1.0"
 prometheus_docker_namespace: "{{ docker_namespace if docker_namespace else 'prom' }}"
 prometheus_port: 9090

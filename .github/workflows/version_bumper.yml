@@ -1,0 +1,78 @@
+name: Check for new upstream releases
+
+on:
+  schedule:
+    - cron: "5 4 * * 1"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump:
+    name: Discover and bump component versions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: pip install ansible-core yq
+
+      - name: Run version bump
+        id: bump
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          chmod +x .github/scripts/version_bump.py
+          ./.github/scripts/version_bump.py
+
+      - name: Compute Git state
+        id: git_state
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Assemble branch metadata
+        if: steps.git_state.outputs.has_changes == 'true'
+        id: meta
+        run: |
+          date_str="$(date +'%Y%m%d')"
+          branch="autoupdate/components/${date_str}"
+          echo "branch_name=${branch}" >> "$GITHUB_OUTPUT"
+          if [[ -f .github/version-bump-report.md ]]; then
+            summary="$(cat .github/version-bump-report.md)"
+          else
+            summary="Automated version bump."
+          fi
+          # Escape EOF markers
+          summary="${summary//'%'/'%25'}"
+          summary="${summary//$'\n'/'%0A'}"
+          summary="${summary//$'\r'/'%0D'}"
+          echo "summary=${summary}" >> "$GITHUB_OUTPUT"
+
+      - name: Create pull request
+        if: steps.git_state.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ steps.meta.outputs.branch_name }}
+          delete-branch: true
+          title: "chore: automated component version bump"
+          body: |
+            Automated update of component versions.
+
+            ${{ steps.meta.outputs.summary }}
+
+      - name: No changes detected
+        if: steps.git_state.outputs.has_changes != 'true'
+        run: echo "No version updates detected."

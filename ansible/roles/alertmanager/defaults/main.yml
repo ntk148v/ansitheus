@@ -1,4 +1,4 @@
----
+alertmanager_repo: "github.com/prometheus/alertmanager"
 alertmanager_version: "0.28.0"
 alertmanager_port: 9093
 alertmanager_container_name: "alertmanager"

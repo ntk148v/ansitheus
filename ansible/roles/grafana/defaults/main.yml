@@ -1,4 +1,5 @@
 ---
+grafana_repo: "github.com/grafana/grafana"
 grafana_version: "11.4.0"
 grafana_container_name: "grafana"
 grafana_docker_namespace: "{{ docker_namespace if docker_namespace else 'grafana' }}"
