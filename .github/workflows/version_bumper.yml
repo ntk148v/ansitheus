@@ -10,9 +10,11 @@ permissions:
   pull-requests: write
 
 jobs:
-  bump:
-    name: Discover and bump component versions
+  discover:
+    name: Discover available updates
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.discover.outputs.matrix }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -22,57 +24,60 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install Python dependencies
-        run: pip install ansible-core yq
-
-      - name: Run version bump
-        id: bump
+      - name: Discover role updates
+        id: discover
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          chmod +x .github/scripts/version_bump.py
-          ./.github/scripts/version_bump.py
+        run: python .github/scripts/discover_versions.py
 
-      - name: Compute Git state
+  bump:
+    name: Bump ${{ matrix.role }} to ${{ matrix.new_version }}
+    needs: discover
+    if: needs.discover.outputs.matrix != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include: ${{ fromJson(needs.discover.outputs.matrix) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Apply version update
+        env:
+          ROLE_NAME: ${{ matrix.role }}
+          NEW_VERSION: ${{ matrix.new_version }}
+        run: python .github/scripts/version_bump.py --role "${ROLE_NAME}" --new-version "${NEW_VERSION}"
+
+      - name: Check git status
         id: git_state
         run: |
           if [[ -n "$(git status --porcelain)" ]]; then
-            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           else
-            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
-
-      - name: Assemble branch metadata
-        if: steps.git_state.outputs.has_changes == 'true'
-        id: meta
-        run: |
-          date_str="$(date +'%Y%m%d')"
-          branch="autoupdate/components/${date_str}"
-          echo "branch_name=${branch}" >> "$GITHUB_OUTPUT"
-          if [[ -f .github/version-bump-report.md ]]; then
-            summary="$(cat .github/version-bump-report.md)"
-          else
-            summary="Automated version bump."
-          fi
-          # Escape EOF markers
-          summary="${summary//'%'/'%25'}"
-          summary="${summary//$'\n'/'%0A'}"
-          summary="${summary//$'\r'/'%0D'}"
-          echo "summary=${summary}" >> "$GITHUB_OUTPUT"
 
       - name: Create pull request
-        if: steps.git_state.outputs.has_changes == 'true'
+        if: steps.git_state.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ steps.meta.outputs.branch_name }}
+          branch: autoupdate/${{ matrix.role }}/${{ matrix.new_version }}
           delete-branch: true
-          title: "chore: automated component version bump"
-          body: |
-            Automated update of component versions.
+          commit-message: "chore(${{ matrix.role }}): bump to ${{ matrix.new_version }}"
+          title: "chore(${{ matrix.role }}): bump to ${{ matrix.new_version }}"
+          body-path: .github/version-bump-report.md
 
-            ${{ steps.meta.outputs.summary }}
-
-      - name: No changes detected
-        if: steps.git_state.outputs.has_changes != 'true'
-        run: echo "No version updates detected."
+      - name: No changes
+        if: steps.git_state.outputs.changed != 'true'
+        run: echo "No updates were required for ${{ matrix.role }}."
