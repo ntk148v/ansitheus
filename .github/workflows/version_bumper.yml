@@ -1,0 +1,83 @@
+name: Check for new upstream releases
+
+on:
+  schedule:
+    - cron: "5 4 * * 1"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  discover:
+    name: Discover available updates
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.discover.outputs.matrix }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Discover role updates
+        id: discover
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python .github/scripts/discover_versions.py
+
+  bump:
+    name: Bump ${{ matrix.role }} to ${{ matrix.new_version }}
+    needs: discover
+    if: needs.discover.outputs.matrix != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include: ${{ fromJson(needs.discover.outputs.matrix) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Apply version update
+        env:
+          ROLE_NAME: ${{ matrix.role }}
+          NEW_VERSION: ${{ matrix.new_version }}
+        run: python .github/scripts/version_bump.py --role "${ROLE_NAME}" --new-version "${NEW_VERSION}"
+
+      - name: Check git status
+        id: git_state
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create pull request
+        if: steps.git_state.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: autoupdate/${{ matrix.role }}/${{ matrix.new_version }}
+          delete-branch: true
+          commit-message: "chore(${{ matrix.role }}): bump to ${{ matrix.new_version }}"
+          title: "chore(${{ matrix.role }}): bump to ${{ matrix.new_version }}"
+          body-path: .github/version-bump-report.md
+
+      - name: No changes
+        if: steps.git_state.outputs.changed != 'true'
+        run: echo "No updates were required for ${{ matrix.role }}."
