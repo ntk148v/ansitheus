@@ -126,23 +126,6 @@
     - inventory_hostname in groups[service.group]
     - service.enabled | bool
 
-# NOTE(kiennt26): Reloading the config by sending SIGHUP to the main process, instead of sending a POST request
-#                 to the /-/reload endpoint, because the latter doesn't work when the basic auth is enabled.
-#                 The password for the basic auth is encrypted using bcrypt, and I don't want to store the raw password
-#                 The SIGHUP signal is sent to the process with PID 1 in the container, which is the main process.
-- name: Reload prometheus config
-  vars:
-    service: "{{ prometheus_services['prometheus'] }}"
-  ansible.builtin.command: >
-    /usr/bin/docker exec -i {{ prometheus_container_name }} kill -SIGHUP 1
-  register: result
-  retries: 5
-  delay: 20
-  until: result.rc == 0
-  when:
-    - inventory_hostname in groups[service.group]
-    - service.enabled | bool
-
 - name: Check prometheus containers
   community.general.docker_container:
     name: "{{ item.value.container_name }}"
@@ -163,3 +146,20 @@
   register: prometheus_container
   notify:
     - Restart keepalived service
+
+# NOTE(kiennt26): Reloading the config by sending SIGHUP to the main process, instead of sending a POST request
+#                 to the /-/reload endpoint, because the latter doesn't work when the basic auth is enabled.
+#                 The password for the basic auth is encrypted using bcrypt, and I don't want to store the raw password
+#                 The SIGHUP signal is sent to the process with PID 1 in the container, which is the main process.
+- name: Reload prometheus config
+  vars:
+    service: "{{ prometheus_services['prometheus'] }}"
+  ansible.builtin.command: >
+    /usr/bin/docker exec -i {{ prometheus_container_name }} kill -SIGHUP 1
+  register: result
+  retries: 5
+  delay: 20
+  until: result.rc == 0
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
