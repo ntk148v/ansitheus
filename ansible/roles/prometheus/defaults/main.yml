@@ -97,7 +97,11 @@ prometheus_services:
         --storage.tsdb.retention={{ prometheus_storage_retention }}
       {% endif %}
       {% else %}
+      {% if prometheus_version is version('3.0.0', '>=') %}
+        --agent
+      {% else %}
         --enable-feature=agent
+      {% endif %}
         --storage.agent.path=/prometheus
       {% endif %}
         --config.file=/etc/prometheus/prometheus.yml
