@@ -90,6 +90,17 @@
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool
   with_dict: "{{ alertmanager_services }}"
+  register: alertmanager_container
+
+- name: Determine if alertmanager container is running
+  ansible.builtin.set_fact:
+    alertmanager_container_running: >-
+      {{ (alertmanager_container.results
+          | json_query("[].container.State.Running")
+          | select('equalto', True)
+          | list | length) > 0 }}
+  when:
+    - alertmanager_container is defined
 
 # NOTE(kiennt26): Reloading the config by sending SIGHUP to the main process, instead of sending a POST request
 #                 to the /-/reload endpoint, because the latter doesn't work when the basic auth is enabled.
@@ -107,3 +118,4 @@
   when:
     - inventory_hostname in groups[service.group]
     - service.enabled | bool
+    - alertmanager_container_running | bool

@@ -147,6 +147,16 @@
   notify:
     - Restart keepalived service
 
+- name: Determine if prometheus container is running
+  ansible.builtin.set_fact:
+    prometheus_container_running: >-
+      {{ (prometheus_container.results
+          | json_query("[].container.State.Running")
+          | select('equalto', True)
+          | list | length) > 0 }}
+  when:
+    - prometheus_container is defined
+
 # NOTE(kiennt26): Reloading the config by sending SIGHUP to the main process, instead of sending a POST request
 #                 to the /-/reload endpoint, because the latter doesn't work when the basic auth is enabled.
 #                 The password for the basic auth is encrypted using bcrypt, and I don't want to store the raw password
@@ -163,3 +173,4 @@
   when:
     - inventory_hostname in groups[service.group]
     - service.enabled | bool
+    - prometheus_container_running | bool
