@@ -1,6 +1,6 @@
 ---
 fluentd_repo: "github.com/fluent/fluentd"
-fluentd_version: "1.17"
+fluentd_version: "1.19.1"
 fluentd_container_name: "fluentd"
 fluentd_docker_namespace: "{{ docker_namespace if docker_namespace else 'kiennt26' }}"
 fluentd_docker_log_driver: "{{ docker_log_driver }}"
