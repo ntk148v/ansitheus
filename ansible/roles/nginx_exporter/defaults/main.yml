@@ -1,5 +1,5 @@
 nginx_exporter_repo: "github.com/nginxinc/nginx-prometheus-exporter"
-nginx_exporter_version: "1.4.1"
+nginx_exporter_version: "1.5.1"
 nginx_exporter_port: 9113
 nginx_exporter_container_name: "nginx_exporter"
 nginx_exporter_docker_namespace: "{{ docker_namespace if docker_namespace else 'nginx' }}"

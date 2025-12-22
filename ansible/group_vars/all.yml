@@ -102,7 +102,7 @@ grafana_version: "11.4.0"
 haproxy_version: "lts-alpine"
 mysqld_exporter_version: "0.15.1"
 fluentd_version: "1.17"
-nginx_exporter_version: "1.4.1"
+nginx_exporter_version: "1.5.1"
 
 ##########################
 # Service docker namespace
