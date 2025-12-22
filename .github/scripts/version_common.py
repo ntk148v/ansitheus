@@ -79,12 +79,7 @@ def normalize_repo_reference(raw: str) -> Tuple[str, str]:
         remainder = remainder[:-4]
     if not host_part or not remainder:
         raise VersionUpdateError(f"Invalid repository reference '{raw}'")
-
-    host_map = {
-        "github.com": "github",
-    }
-    host = host_map.get(host_part, host_part)
-    return host, remainder
+    return host_part, remainder
 
 
 def load_role_metadata() -> List[RoleMetadata]:
@@ -154,7 +149,7 @@ def fetch_latest_github_release(repo: str, token: str) -> Optional[str]:
 
 
 def discover_latest_version(role_meta: RoleMetadata, token: str) -> Optional[str]:
-    if role_meta.host == "github":
+    if role_meta.host == "github.com":
         return fetch_latest_github_release(role_meta.repo_path, token)
     print(
         f"::warning::Unsupported githost '{role_meta.host}' for role {role_meta.name}",

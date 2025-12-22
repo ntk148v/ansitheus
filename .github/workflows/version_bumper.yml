@@ -56,7 +56,8 @@ jobs:
         env:
           ROLE_NAME: ${{ matrix.role }}
           NEW_VERSION: ${{ matrix.new_version }}
-        run: python .github/scripts/version_bump.py --role "${ROLE_NAME}" --new-version "${NEW_VERSION}"
+          REPO: https://${{ matrix.host }}/${{ matrix.repo_path }}
+        run: python .github/scripts/version_bump.py --role "${ROLE_NAME}" --new-version "${NEW_VERSION} --repo "${REPO}"
 
       - name: Check git status
         id: git_state
@@ -75,8 +76,8 @@ jobs:
           branch: autoupdate/${{ matrix.role }}/${{ matrix.new_version }}
           delete-branch: true
           commit-message: "chore(${{ matrix.role }}): bump to ${{ matrix.new_version }}"
-          title: "chore(${{ matrix.role }}): bump to ${{ matrix.new_version }}"
-          body-path: .github/version-bump-report.md
+          title: "patch(${{ matrix.role }}): bump to ${{ matrix.new_version }}"
+          body-path: /tmp/version-bump-report-${{ matrix.role }}-${{ matrix.new_version }}.md
 
       - name: No changes
         if: steps.git_state.outputs.changed != 'true'
