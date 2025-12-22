@@ -10,7 +10,7 @@ argument_specs:
     options:
       openstack_exporter_version:
         description: "Openstack-exporter version."
-        default: "1.8.0"
+        default: "1.8.0-alpha"
       openstack_exporter_web_listen_address:
         description: "Address on which openstack-exporter will listen"
         default: "<ip-address>:9180"
