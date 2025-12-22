@@ -1,6 +1,6 @@
 ---
 mysqld_exporter_repo: "github.com/prometheus/mysqld_exporter"
-mysqld_exporter_version: "0.15.1"
+mysqld_exporter_version: "0.18.0"
 mysqld_exporter_port: 9104
 mysqld_exporter_container_name: "mysqld_exporter"
 mysqld_exporter_docker_namespace: "{{ docker_namespace if docker_namespace else 'prom' }}"

@@ -10,7 +10,7 @@ argument_specs:
     options:
       mysqld_exporter_version:
         description: "MySQLd exporter package version. Also accepts latest as parameter."
-        default: "0.15.1"
+        default: "0.18.0"
       mysqld_exporter_web_listen_address:
         description: "Address on which mysqld_exporter will listen"
         default: "{{ api_interface_address }}:9104"
