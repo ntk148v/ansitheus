@@ -56,7 +56,7 @@ jobs:
         env:
           ROLE_NAME: ${{ matrix.role }}
           NEW_VERSION: ${{ matrix.new_version }}
-          REPO: https://${{ matrix.host }}/${{ matrix.repo_path }}
+          REPO: https://${{ matrix.host }}/${{ matrix.repo }}
         run: python .github/scripts/version_bump.py --role "${ROLE_NAME}" --new-version "${NEW_VERSION} --repo "${REPO}"
 
       - name: Check git status
