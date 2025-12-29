@@ -1,6 +1,6 @@
 ---
 openstack_exporter_repo: "github.com/openstack-exporter/openstack-exporter"
-openstack_exporter_version: "1.8.0"
+openstack_exporter_version: "1.8.0-alpha"
 openstack_exporter_port: 9180
 openstack_exporter_container_name: "openstack_exporter"
 openstack_exporter_docker_namespace: "{{ docker_namespace if docker_namespace else 'openstack-exporter' }}"
