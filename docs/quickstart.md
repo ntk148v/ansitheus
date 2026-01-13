@@ -168,7 +168,7 @@ Commands:
   - Image: You can change the Docker image version by setting `*_version` variables. This is used mostly in upgrade case. The current version is listed here:
 
   ```yaml
-  prometheus_version: "3.8.1"
+  prometheus_version: "3.9.1"
   alertmanager_version: "0.30.0"
   node_exporter_version: "1.10.2"
   cadvisor_version: "0.55.1"
