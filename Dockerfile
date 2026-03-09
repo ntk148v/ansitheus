@@ -9,6 +9,8 @@ ENV ANSIBLE_LOOKUP_PLUGINS=/root/.local/share/pipx/venvs/ansible-core/lib/python
 COPY etc/ansible.example.cfg /etc/ansible/ansible.cfg
 COPY . /opt/ansitheus
 WORKDIR /opt/ansitheus
+RUN apt-get update && apt-get install -y sudo \
+    && rm -rf /var/lib/apt/lists/*
 RUN ansible-galaxy install -r requirements.yml
 RUN pipx inject ansible-core ara>=1.7.2 jmespath
 # Mitogen needs sudo command to execute
