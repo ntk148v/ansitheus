@@ -12,6 +12,9 @@ mysqld_exporter_docker_memory_limit: "{{ docker_memory_limit }}"
 mysqld_exporter_docker_memory_swap_limit: "{{ docker_memory_swap_limit }}"
 mysqld_exporter_docker_cpus_limit: "{{ docker_cpus_limit }}"
 
+# Docker restart policy
+mysqld_exporter_restart_policy: "unless-stopped"
+
 mysqld_exporter_web_listen_address: "{{ api_interface_address }}:{{ mysqld_exporter_port }}"
 mysqld_exporter_config_dir: "{{ ansitheus_config_dir }}/mysqld_exporter"
 mysqld_exporter_web_telemetry_path: "/metrics"
@@ -85,7 +88,7 @@ mysqld_exporter_services:
       {% for flag, flag_value in mysqld_exporter_config_flags_extra.items() %}
         {{ pre }}-{{ flag }}={{ flag_value }}
       {% endfor %}
-    restart_policy: "unless-stopped"
+    restart_policy: "{{ mysqld_exporter_restart_policy }}"
     network_mode: "host"
     log_driver: "{{ mysqld_exporter_docker_log_driver }}"
     log_options: "{{ mysqld_exporter_docker_log_opts }}"

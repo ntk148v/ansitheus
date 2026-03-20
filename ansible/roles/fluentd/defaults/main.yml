@@ -11,6 +11,9 @@ fluentd_docker_memory_limit: "{{ docker_memory_limit }}"
 fluentd_docker_memory_swap_limit: "{{ docker_memory_swap_limit }}"
 fluentd_docker_cpus_limit: "{{ docker_cpus_limit }}"
 
+# Docker restart policy
+fluentd_restart_policy: "unless-stopped"
+
 fluentd_config_dir: "{{ ansitheus_config_dir }}/fluentd"
 
 fluentd_env: "{{ docker_container_env }}"
@@ -25,7 +28,7 @@ fluentd_services:
     state: "started"
     volumes:
       - "{{ fluentd_config_dir }}:/fluentd/etc"
-    restart_policy: "unless-stopped"
+    restart_policy: "{{ fluentd_restart_policy }}"
     network_mode: "host"
     log_driver: "{{ fluentd_docker_log_driver }}"
     log_options: "{{ fluentd_docker_log_opts }}"

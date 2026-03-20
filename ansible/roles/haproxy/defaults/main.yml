@@ -10,6 +10,9 @@ haproxy_docker_memory_limit: "{{ docker_memory_limit }}"
 haproxy_docker_memory_swap_limit: "{{ docker_memory_swap_limit }}"
 haproxy_docker_cpus_limit: "{{ docker_cpus_limit }}"
 
+# Docker restart policy
+haproxy_restart_policy: "unless-stopped"
+
 haproxy_config_dir: "{{ ansitheus_config_dir }}/haproxy/"
 set_sysctl: "yes"
 haproxy_max_connections: 10000
@@ -42,7 +45,7 @@ haproxy_services:
     image: "{{ haproxy_image }}"
     privileged: "no"
     network_mode: "host"
-    restart_policy: "unless-stopped"
+    restart_policy: "{{ haproxy_restart_policy }}"
     state: "started"
     volumes:
       - "{{ haproxy_config_dir }}:/usr/local/etc/haproxy/:ro"

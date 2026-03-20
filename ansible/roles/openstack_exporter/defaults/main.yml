@@ -12,6 +12,9 @@ openstack_exporter_docker_memory_limit: "{{ docker_memory_limit }}"
 openstack_exporter_docker_memory_swap_limit: "{{ docker_memory_swap_limit }}"
 openstack_exporter_docker_cpus_limit: "{{ docker_cpus_limit }}"
 
+# Docker restart policy
+openstack_exporter_restart_policy: "unless-stopped"
+
 # openstack-exporter arguments
 # ----------------------------
 openstack_exporter_web_listen_address: "{{ api_interface_address }}:{{ openstack_exporter_port }}"
@@ -78,7 +81,7 @@ openstack_exporter_services:
       {{ pre }}-{{ flag }}={{ flag_value }}
       {% endfor %}
       {{ openstack_cloud_name }}
-    restart_policy: "unless-stopped"
+    restart_policy: "{{ openstack_exporter_restart_policy }}"
     network_mode: "host"
     log_driver: "{{ openstack_exporter_docker_log_driver }}"
     log_options: "{{ openstack_exporter_docker_log_opts }}"

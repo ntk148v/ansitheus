@@ -13,6 +13,9 @@ alertmanager_docker_memory_limit: "{{ docker_memory_limit }}"
 alertmanager_docker_memory_swap_limit: "{{ docker_memory_swap_limit }}"
 alertmanager_docker_cpus_limit: "{{ docker_cpus_limit }}"
 
+# Docker restart policy
+alertmanager_restart_policy: "unless-stopped"
+
 # Alertmanager agruments
 # ----------------------
 alertmanager_web_listen_address: "{{ api_interface_address }}:{{ alertmanager_port }}"
@@ -140,7 +143,7 @@ alertmanager_services:
     volumes:
       - "{{ alertmanager_config_dir }}:/etc/alertmanager"
       - "{{ alertmanager_volume }}:/alertmanager"
-    restart_policy: "unless-stopped"
+    restart_policy: "{{ alertmanager_restart_policy }}"
     privileged: "no"
     network_mode: "host"
     command: >

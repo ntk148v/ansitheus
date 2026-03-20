@@ -11,6 +11,9 @@ nginx_exporter_docker_memory_limit: "{{ docker_memory_limit }}"
 nginx_exporter_docker_memory_swap_limit: "{{ docker_memory_swap_limit }}"
 nginx_exporter_docker_cpus_limit: "{{ docker_cpus_limit }}"
 
+# Docker restart policy
+nginx_exporter_restart_policy: "unless-stopped"
+
 # Nginx-exporter arguments
 # -----------------------
 nginx_exporter_plus: false
@@ -56,7 +59,7 @@ nginx_exporter_services:
       {% if nginx_exporter_plus %}
           '--nginx.plus'
       {% endif %}
-    restart_policy: "unless-stopped"
+    restart_policy: "{{ nginx_exporter_restart_policy }}"
     network_mode: "host"
     log_driver: "{{ nginx_exporter_docker_log_driver }}"
     log_options: "{{ nginx_exporter_docker_log_opts }}"

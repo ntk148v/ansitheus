@@ -13,6 +13,9 @@ grafana_docker_memory_limit: "{{ docker_memory_limit }}"
 grafana_docker_memory_swap_limit: "{{ docker_memory_swap_limit }}"
 grafana_docker_cpus_limit: "{{ docker_cpus_limit }}"
 
+# Docker restart policy
+grafana_restart_policy: "unless-stopped"
+
 grafana_config_dir: "{{ ansitheus_config_dir }}/grafana/"
 grafana_data_dir: "/var/lib/grafana"
 grafana_log_dir: "/var/log/grafana"
@@ -123,7 +126,7 @@ grafana_services:
     image: "{{ grafana_image }}"
     privileged: "no"
     network_mode: "host"
-    restart_policy: "unless-stopped"
+    restart_policy: "{{ grafana_restart_policy }}"
     state: "started"
     volumes:
       - "{{ grafana_config_dir }}:/etc/grafana:rw"

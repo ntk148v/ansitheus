@@ -11,6 +11,9 @@ node_exporter_docker_memory_limit: "{{ docker_memory_limit }}"
 node_exporter_docker_memory_swap_limit: "{{ docker_memory_swap_limit }}"
 node_exporter_docker_cpus_limit: "{{ docker_cpus_limit }}"
 
+# Docker restart policy
+node_exporter_restart_policy: "unless-stopped"
+
 node_exporter_web_disable_exporter_metrics: false
 node_exporter_web_listen_address: "{{ api_interface_address }}:{{ node_exporter_port }}"
 node_exporter_config_dir: "{{ ansitheus_config_dir }}/node_exporter"
@@ -88,7 +91,7 @@ node_exporter_services:
       {% for flag, flag_value in node_exporter_config_flags_extra.items() %}
           {{ pre }}-{{ flag }}={{ flag_value }}
       {% endfor %}
-    restart_policy: "unless-stopped"
+    restart_policy: "{{ node_exporter_restart_policy }}"
     network_mode: "host"
     log_driver: "{{ node_exporter_docker_log_driver }}"
     log_options: "{{ node_exporter_docker_log_opts }}"

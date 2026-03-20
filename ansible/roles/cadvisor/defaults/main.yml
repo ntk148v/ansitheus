@@ -11,6 +11,9 @@ cadvisor_docker_memory_limit: "{{ docker_memory_limit }}"
 cadvisor_docker_cpus_limit: "{{ docker_cpus_limit }}"
 cadvisor_docker_memory_swap_limit: "{{ docker_memory_swap_limit }}"
 
+# Docker restart policy
+cadvisor_restart_policy: "unless-stopped"
+
 # Cadvisor arguments
 # ------------------
 cadvisor_prometheus_endpoint: "/metrics"
@@ -60,7 +63,7 @@ cadvisor_services:
       {% for flag, flag_value in cadvisor_config_flags_extra.items() %}
         {{ pre }}-{{ flag }}={{ flag_value }}
       {% endfor %}
-    restart_policy: "unless-stopped"
+    restart_policy: "{{ cadvisor_restart_policy }}"
     state: "started"
     network_mode: "host"
     log_driver: "{{ cadvisor_docker_log_driver }}"
