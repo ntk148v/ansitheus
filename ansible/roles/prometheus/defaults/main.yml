@@ -121,7 +121,7 @@ prometheus_services:
       {% if not flag == "web.enable-lifecycle" %}
         --{{ flag }}
       {% endif %}
-      {% elif flag_value is string %}
+      {% elif flag_value is not sequence %}
         --{{ flag }}={{ flag_value }}
       {% elif flag_value is sequence %}
       {% for flag_value_item in flag_value %}
