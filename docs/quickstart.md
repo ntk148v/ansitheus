@@ -169,8 +169,8 @@ Commands:
 
   ```yaml
   prometheus_version: "3.11.1"
-  alertmanager_version: "0.31.1"
-  node_exporter_version: "1.10.2"
+  alertmanager_version: "0.32.0"
+  node_exporter_version: "1.11.1"
   cadvisor_version: "0.56.2"
   grafana_version: "12.4.2"
   haproxy_version: "lts-alpine"
