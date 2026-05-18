@@ -171,7 +171,7 @@ Commands:
   prometheus_version: "3.11.3"
   alertmanager_version: "0.32.1"
   node_exporter_version: "1.11.1"
-  cadvisor_version: "0.56.2"
+  cadvisor_version: "0.57.0"
   grafana_version: "13.0.1"
   haproxy_version: "lts-alpine"
   ```
