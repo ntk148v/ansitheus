@@ -101,7 +101,7 @@ cadvisor_version: "0.60.1"
 grafana_version: "13.0.2"
 haproxy_version: "lts-alpine"
 mysqld_exporter_version: "0.19.0"
-fluentd_version: "1.19.2"
+fluentd_version: "1.19.3"
 nginx_exporter_version: "1.5.1"
 
 ##########################
