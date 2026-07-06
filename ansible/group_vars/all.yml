@@ -94,7 +94,7 @@ nginx_exporter_port: "9113"
 # Image version
 ###############
 
-prometheus_version: "3.12.0"
+prometheus_version: "3.13.0"
 alertmanager_version: "0.33.0"
 node_exporter_version: "1.11.1"
 cadvisor_version: "0.60.3"
