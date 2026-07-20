@@ -67,7 +67,7 @@ nginx_exporter_port: "9113"
 
 prometheus_version: "3.12.0"
 alertmanager_version: "0.33.0"
-node_exporter_version: "1.11.1"
+node_exporter_version: "1.12.1"
 cadvisor_version: "0.60.3"
 grafana_version: "13.0.2"
 haproxy_version: "lts-alpine"
