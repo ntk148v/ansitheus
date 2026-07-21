@@ -172,7 +172,7 @@ Commands:
   alertmanager_version: "0.33.1"
   node_exporter_version: "1.12.1"
   cadvisor_version: "0.60.5"
-  grafana_version: "13.0.2"
+  grafana_version: "13.1.0"
   haproxy_version: "lts-alpine"
   ```
 
