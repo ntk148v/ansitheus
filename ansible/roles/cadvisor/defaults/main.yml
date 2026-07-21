@@ -1,5 +1,5 @@
 cadvisor_repo: "github.com/google/cadvisor"
-cadvisor_version: "0.60.3"
+cadvisor_version: "0.60.5"
 cadvisor_port: "8080"
 cadvisor_container_name: "cadvisor"
 cadvisor_docker_namespace: "{{ docker_namespace if docker_namespace else 'cadvisor' }}"
