@@ -169,7 +169,7 @@ Commands:
 
   ```yaml
   prometheus_version: "3.14.0"
-  alertmanager_version: "0.34.0"
+  alertmanager_version: "0.34.1"
   node_exporter_version: "1.12.1"
   cadvisor_version: "0.60.5"
   grafana_version: "13.2.1"
