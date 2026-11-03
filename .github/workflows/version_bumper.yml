@@ -4,6 +4,12 @@ on:
   schedule:
     - cron: "5 4 * * 1"
   workflow_dispatch: {}
+  # Delete the bump branch when its PR is merged or closed.
+  pull_request:
+    types:
+      - closed
+    branches:
+      - "master"
 
 permissions:
   actions: write
@@ -13,6 +19,7 @@ permissions:
 jobs:
   discover:
     name: Discover available updates
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.discover.outputs.matrix }}
@@ -90,6 +97,43 @@ jobs:
           BRANCH: autoupdate/${{ matrix.role }}/${{ matrix.new_version }}
         run: gh workflow run e2e.yml --repo "${{ github.repository }}" --ref "${BRANCH}"
 
+      # The new PR always carries the latest version, so older bump PRs
+      # for the same role are obsolete.
+      - name: Close older bump PRs for this role
+        if: steps.cpr.outputs.pull-request-number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ROLE_NAME: ${{ matrix.role }}
+          NEW_PR: ${{ steps.cpr.outputs.pull-request-number }}
+        run: |
+          gh pr list --repo "$GITHUB_REPOSITORY" --state open --limit 200 --json number,headRefName \
+            | jq -r --arg prefix "autoupdate/${ROLE_NAME}/" --argjson keep "$NEW_PR" \
+                '.[] | select((.headRefName | startswith($prefix)) and .number != $keep) | .number' \
+            | while read -r pr; do
+                echo "Closing #${pr} (superseded by #${NEW_PR})"
+                gh pr close "$pr" --repo "$GITHUB_REPOSITORY" --delete-branch \
+                  --comment "Superseded by #${NEW_PR}."
+              done
+
       - name: No changes
         if: steps.git_state.outputs.changed != 'true'
         run: echo "No updates were required for ${{ matrix.role }}."
+
+  cleanup:
+    name: Delete bump branch
+    if: >-
+      github.event_name == 'pull_request' &&
+      startsWith(github.event.pull_request.head.ref, 'autoupdate/') &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          if gh api --silent -X DELETE "repos/${GITHUB_REPOSITORY}/git/refs/heads/${BRANCH}"; then
+            echo "Deleted ${BRANCH}"
+          else
+            echo "Branch ${BRANCH} is already deleted"
+          fi
