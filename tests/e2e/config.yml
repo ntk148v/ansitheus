@@ -1,0 +1,23 @@
+---
+# Ansitheus configuration for the all-in-one e2e test on a GitHub Actions runner.
+# Docker is preinstalled on the runner, so the common role is disabled.
+# Haproxy/keepalived is out of scope for this scenario.
+
+ansitheus_vip_address: "127.0.0.1"
+
+docker_registry: ""
+docker_namespace: ""
+docker_registry_username: ""
+docker_registry_password: ""
+
+enable_common: "no"
+enable_haproxy: "no"
+enable_prometheus: "yes"
+enable_alertmanager: "yes"
+enable_node_exporter: "yes"
+enable_cadvisor: "yes"
+enable_grafana: "yes"
+enable_mysqld_exporter: "no"
+enable_fluentd: "no"
+enable_openstack_exporter: "no"
+enable_nginx_exporter: "no"
