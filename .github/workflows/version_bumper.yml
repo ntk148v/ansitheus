@@ -6,6 +6,7 @@ on:
   workflow_dispatch: {}
 
 permissions:
+  actions: write
   contents: write
   pull-requests: write
 
@@ -69,6 +70,7 @@ jobs:
           fi
 
       - name: Create pull request
+        id: cpr
         if: steps.git_state.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
@@ -78,6 +80,15 @@ jobs:
           commit-message: "chore(${{ matrix.role }}): bump to ${{ matrix.new_version }}"
           title: "patch(${{ matrix.role }}): bump to ${{ matrix.new_version }}"
           body-path: /tmp/version-bump-report-${{ matrix.role }}-${{ matrix.new_version }}.md
+
+      # PRs created with GITHUB_TOKEN do not trigger pull_request workflows,
+      # but workflow_dispatch does. Run e2e on the bump branch explicitly.
+      - name: Run e2e tests on the bump branch
+        if: steps.cpr.outputs.pull-request-operation == 'created' || steps.cpr.outputs.pull-request-operation == 'updated'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: autoupdate/${{ matrix.role }}/${{ matrix.new_version }}
+        run: gh workflow run e2e.yml --repo "${{ github.repository }}" --ref "${BRANCH}"
 
       - name: No changes
         if: steps.git_state.outputs.changed != 'true'

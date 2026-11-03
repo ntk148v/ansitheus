@@ -1,0 +1,114 @@
+name: E2E
+
+on:
+  push:
+    branches:
+      - "master"
+  pull_request:
+    branches:
+      - "master"
+  # Also used by version_bumper.yml to test the bump branches.
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint and syntax check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt ansible-lint jmespath
+          ansible-galaxy install -r requirements.yml
+
+      - name: Syntax check
+        run: |
+          ansible-playbook -i ansible/inventory/all-in-one ansible/site.yml --syntax-check
+          ansible-playbook -i localhost, tests/e2e/verify.yml --syntax-check
+
+      - name: Ansible lint
+        run: ansible-lint --profile min ansible/site.yml tests/e2e/verify.yml
+
+  e2e:
+    name: All-in-one (${{ matrix.os }})
+    needs: lint
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-22.04
+          - ubuntu-24.04
+    env:
+      ANSIBLE_FORCE_COLOR: "1"
+      INVENTORY: ansible/inventory/all-in-one
+      CONFIG_DIR: tests/e2e
+      CONTAINERS: prometheus alertmanager node_exporter cadvisor grafana
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt docker requests jmespath
+          ansible-galaxy install -r requirements.yml
+
+      # The common role is disabled, so the Docker SDK must come from this venv.
+      - name: Use the venv Python on the target
+        run: echo "EXTRA_OPTS=-e ansible_python_interpreter=$(which python)" >> "$GITHUB_ENV"
+
+      - name: Precheck
+        run: ./tools/ansitheus -i "$INVENTORY" -c "$CONFIG_DIR" precheck
+
+      - name: Deploy
+        run: ./tools/ansitheus -i "$INVENTORY" -c "$CONFIG_DIR" deploy
+
+      - name: Verify deployment
+        run: ansible-playbook -i localhost, tests/e2e/verify.yml $EXTRA_OPTS -e e2e_stage=deployed
+
+      - name: Redeploy and check that no container is recreated or restarted
+        run: |
+          snapshot() { docker inspect -f '{{.Name}} {{.Id}} {{.State.StartedAt}}' $CONTAINERS; }
+          snapshot > /tmp/before.txt
+          ./tools/ansitheus -i "$INVENTORY" -c "$CONFIG_DIR" deploy
+          snapshot > /tmp/after.txt
+          diff -u /tmp/before.txt /tmp/after.txt
+
+      - name: Verify deployment after redeploy
+        run: ansible-playbook -i localhost, tests/e2e/verify.yml $EXTRA_OPTS -e e2e_stage=deployed
+
+      - name: Destroy
+        run: ./tools/ansitheus -i "$INVENTORY" -c "$CONFIG_DIR" --include-volumes destroy
+
+      - name: Verify destroy
+        run: ansible-playbook -i localhost, tests/e2e/verify.yml $EXTRA_OPTS -e e2e_stage=destroyed
+
+      - name: Dump container state and logs
+        if: failure()
+        run: |
+          docker ps -a
+          for c in $CONTAINERS; do
+            echo "::group::docker logs $c"
+            docker logs --tail 200 "$c" 2>&1 || true
+            echo "::endgroup::"
+          done
