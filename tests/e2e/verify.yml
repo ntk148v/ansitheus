@@ -1,0 +1,160 @@
+---
+# Verify the all-in-one deployment.
+# Usage: ansible-playbook -i localhost, tests/e2e/verify.yml -e e2e_stage=<deployed|destroyed>
+- name: Verify ansitheus all-in-one deployment
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  vars:
+    e2e_stage: "deployed"
+    # Services listen on the address of the default interface (api_interface_address).
+    e2e_address: "{{ ansible_default_ipv4.address }}"
+    e2e_containers:
+      - prometheus
+      - alertmanager
+      - node_exporter
+      - cadvisor
+      - grafana
+    e2e_endpoints:
+      - { name: prometheus, port: 9090, path: /-/ready }
+      - { name: alertmanager, port: 9093, path: /-/ready }
+      - { name: node_exporter, port: 9100, path: /metrics }
+      - { name: cadvisor, port: 8080, path: /healthz }
+      - { name: grafana, port: 3000, path: /api/health }
+    e2e_prometheus_jobs:
+      - prometheus
+      - alertmanager
+      - node-exporter
+      - cadvisor
+    e2e_volumes:
+      - prometheus_data
+      - alertmanager_data
+      - grafana
+      - grafana_log
+    e2e_config_dirs:
+      - /etc/ansitheus/prometheus
+      - /etc/ansitheus/alertmanager
+      - /etc/ansitheus/grafana
+  tasks:
+    - name: Check stage value
+      ansible.builtin.assert:
+        that: e2e_stage in ["deployed", "destroyed"]
+        fail_msg: "e2e_stage must be 'deployed' or 'destroyed', got '{{ e2e_stage }}'"
+
+    - name: Verify deployed stack
+      when: e2e_stage == "deployed"
+      block:
+        - name: Wait for service endpoints to return HTTP 200
+          ansible.builtin.uri:
+            url: "http://{{ e2e_address }}:{{ item.port }}{{ item.path }}"
+            status_code: 200
+          register: e2e_endpoint
+          until: e2e_endpoint.status == 200
+          retries: 30
+          delay: 2
+          loop: "{{ e2e_endpoints }}"
+          loop_control:
+            label: "{{ item.name }}"
+
+        - name: Get container info
+          community.docker.docker_container_info:
+            name: "{{ item }}"
+          register: e2e_container
+          loop: "{{ e2e_containers }}"
+
+        - name: Check containers are running and not restarting
+          ansible.builtin.assert:
+            that:
+              - item.exists
+              - item.container.State.Running
+              - not item.container.State.Restarting
+              - item.container.RestartCount == 0
+            fail_msg: "Container {{ item.item }} is not healthy"
+          loop: "{{ e2e_container.results }}"
+          loop_control:
+            label: "{{ item.item }}"
+
+        - name: Check Grafana database health
+          ansible.builtin.uri:
+            url: "http://{{ e2e_address }}:3000/api/health"
+            return_content: true
+          register: e2e_grafana
+          failed_when: e2e_grafana.json.database != "ok"
+
+        - name: Wait for all Prometheus targets to be up
+          ansible.builtin.uri:
+            url: "http://{{ e2e_address }}:9090/api/v1/targets?state=active"
+            return_content: true
+          register: e2e_targets
+          vars:
+            e2e_active: "{{ e2e_targets.json.data.activeTargets | default([]) }}"
+          until:
+            - e2e_active | length > 0
+            - e2e_active | rejectattr('health', 'equalto', 'up') | list | length == 0
+            - e2e_prometheus_jobs | difference(e2e_active | map(attribute='labels.job') | list) | length == 0
+          retries: 24
+          delay: 5
+
+        - name: Check Prometheus discovered Alertmanager
+          ansible.builtin.uri:
+            url: "http://{{ e2e_address }}:9090/api/v1/alertmanagers"
+            return_content: true
+          register: e2e_alertmanagers
+          until: e2e_alertmanagers.json.data.activeAlertmanagers | length > 0
+          retries: 12
+          delay: 5
+
+    - name: Verify destroyed stack
+      when: e2e_stage == "destroyed"
+      block:
+        - name: Get container info
+          community.docker.docker_container_info:
+            name: "{{ item }}"
+          register: e2e_container
+          loop: "{{ e2e_containers }}"
+
+        - name: Check containers are removed
+          ansible.builtin.assert:
+            that: not item.exists
+            fail_msg: "Container {{ item.item }} still exists"
+          loop: "{{ e2e_container.results }}"
+          loop_control:
+            label: "{{ item.item }}"
+
+        - name: Check service ports are closed
+          ansible.builtin.wait_for:
+            host: "{{ e2e_address }}"
+            port: "{{ item.port }}"
+            state: stopped
+            timeout: 10
+          loop: "{{ e2e_endpoints }}"
+          loop_control:
+            label: "{{ item.name }}"
+
+        - name: Get volume info
+          community.docker.docker_volume_info:
+            name: "{{ item }}"
+          register: e2e_volume
+          loop: "{{ e2e_volumes }}"
+
+        - name: Check volumes are removed
+          ansible.builtin.assert:
+            that: not item.exists
+            fail_msg: "Volume {{ item.item }} still exists"
+          loop: "{{ e2e_volume.results }}"
+          loop_control:
+            label: "{{ item.item }}"
+
+        - name: Get config directory info
+          ansible.builtin.stat:
+            path: "{{ item }}"
+          register: e2e_dir
+          loop: "{{ e2e_config_dirs }}"
+
+        - name: Check config directories are removed
+          ansible.builtin.assert:
+            that: not item.stat.exists
+            fail_msg: "Directory {{ item.item }} still exists"
+          loop: "{{ e2e_dir.results }}"
+          loop_control:
+            label: "{{ item.item }}"
