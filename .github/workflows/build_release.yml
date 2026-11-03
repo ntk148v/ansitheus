@@ -21,7 +21,7 @@ on:
 
 jobs:
   build:
-    name: Build and Publish Docker image to Docker Hub
+    name: Build Docker image (push to Docker Hub on master and tags)
     runs-on: ubuntu-latest
     permissions:
       packages: write

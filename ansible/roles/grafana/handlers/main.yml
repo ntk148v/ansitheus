@@ -10,6 +10,12 @@
     state: "{{ service.state }}"
     network_mode: "{{ service.network_mode }}"
     restart_policy: "{{ service.restart_policy }}"
+    log_driver: "{{ service.log_driver }}"
+    log_options: "{{ service.log_options }}"
+    memory: "{{ service.memory }}"
+    memory_swap: "{{ service.memory_swap }}"
+    cpus: "{{ service.cpus }}"
+    env: "{{ service.env }}"
     recreate: "yes"
   when:
     - inventory_hostname in groups[service.group]
