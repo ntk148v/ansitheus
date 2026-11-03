@@ -112,7 +112,7 @@ prometheus_docker_namespace: "{{ docker_namespace if docker_namespace else 'prom
 alertmanager_docker_namespace: "{{ docker_namespace if docker_namespace else 'prom' }}"
 node_exporter_docker_namespace: "{{ docker_namespace if docker_namespace else 'prom' }}"
 grafana_docker_namespace: "{{ docker_namespace if docker_namespace else 'grafana' }}"
-cadvisor_docker_namespace: "{{ docker_namespace if docker_namespace else 'cadvisor' }}"
+cadvisor_docker_namespace: "{{ docker_namespace if docker_namespace else 'google' }}"
 keepalived_docker_namespace: "{{ docker_namespace if docker_namespace else 'kiennt26' }}"
 haproxy_docker_namespace: "{{ docker_namespace if docker_namespace else '' }}"
 mysqld_exporter_docker_namespace: "{{ docker_namespace if docker_namespace else 'prom' }}"
